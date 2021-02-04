@@ -1,9 +1,9 @@
 # DEH-CATIA
 
-The DEH CATIA is a WPF C# Application that make use of the [Digital Engineering Hub Common library](https://github.com/RHEAGROUP/DEHP-Common)
-Which is available as Nuget package.
+The DEH CATIA is a WPF C# Application that makes use of the [Digital Engineering Hub Common library](https://github.com/RHEAGROUP/DEHP-Common),
+which is available as Nuget package.
 
-The DEH CATIA allows users to interactivly exchange data between models built with [CATIA](https://www.3ds.com/products-services/catia/) software and a ECSS-E-TM-10-25A data source.
+The DEH CATIA allows users to interactivly exchange data between models built with the [CATIA](https://www.3ds.com/products-services/catia/) software and a ECSS-E-TM-10-25A data source.
 
 # License
 

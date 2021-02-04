@@ -22,10 +22,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using DEHCATIA.ViewModels;
-using DEHCATIA.ViewModels.Interfaces;
-using DEHCATIA.Views;
-
 namespace DEHCATIA
 {
     using System.Reflection;
@@ -36,6 +32,10 @@ namespace DEHCATIA
     using DEHPCommon;
     using DEHPCommon.MappingEngine;
     using DEHPCommon.Services.NavigationService;
+
+    using DEHCATIA.ViewModels;
+    using DEHCATIA.ViewModels.Interfaces;
+    using DEHCATIA.Views;
 
     using DevExpress.Xpf.Core;
 
