@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net472</TargetFramework>
+		<RootNamespace>DEHCATIA</RootNamespace>
+		<UseWPF>true</UseWPF>
+		<AssemblyTitle>DEHCATIA</AssemblyTitle>
+		<Company>RHEA System S.A.</Company>
+		<Product>DEHCATIA</Product>
+		<Description>DEHCATIA desktop application</Description>
+		<Copyright>Copyright © RHEA System S.A.</Copyright>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<FileVersion>1.0.0.0</FileVersion>
+		<LangVersion>latest</LangVersion>
+		<StartupObject>DEHCATIA.App</StartupObject>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="DEHPCommon" Version="1.0.124" />
+		<PackageReference Include="DevExpress.WindowsDesktop.Wpf.Layout" Version="20.1.8" />
+		<PackageReference Include="DevExpress.Wpf.Core" Version="20.1.8" />
+		<PackageReference Include="DevExpress.Wpf.Grid" Version="20.1.8" />
+		<PackageReference Include="DevExpress.Wpf.Layout" Version="20.1.8" />
+		<PackageReference Include="DevExpress.Wpf.Navigation" Version="20.1.8" />
+		<PackageReference Include="DevExpress.Wpf.Reporting" Version="20.1.8" />
+		<PackageReference Include="reactiveui-core.Net40" Version="6.5.0" />
+		<PackageReference Include="Splat.Net40" Version="1.6.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Page Include="App.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="System.Web" />
+	</ItemGroup>
+
+</Project>
