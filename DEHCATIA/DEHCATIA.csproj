@@ -17,7 +17,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Autofac" Version="6.0.0" />
 		<PackageReference Include="DEHPCommon" Version="1.0.124" />
 		<PackageReference Include="DevExpress.WindowsDesktop.Wpf.Layout" Version="20.1.8" />
 		<PackageReference Include="DevExpress.Wpf.Core" Version="20.1.8" />
