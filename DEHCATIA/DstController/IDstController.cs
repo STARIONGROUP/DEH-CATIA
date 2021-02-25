@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IMainWindowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="IDstController.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -22,33 +22,33 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.ViewModels.Interfaces
+namespace DEHCATIA.DstController
 {
-    using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
+    using INFITF;
 
     /// <summary>
-    /// Interface definitions of methods and properties of the application Main window
+    /// Interface definition for <see cref="DstController"/>
     /// </summary>
-    public interface IMainWindowViewModel : ISwitchLayoutPanelOrderViewModel
+    public interface IDstController
     {
         /// <summary>
-        /// Gets the view model that represents the net change preview panel
+        /// Gets the <see cref="Application"/> instance of a running CATIA client.
         /// </summary>
-        INetChangePreviewViewModel NetChangePreviewViewModel { get; }
+        Application CatiaApp { get; }
 
         /// <summary>
-        /// Gets the view model that represents the 10-25 data source
+        /// Gets or sets whether there's a connection to a running CATIA client.
         /// </summary>
-        IHubDataSourceViewModel HubDataSourceViewModel { get; }
+        bool IsCatiaConnected { get; set; }
 
         /// <summary>
-        /// Gets the view model the represents the CATIA data source
+        /// Attempts to connect to a running CATIA client and sets the <see cref="CatiaApp"/> value if one is found.
         /// </summary>
-        IDstDataSourceViewModel DstSourceViewModel { get; }
+        void ConnectToCatia();
 
         /// <summary>
-        /// Gets the view model that represents the status bar
+        /// Disconnects from a running CATIA client.
         /// </summary>
-        IStatusBarControlViewModel StatusBarControlViewModel { get; }
+        void DisconnectFromCatia();
     }
 }

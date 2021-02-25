@@ -8,6 +8,81 @@
   </PropertyGroup>
 
   <ItemGroup>
+	  <COMReference Include="CATMat.dll">
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>0</VersionMajor>
+	    <Guid>4d3f28c0-7790-11d6-8056-0030f113d1bf</Guid>
+	    <Lcid>0</Lcid>
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <Isolated>false</Isolated>
+	  </COMReference>
+	  <COMReference Include="CATRma.dll">
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>0</VersionMajor>
+	    <Guid>9be25e70-7167-11d6-8054-0030f113d1bf</Guid>
+	    <Lcid>0</Lcid>
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <Isolated>false</Isolated>
+	  </COMReference>
+	  <COMReference Include="KinTypeLib.dll">
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>0</VersionMajor>
+	    <Guid>6652fda0-ba01-11d2-88a1-0008c7194e6a</Guid>
+	    <Lcid>0</Lcid>
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <Isolated>false</Isolated>
+	  </COMReference>
+	  <COMReference Include="KnowledgewareTypeLib.dll">
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>0</VersionMajor>
+	    <Guid>0770412c-722e-11d2-8378-0060941974ff</Guid>
+	    <Lcid>0</Lcid>
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <Isolated>false</Isolated>
+	  </COMReference>
+	  <COMReference Include="MECMOD.dll">
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>0</VersionMajor>
+	    <Guid>0d90a5c9-3b08-11d1-a26c-0000f87546fd</Guid>
+	    <Lcid>0</Lcid>
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <Isolated>false</Isolated>
+	  </COMReference>
+	  <COMReference Include="PARTITF.dll">
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>0</VersionMajor>
+	    <Guid>d8431606-e4b5-11d1-a5d3-00a0c95752ed</Guid>
+	    <Lcid>0</Lcid>
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <Isolated>false</Isolated>
+	  </COMReference>
+	  <COMReference Include="ProductStructureTypeLib.dll">
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>0</VersionMajor>
+	    <Guid>5065f8b6-61bb-11d1-9d85-0000f8759f82</Guid>
+	    <Lcid>0</Lcid>
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <Isolated>false</Isolated>
+	  </COMReference>
+	  <COMReference Include="SPATypeLib.dll">
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>0</VersionMajor>
+	    <Guid>9143c8cc-1474-11d4-9461-006094eb3826</Guid>
+	    <Lcid>0</Lcid>
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <Isolated>false</Isolated>
+	  </COMReference>
+	  <COMReference Include="INFITF.dll">
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>0</VersionMajor>
+	    <Guid>14f197b2-0771-11d1-a5b1-00a0c9575177</Guid>
+	    <Lcid>0</Lcid>
+	    <Isolated>false</Isolated>
+	  </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />

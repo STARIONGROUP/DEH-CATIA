@@ -40,6 +40,7 @@ namespace DEHCATIA.Tests.ViewModels
     {
         private Mock<IStatusBarControlViewModel> statusBarViewModel;
         private Mock<IHubDataSourceViewModel> hubDataSourceViewModel;
+        private Mock<IDstDataSourceViewModel> dstSourceViewModel;
         private Mock<INetChangePreviewViewModel> netChangePreviewViewModel;
         private MainWindowViewModel viewModel;
 
@@ -48,9 +49,10 @@ namespace DEHCATIA.Tests.ViewModels
         {
             this.statusBarViewModel = new Mock<IStatusBarControlViewModel>();
             this.hubDataSourceViewModel = new Mock<IHubDataSourceViewModel>();
+            this.dstSourceViewModel = new Mock<IDstDataSourceViewModel>();
             this.netChangePreviewViewModel = new Mock<INetChangePreviewViewModel>();
 
-            this.viewModel = new MainWindowViewModel(this.hubDataSourceViewModel.Object, this.statusBarViewModel.Object, this.netChangePreviewViewModel.Object);
+            this.viewModel = new MainWindowViewModel(this.hubDataSourceViewModel.Object, this.dstSourceViewModel.Object, this.statusBarViewModel.Object, this.netChangePreviewViewModel.Object);
         }
 
         [Test]

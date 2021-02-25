@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IMainWindowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="DstControllerTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -22,33 +22,40 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.ViewModels.Interfaces
+namespace DEHCATIA.Tests.DstController
 {
-    using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
+    using DEHCATIA.DstController;
 
-    /// <summary>
-    /// Interface definitions of methods and properties of the application Main window
-    /// </summary>
-    public interface IMainWindowViewModel : ISwitchLayoutPanelOrderViewModel
+    using NUnit.Framework;
+
+    public class DstControllerTestFixture
     {
-        /// <summary>
-        /// Gets the view model that represents the net change preview panel
-        /// </summary>
-        INetChangePreviewViewModel NetChangePreviewViewModel { get; }
+        private DstController dstController;
 
-        /// <summary>
-        /// Gets the view model that represents the 10-25 data source
-        /// </summary>
-        IHubDataSourceViewModel HubDataSourceViewModel { get; }
+        [SetUp]
+        public void Setup()
+        {
+            this.dstController = new DstController();
+        }
 
-        /// <summary>
-        /// Gets the view model the represents the CATIA data source
-        /// </summary>
-        IDstDataSourceViewModel DstSourceViewModel { get; }
+        [Test]
+        public void VerifyProperties()
+        {
+            Assert.IsNull(this.dstController.CatiaApp);
+            Assert.IsFalse(this.dstController.IsCatiaConnected);
+        }
 
-        /// <summary>
-        /// Gets the view model that represents the status bar
-        /// </summary>
-        IStatusBarControlViewModel StatusBarControlViewModel { get; }
+        [Test]
+        [Ignore("Please make sure a CATIA client is running")]
+        public void VerifyCatiaConnection()
+        {
+            Assert.DoesNotThrow(() => this.dstController.ConnectToCatia());
+            Assert.IsTrue(this.dstController.IsCatiaConnected);
+            Assert.IsNotNull(this.dstController.CatiaApp);
+
+            this.dstController.DisconnectFromCatia();
+            Assert.IsFalse(this.dstController.IsCatiaConnected);
+            Assert.IsNull(this.dstController.CatiaApp);
+        }
     }
 }

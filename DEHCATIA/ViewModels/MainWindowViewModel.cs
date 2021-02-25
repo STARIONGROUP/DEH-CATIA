@@ -52,6 +52,11 @@ namespace DEHCATIA.ViewModels
         public IHubDataSourceViewModel HubDataSourceViewModel { get; }
 
         /// <summary>
+        /// Gets the view model the represents the CATIA data source
+        /// </summary>
+        public IDstDataSourceViewModel DstSourceViewModel { get; }
+
+        /// <summary>
         /// Gets the view model that represents the status bar
         /// </summary>
         public IStatusBarControlViewModel StatusBarControlViewModel { get; }
@@ -59,12 +64,14 @@ namespace DEHCATIA.ViewModels
         /// <summary>
         /// Initializes a new <see cref="MainWindowViewModel"/>
         /// </summary>
-        /// <param name="hubDataSourceViewModelViewModel">A <see cref="IHubDataSourceViewModel"/></param>
+        /// <param name="hubDataSourceViewModel">A <see cref="IHubDataSourceViewModel"/></param>
+        /// <param name="dstSourceViewModel">A <see cref="IDstDataSourceViewModel"/></param>/// 
         /// <param name="statusBarControlViewModel">The <see cref="IStatusBarControlViewModel"/></param>
         /// <param name="netChangePreviewViewModel">The <see cref="INetChangePreviewViewModel"/></param>
-        public MainWindowViewModel(IHubDataSourceViewModel hubDataSourceViewModelViewModel, IStatusBarControlViewModel statusBarControlViewModel, INetChangePreviewViewModel netChangePreviewViewModel)
+        public MainWindowViewModel(IHubDataSourceViewModel hubDataSourceViewModel, IDstDataSourceViewModel dstSourceViewModel, IStatusBarControlViewModel statusBarControlViewModel, INetChangePreviewViewModel netChangePreviewViewModel)
         {
-            this.HubDataSourceViewModel = hubDataSourceViewModelViewModel;
+            this.HubDataSourceViewModel = hubDataSourceViewModel;
+            this.DstSourceViewModel = dstSourceViewModel;
             this.StatusBarControlViewModel = statusBarControlViewModel;
             this.NetChangePreviewViewModel = netChangePreviewViewModel;
         }
