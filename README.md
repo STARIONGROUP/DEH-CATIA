@@ -24,7 +24,7 @@ By default, the *CATIA V5 installation folder* is: "C:\Program Files\Dassault Sy
 | CATIA V5 CATRmaInterfaces | *{CATIA V5 installation folder}*\CATRmaTypeLib.tlb |
 | CATIA V5 InfInterfaces | *{CATIA V5 installation folder}*\InfTypeLib.tlb |
 | CATIA V5 KinematicsInterfaces | *{CATIA V5 installation folder}*\KinTypeLib.tlb |
-| CATIA V5 KnowledgeInterfaces | *{CATIA V5 installation folder}*\CATMatTypeLib.tlb |
+| CATIA V5 KnowledgeInterfaces | *{CATIA V5 installation folder}*\KweTypeLib.tlb |
 | CATIA V5 MecModInterfaces | *{CATIA V5 installation folder}*\MecModTypeLib.tlb |
 | CATIA V5 PartInterfaces | *{CATIA V5 installation folder}*\PartTypeLib.tlb |
 | CATIA V5 ProductStructureInterfaces | *{CATIA V5 installation folder}*\PSTypeLib.tlb |
