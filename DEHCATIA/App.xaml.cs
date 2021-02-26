@@ -29,13 +29,14 @@ namespace DEHCATIA
 
     using Autofac;
 
-    using DEHPCommon;
-    using DEHPCommon.MappingEngine;
-    using DEHPCommon.Services.NavigationService;
-
+    using DEHCATIA.DstController;
     using DEHCATIA.ViewModels;
     using DEHCATIA.ViewModels.Interfaces;
     using DEHCATIA.Views;
+
+    using DEHPCommon;
+    using DEHPCommon.MappingEngine;
+    using DEHPCommon.Services.NavigationService;
 
     using DevExpress.Xpf.Core;
 
@@ -94,6 +95,7 @@ namespace DEHCATIA
         private static void RegisterTypes(ContainerBuilder containerBuilder)
         {
             containerBuilder.RegisterType<MappingEngine>().As<IMappingEngine>().WithParameter(MappingEngine.ParameterName, Assembly.GetExecutingAssembly());
+            containerBuilder.RegisterType<DstController.DstController>().As<IDstController>().SingleInstance();
         }
 
         /// <summary>
@@ -104,6 +106,7 @@ namespace DEHCATIA
         {
             containerBuilder.RegisterType<MainWindowViewModel>().As<IMainWindowViewModel>().SingleInstance();
             containerBuilder.RegisterType<HubDataSourceViewModel>().As<IHubDataSourceViewModel>();
+            containerBuilder.RegisterType<DstDataSourceViewModel>().As<IDstDataSourceViewModel>();
         }
     }
 }

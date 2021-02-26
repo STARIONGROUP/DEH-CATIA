@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IMainWindowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="IDstDataSourceViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -24,31 +24,11 @@
 
 namespace DEHCATIA.ViewModels.Interfaces
 {
-    using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
-
-    /// <summary>
-    /// Interface definitions of methods and properties of the application Main window
-    /// </summary>
-    public interface IMainWindowViewModel : ISwitchLayoutPanelOrderViewModel
+    public interface IDstDataSourceViewModel
     {
         /// <summary>
-        /// Gets the view model that represents the net change preview panel
+        /// Gets or sets the connection status to CATIA
         /// </summary>
-        INetChangePreviewViewModel NetChangePreviewViewModel { get; }
-
-        /// <summary>
-        /// Gets the view model that represents the 10-25 data source
-        /// </summary>
-        IHubDataSourceViewModel HubDataSourceViewModel { get; }
-
-        /// <summary>
-        /// Gets the view model the represents the CATIA data source
-        /// </summary>
-        IDstDataSourceViewModel DstSourceViewModel { get; }
-
-        /// <summary>
-        /// Gets the view model that represents the status bar
-        /// </summary>
-        IStatusBarControlViewModel StatusBarControlViewModel { get; }
+        string ConnectionStatus { get; set; }
     }
 }
