@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
         xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+        xmlns:views="clr-namespace:DEHCATIA.Views"
         xmlns:common="clr-namespace:DEHPCommon.UserInterfaces.Views;assembly=DEHPCommon"
         xmlns:behaviors="clr-namespace:DEHPCommon.UserInterfaces.Behaviors;assembly=DEHPCommon"
         xmlns:objectBrowser="clr-namespace:DEHPCommon.UserInterfaces.Views.ObjectBrowser;assembly=DEHPCommon"
@@ -47,6 +48,7 @@
                                         <TextBlock Text="Connection Status: "/>
                                         <TextBlock Text="{Binding DstSourceViewModel.ConnectionStatus}"/>
                                     </StackPanel>
+                                    <views:DstBrowserHeader DataContext="{Binding DstSourceViewModel.DstBrowserHeaderViewModel}" Grid.Row="1" />
                                 </Grid>
                             </Grid>
                         </dxdo:LayoutPanel>
