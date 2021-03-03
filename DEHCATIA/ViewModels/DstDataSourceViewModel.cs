@@ -59,18 +59,24 @@ namespace DEHCATIA.ViewModels
         }
 
         /// <summary>
+        /// Gets the <see cref="IDstBrowserHeaderViewModel"/>.
+        /// </summary>
+        public IDstBrowserHeaderViewModel DstBrowserHeaderViewModel { get; }
+
+        /// <summary>
         /// Initializes a new instance of <see cref="DstDataSourceViewModel"/>.
         /// </summary>
         /// <param name="navigationService">The <see cref="INavigationService"/> instance.</param>
         /// <param name="dstController">The <see cref="IDstController"/> instance.</param>
-        public DstDataSourceViewModel(INavigationService navigationService, IDstController dstController) : base(navigationService)
+        public DstDataSourceViewModel(INavigationService navigationService, IDstController dstController, IDstBrowserHeaderViewModel dstBrowserHeaderViewModel) : base(navigationService)
         {
             this.dstController = dstController;
+            this.DstBrowserHeaderViewModel = dstBrowserHeaderViewModel;
 
             this.WhenAnyValue(vm => vm.dstController.IsCatiaConnected)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.UpdateConnectButtonText);
-            
+
             this.InitializeCommands();
 
             this.ConnectionStatus = "Connection is not established";

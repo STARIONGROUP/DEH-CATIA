@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDstDataSourceViewModel.cs" company="RHEA System S.A.">
+// <copyright file="IDstBrowserHeaderViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -24,16 +24,31 @@
 
 namespace DEHCATIA.ViewModels.Interfaces
 {
-    public interface IDstDataSourceViewModel
+    public interface IDstBrowserHeaderViewModel
     {
         /// <summary>
-        /// Gets or sets the connection status to CATIA
+        /// Gets or sets the current WorkBenchId of the running CATIA client.
         /// </summary>
-        string ConnectionStatus { get; set; }
+        string WorkBenchId { get; set; }
 
         /// <summary>
-        /// Gets the <see cref="IDstBrowserHeaderViewModel"/>.
+        /// Gets or sets the number of available documents in the running CATIA client.
         /// </summary>
-        IDstBrowserHeaderViewModel DstBrowserHeaderViewModel { get; }
+        int DocumentsCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the active document of the running CATIA client.
+        /// </summary>
+        string ActiveDocumentName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the applied filter to the active document of the running CATIA client.
+        /// </summary>
+        string ActiveDocumentCurrentFilter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the applied layer to the active document of the running CATIA client.
+        /// </summary>
+        string ActiveDocumentCurrentLayer { get; set; }
     }
 }

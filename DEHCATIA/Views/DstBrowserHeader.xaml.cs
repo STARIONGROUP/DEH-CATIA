@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDstDataSourceViewModel.cs" company="RHEA System S.A.">
+// <copyright file="DstBrowserHeader.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -22,18 +22,21 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.ViewModels.Interfaces
+namespace DEHCATIA.Views
 {
-    public interface IDstDataSourceViewModel
+    using System.Windows.Controls;
+
+    /// <summary>
+    /// Interaction logic for <see cref="DstBrowserHeader"/> XAML.
+    /// </summary>
+    public partial class DstBrowserHeader : UserControl
     {
         /// <summary>
-        /// Gets or sets the connection status to CATIA
+        /// Initializes a new instance of the <see cref="DstBrowserHeader"/> class.
         /// </summary>
-        string ConnectionStatus { get; set; }
-
-        /// <summary>
-        /// Gets the <see cref="IDstBrowserHeaderViewModel"/>.
-        /// </summary>
-        IDstBrowserHeaderViewModel DstBrowserHeaderViewModel { get; }
+        public DstBrowserHeader()
+        {
+            this.InitializeComponent();
+        }
     }
 }

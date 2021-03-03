@@ -28,7 +28,7 @@ namespace DEHCATIA.Tests.ViewModels
 
     using DEHCATIA.DstController;
     using DEHCATIA.ViewModels;
-
+    using DEHCATIA.ViewModels.Interfaces;
     using DEHPCommon.Services.NavigationService;
 
     using Moq;
@@ -42,6 +42,7 @@ namespace DEHCATIA.Tests.ViewModels
     {
         private Mock<IDstController> dstController;
         private Mock<INavigationService> navigationService;
+        private Mock<IDstBrowserHeaderViewModel> dstBrowserHeader;
 
         private DstDataSourceViewModel viewModel;
 
@@ -52,8 +53,9 @@ namespace DEHCATIA.Tests.ViewModels
 
             this.dstController = new Mock<IDstController>();
             this.navigationService = new Mock<INavigationService>();
+            this.dstBrowserHeader = new Mock<IDstBrowserHeaderViewModel>();
 
-            this.viewModel = new DstDataSourceViewModel(this.navigationService.Object, this.dstController.Object);
+            this.viewModel = new DstDataSourceViewModel(this.navigationService.Object, this.dstController.Object, this.dstBrowserHeader.Object);
         }
 
         [Test]
