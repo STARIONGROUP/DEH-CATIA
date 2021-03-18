@@ -115,4 +115,10 @@
 		<Reference Include="System.Web" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Page Update="Views\DstProductTree.xaml">
+	    <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+	  </Page>
+	</ItemGroup>
+
 </Project>

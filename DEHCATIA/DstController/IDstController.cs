@@ -24,6 +24,8 @@
 
 namespace DEHCATIA.DstController
 {
+    using DEHCATIA.CatiaModules;
+
     using INFITF;
 
     /// <summary>
@@ -35,6 +37,11 @@ namespace DEHCATIA.DstController
         /// Gets the <see cref="Application"/> instance of a running CATIA client.
         /// </summary>
         Application CatiaApp { get; }
+
+        /// <summary>
+        /// Gets the current active document from the running CATIA client.
+        /// </summary>
+        CatiaDocument ActiveDocument { get; }
 
         /// <summary>
         /// Gets or sets whether there's a connection to a running CATIA client.
@@ -50,5 +57,18 @@ namespace DEHCATIA.DstController
         /// Disconnects from a running CATIA client.
         /// </summary>
         void DisconnectFromCatia();
+
+        /// <summary>
+        /// Gets the CATIA product or specification tree as a <see cref="CatiaProductTree"/> of the <see cref="ActiveDocument"/>.
+        /// </summary>
+        /// <returns>The product tree in a <see cref="CatiaProductTree"/> form.</returns>
+        CatiaProductTree GetCatiaProductTreeFromActiveDocument();
+
+        /// <summary>
+        /// Gets the CATIA product or specification tree as a <see cref="CatiaProductTree"/> of a <see cref="CatiaDocument"/>.
+        /// </summary>
+        /// <param name="catiaDoc"></param>
+        /// <returns>The product tree in a <see cref="CatiaProductTree"/> form.</returns>
+        CatiaProductTree GetCatiaProductTreeFromDocument(CatiaDocument catiaDoc);
     }
 }

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDstDataSourceViewModel.cs" company="RHEA System S.A.">
+// <copyright file="TreeElementType.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -22,26 +22,26 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.ViewModels.Interfaces
+namespace DEHCATIA.CatiaModules
 {
     /// <summary>
-    /// Definition of properties and methods for <see cref="DstDataSourceViewModel"/>.
+    /// The type of a CATIA product tree element.
     /// </summary>
-    public interface IDstDataSourceViewModel
+    public enum TreeElementType
     {
         /// <summary>
-        /// Gets or sets the connection status to CATIA
+        /// An assembly may contain components
         /// </summary>
-        string ConnectionStatus { get; set; }
+        Assembly,
 
         /// <summary>
-        /// Gets the <see cref="IDstBrowserHeaderViewModel"/>.
+        /// A component refers to a Part or assembly and is located as child of another assembly
         /// </summary>
-        IDstBrowserHeaderViewModel DstBrowserHeaderViewModel { get; }
+        Component,
 
         /// <summary>
-        /// Gets the <see cref="IDstProductTreeViewModel"/>.
+        /// A part contains the shape and is referred by components
         /// </summary>
-        IDstProductTreeViewModel DstProductTreeViewModel { get; }
+        Part
     }
 }

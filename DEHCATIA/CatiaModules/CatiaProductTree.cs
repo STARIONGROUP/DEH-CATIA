@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDstDataSourceViewModel.cs" company="RHEA System S.A.">
+// <copyright file="CatiaProductTree.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -22,26 +22,16 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.ViewModels.Interfaces
+namespace DEHCATIA.CatiaModules
 {
     /// <summary>
-    /// Definition of properties and methods for <see cref="DstDataSourceViewModel"/>.
+    /// A wrapper for the root of a CATIA product or specification tree.
     /// </summary>
-    public interface IDstDataSourceViewModel
+    public class CatiaProductTree
     {
         /// <summary>
-        /// Gets or sets the connection status to CATIA
+        /// The top element, or root, of a CATIA product or specification tree.
         /// </summary>
-        string ConnectionStatus { get; set; }
-
-        /// <summary>
-        /// Gets the <see cref="IDstBrowserHeaderViewModel"/>.
-        /// </summary>
-        IDstBrowserHeaderViewModel DstBrowserHeaderViewModel { get; }
-
-        /// <summary>
-        /// Gets the <see cref="IDstProductTreeViewModel"/>.
-        /// </summary>
-        IDstProductTreeViewModel DstProductTreeViewModel { get; }
+        public CatiaTreeElement TopElement { get; set; }
     }
 }

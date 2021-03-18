@@ -43,19 +43,22 @@ namespace DEHCATIA.Tests.DstController
         {
             Assert.IsNull(this.dstController.CatiaApp);
             Assert.IsFalse(this.dstController.IsCatiaConnected);
+            Assert.IsNull(this.dstController.ActiveDocument);
         }
 
         [Test]
-        [Ignore("Please make sure a CATIA client is running")]
+        //[Ignore("Please make sure a CATIA client is running")]
         public void VerifyCatiaConnection()
         {
             Assert.DoesNotThrow(() => this.dstController.ConnectToCatia());
             Assert.IsTrue(this.dstController.IsCatiaConnected);
             Assert.IsNotNull(this.dstController.CatiaApp);
+            Assert.IsNotNull(this.dstController.ActiveDocument);
 
             this.dstController.DisconnectFromCatia();
             Assert.IsFalse(this.dstController.IsCatiaConnected);
             Assert.IsNull(this.dstController.CatiaApp);
+            Assert.IsNull(this.dstController.ActiveDocument);
         }
     }
 }

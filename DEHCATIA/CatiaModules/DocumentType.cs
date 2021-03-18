@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDstDataSourceViewModel.cs" company="RHEA System S.A.">
+// <copyright file="DocumentType.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -22,26 +22,37 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.ViewModels.Interfaces
+namespace DEHCATIA.CatiaModules
 {
     /// <summary>
-    /// Definition of properties and methods for <see cref="DstDataSourceViewModel"/>.
+    /// The type of a CATIA document.
     /// </summary>
-    public interface IDstDataSourceViewModel
+    public enum DocumentType
     {
         /// <summary>
-        /// Gets or sets the connection status to CATIA
+        /// A Product might contain components
         /// </summary>
-        string ConnectionStatus { get; set; }
+        CATProduct,
 
         /// <summary>
-        /// Gets the <see cref="IDstBrowserHeaderViewModel"/>.
+        /// A Part is the outer leaf of the CATIA product tree and contains the shape or body with the shape inside
         /// </summary>
-        IDstBrowserHeaderViewModel DstBrowserHeaderViewModel { get; }
+        CATPart,
 
         /// <summary>
-        /// Gets the <see cref="IDstProductTreeViewModel"/>.
+        /// A material might be attached to a Part inside CATIA.
+        /// CATIA materials can be stored inside a material library
         /// </summary>
-        IDstProductTreeViewModel DstProductTreeViewModel { get; }
+        CATMaterial,
+
+        /// <summary>
+        /// A Component refers an Assembly or a Part file and contains position information
+        /// </summary>
+        Component,
+
+        /// <summary>
+        /// A default value for neither of the above document types
+        /// </summary>
+        InvalidCatiaDocument
     }
 }

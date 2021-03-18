@@ -108,6 +108,7 @@ namespace DEHCATIA
             containerBuilder.RegisterType<HubDataSourceViewModel>().As<IHubDataSourceViewModel>();
             containerBuilder.RegisterType<DstDataSourceViewModel>().As<IDstDataSourceViewModel>();
             containerBuilder.RegisterType<DstBrowserHeaderViewModel>().As<IDstBrowserHeaderViewModel>();
+            containerBuilder.RegisterType<DstProductTreeViewModel>().As<IDstProductTreeViewModel>();
         }
     }
 }

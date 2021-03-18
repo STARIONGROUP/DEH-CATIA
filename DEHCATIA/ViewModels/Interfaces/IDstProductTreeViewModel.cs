@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDstDataSourceViewModel.cs" company="RHEA System S.A.">
+// <copyright file="IDstProductTreeViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -24,24 +24,33 @@
 
 namespace DEHCATIA.ViewModels.Interfaces
 {
+    using DEHCATIA.CatiaModules;
+
+    using ReactiveUI;
+
     /// <summary>
-    /// Definition of properties and methods for <see cref="DstDataSourceViewModel"/>.
+    /// Definition of properties and methods for <see cref="DstProductTreeViewModel"/>.
     /// </summary>
-    public interface IDstDataSourceViewModel
+    public interface IDstProductTreeViewModel
     {
         /// <summary>
-        /// Gets or sets the connection status to CATIA
+        /// Gets or sets the assert indicating whether the view is busy
         /// </summary>
-        string ConnectionStatus { get; set; }
+        bool IsBusy { get; set; }
 
         /// <summary>
-        /// Gets the <see cref="IDstBrowserHeaderViewModel"/>.
+        /// Gets the CATIA product tree.
         /// </summary>
-        IDstBrowserHeaderViewModel DstBrowserHeaderViewModel { get; }
+        CatiaProductTree ProductTree { get; }
 
         /// <summary>
-        /// Gets the <see cref="IDstProductTreeViewModel"/>.
+        /// Gets the reactive list of root elements of the <see cref="ProductTree"/>.
         /// </summary>
-        IDstProductTreeViewModel DstProductTreeViewModel { get; }
+        ReactiveList<CatiaTreeElement> RootElements { get; }
+
+        /// <summary>
+        /// Gets or sets the selected element.
+        /// </summary>
+        CatiaTreeElement SelectedElement { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDstDataSourceViewModel.cs" company="RHEA System S.A.">
+// <copyright file="CatiaDocument.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -22,26 +22,38 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.ViewModels.Interfaces
+namespace DEHCATIA.CatiaModules
 {
+    using INFITF;
+
     /// <summary>
-    /// Definition of properties and methods for <see cref="DstDataSourceViewModel"/>.
+    /// Represents an instance of a CATIA document.
     /// </summary>
-    public interface IDstDataSourceViewModel
+    public class CatiaDocument
     {
         /// <summary>
-        /// Gets or sets the connection status to CATIA
+        /// Gets or sets the name of the document.
         /// </summary>
-        string ConnectionStatus { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
-        /// Gets the <see cref="IDstBrowserHeaderViewModel"/>.
+        /// Gets or sets the physical path of the document.
         /// </summary>
-        IDstBrowserHeaderViewModel DstBrowserHeaderViewModel { get; }
+        public string Path { get; set; }
 
         /// <summary>
-        /// Gets the <see cref="IDstProductTreeViewModel"/>.
+        /// Gets or sets the full name (compination of <see cref="Name"/> and <see cref="Path"/>) of the document. 
         /// </summary>
-        IDstProductTreeViewModel DstProductTreeViewModel { get; }
+        public string FullName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the COM CATIA document.
+        /// </summary>
+        public Document Document { get; set; }
+
+        /// <summary>
+        /// Gets or sets the document type.
+        /// </summary>
+        public DocumentType DocumentType { get; set; }
     }
 }

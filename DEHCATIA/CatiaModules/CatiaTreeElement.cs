@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDstDataSourceViewModel.cs" company="RHEA System S.A.">
+// <copyright file="CatiaTreeElement.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -22,26 +22,43 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.ViewModels.Interfaces
+namespace DEHCATIA.CatiaModules
 {
+    using System.Collections.Generic;
+
     /// <summary>
-    /// Definition of properties and methods for <see cref="DstDataSourceViewModel"/>.
+    /// Represents an element in a CATIA product or specification tree.
     /// </summary>
-    public interface IDstDataSourceViewModel
+    public class CatiaTreeElement
     {
         /// <summary>
-        /// Gets or sets the connection status to CATIA
+        /// Gets or sets the element name.
         /// </summary>
-        string ConnectionStatus { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
-        /// Gets the <see cref="IDstBrowserHeaderViewModel"/>.
+        /// Gets or sets the element part number.
         /// </summary>
-        IDstBrowserHeaderViewModel DstBrowserHeaderViewModel { get; }
+        public string PartNumber { get; set; }
 
         /// <summary>
-        /// Gets the <see cref="IDstProductTreeViewModel"/>.
+        /// Gets or sets the element description.
         /// </summary>
-        IDstProductTreeViewModel DstProductTreeViewModel { get; }
+        public string Description { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type.
+        /// </summary>
+        public TreeElementType Type { get; set; }
+
+        /// <summary>
+        /// Gets or sets the file name of the document holding this element, if any (unless it's a Component).
+        /// </summary>
+        public string FileName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the child elements of this element.
+        /// </summary>
+        public IList<CatiaTreeElement> Children { get; set; }
     }
 }

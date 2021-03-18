@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDstDataSourceViewModel.cs" company="RHEA System S.A.">
+// <copyright file="DstProductTree.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -22,26 +22,21 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.ViewModels.Interfaces
+namespace DEHCATIA.Views
 {
+    using System.Windows.Controls;
+
     /// <summary>
-    /// Definition of properties and methods for <see cref="DstDataSourceViewModel"/>.
+    /// Interaction logic for <see cref="DstProductTree"/> XAML.
     /// </summary>
-    public interface IDstDataSourceViewModel
+    public partial class DstProductTree : UserControl
     {
         /// <summary>
-        /// Gets or sets the connection status to CATIA
+        /// Initializes a new instance of the <see cref="DstProductTree"/> class.
         /// </summary>
-        string ConnectionStatus { get; set; }
-
-        /// <summary>
-        /// Gets the <see cref="IDstBrowserHeaderViewModel"/>.
-        /// </summary>
-        IDstBrowserHeaderViewModel DstBrowserHeaderViewModel { get; }
-
-        /// <summary>
-        /// Gets the <see cref="IDstProductTreeViewModel"/>.
-        /// </summary>
-        IDstProductTreeViewModel DstProductTreeViewModel { get; }
+        public DstProductTree()
+        {
+            this.InitializeComponent();
+        }
     }
 }

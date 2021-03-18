@@ -26,6 +26,7 @@ namespace DEHCATIA.ViewModels
 {
     using System;
     using System.Reactive.Linq;
+    using System.Runtime.InteropServices;
 
     using DEHCATIA.DstController;
     using DEHCATIA.ViewModels.Interfaces;
@@ -142,7 +143,7 @@ namespace DEHCATIA.ViewModels
                 {
                     this.ActiveDocumentCurrentFilter = catiaApp.ActiveDocument.get_CurrentFilter();
                 }
-                catch (Exception)
+                catch (COMException)
                 {
                     this.ActiveDocumentCurrentFilter = "Active document has no filters";
                 }
@@ -151,7 +152,7 @@ namespace DEHCATIA.ViewModels
                 {
                     this.ActiveDocumentCurrentLayer = catiaApp.ActiveDocument.get_CurrentLayer();
                 }
-                catch (Exception)
+                catch (COMException)
                 {
 
                     this.ActiveDocumentCurrentLayer = "Active document has no layers";

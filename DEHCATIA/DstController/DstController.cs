@@ -24,9 +24,14 @@
 
 namespace DEHCATIA.DstController
 {
+    using System;
+    using System.Collections.Generic;
     using System.Runtime.InteropServices;
 
+    using DEHCATIA.CatiaModules;
+
     using INFITF;
+    using ProductStructureTypeLib;
 
     using NLog;
 
@@ -62,10 +67,16 @@ namespace DEHCATIA.DstController
         public Application CatiaApp { get; private set; }
 
         /// <summary>
+        /// Gets the current active document from the running CATIA client.
+        /// </summary>
+        public CatiaDocument ActiveDocument { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DstController"/>.
         /// </summary>
         public DstController()
         {
+            this.WhenAnyValue(vm => vm.IsCatiaConnected).Subscribe(_ => this.SetActiveDocumentFromCatia());
         }
 
         /// <summary>
@@ -83,6 +94,62 @@ namespace DEHCATIA.DstController
         {
             this.CatiaApp = null;
             this.IsCatiaConnected = false;
+        }
+
+        /// <summary>
+        /// Gets the CATIA product or specification tree as a <see cref="CatiaProductTree"/> of the <see cref="ActiveDocument"/>.
+        /// </summary>
+        /// <returns>The product tree in a <see cref="CatiaProductTree"/> form.</returns>
+        public CatiaProductTree GetCatiaProductTreeFromActiveDocument()
+        {
+            if (!this.IsCatiaConnected || this.ActiveDocument == null)
+            {
+                return null;
+            }
+
+            return this.GetCatiaProductTreeFromDocument(this.ActiveDocument);
+        }
+
+        /// <summary>
+        /// Gets the CATIA product or specification tree as a <see cref="CatiaProductTree"/> of a <see cref="CatiaDocument"/>.
+        /// </summary>
+        /// <param name="catiaDoc"></param>
+        /// <returns>The product tree in a <see cref="CatiaProductTree"/> form.</returns>
+        public CatiaProductTree GetCatiaProductTreeFromDocument(CatiaDocument catiaDoc)
+        {
+            if (catiaDoc == null)
+            {
+                throw new ArgumentNullException(nameof(catiaDoc));
+            }
+
+            if (catiaDoc.DocumentType != DocumentType.CATProduct || catiaDoc.Document is not ProductDocument)
+            {
+                logger.Error("Cannot open a product tree of a non .CATProduct file.");
+                return null;
+            }
+
+            var productDoc = (ProductDocument)catiaDoc.Document;
+
+            var topElement = new CatiaTreeElement()
+            {
+                Name = productDoc.Product.get_Name(),
+                PartNumber = productDoc.Product.get_PartNumber(),
+                Description = productDoc.Product.get_DescriptionRef(),
+                FileName = catiaDoc.Name,
+                Type = TreeElementType.Assembly,
+                Children = new List<CatiaTreeElement>()
+            };
+
+            foreach (Product prod in productDoc.Product.Products)
+            {
+                var newTreeElement = this.GetTreeElementFromProduct(prod, catiaDoc.Name);
+                if (newTreeElement != null)
+                {
+                    topElement.Children.Add(newTreeElement);
+                }
+            }
+
+            return new CatiaProductTree { TopElement = topElement };
         }
 
         /// <summary>
@@ -129,6 +196,124 @@ namespace DEHCATIA.DstController
             }
 
             return catiaApplication as Application;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="ActiveDocument"/> from the current active document in the running CATIA client.
+        /// </summary>
+        private void SetActiveDocumentFromCatia()
+        {
+            if (!this.IsCatiaConnected || this.CatiaApp == null)
+            {
+                this.ActiveDocument = null;
+                return;
+            }
+
+            string activeDocName;
+            try
+            {
+                activeDocName = this.CatiaApp.ActiveDocument.get_Name();
+            }
+            catch (COMException)
+            {
+                this.ActiveDocument = null;
+                return;
+            }
+
+            this.ActiveDocument = new CatiaDocument
+            {
+                Name = activeDocName,
+                Path = this.CatiaApp.ActiveDocument.Path,
+                FullName = this.CatiaApp.ActiveDocument.FullName,
+                Document = this.CatiaApp.ActiveDocument,
+                DocumentType = this.GetDocumentTypeFromFileName(activeDocName)
+            };
+        }
+
+        /// <summary>
+        /// Receives the document type from the CATIA filename as it is stored
+        /// </summary>
+        /// <param name="fileName">The CATIA full file name</param>
+        /// <returns>The document type</returns>
+        private DocumentType GetDocumentTypeFromFileName(string fileName)
+        {
+            int i = fileName.LastIndexOf('.');
+            string documentType = i < 0 ? "" : fileName.Substring(i + 1);
+            var values = (DocumentType[])Enum.GetValues(typeof(DocumentType));
+
+            foreach (var type in values)
+            {
+                if (type.ToString().Equals(documentType))
+                {
+                    return type;
+                }
+            }
+
+            return DocumentType.InvalidCatiaDocument;
+        }
+
+        /// <summary>
+        /// Resolves a <see cref="Product"/> into a CATIA tree element, adding all its child elements.
+        /// </summary>
+        /// <param name="product">The COM product.</param>
+        /// <param name="parentFileName">The parent file name of the product.</param>
+        /// <returns>The element on a <see cref="CatiaTreeElement"/> form, or null if the <see cref="Product"/> couldn't be resolved.</returns>
+        private CatiaTreeElement GetTreeElementFromProduct(Product product, string parentFileName)
+        {
+            if (product == null)
+            {
+                throw new ArgumentException(nameof(product));
+            }
+
+            if (string.IsNullOrEmpty(parentFileName))
+            {
+                throw new ArgumentNullException(nameof(parentFileName));
+            }
+
+            string fileName;
+            try
+            {
+                var currentDocument = (Document)product.ReferenceProduct.Parent;
+                fileName = currentDocument.get_Name();
+            }
+            catch (COMException)
+            {
+                return null;
+            }
+
+            var treeElement = new CatiaTreeElement
+            {
+                Name = product.get_Name(),
+                PartNumber = product.get_PartNumber(),
+                Description = product.get_DescriptionRef(),
+                FileName = fileName,
+                Children = new List<CatiaTreeElement>()
+            };
+
+            switch (this.GetDocumentTypeFromFileName(fileName))
+            {
+                case DocumentType.CATProduct:
+                treeElement.Type = fileName.Equals(parentFileName) ? TreeElementType.Component : TreeElementType.Assembly;
+                break;
+
+                case DocumentType.CATPart:
+                treeElement.Type = TreeElementType.Part;
+                break;
+
+                default:
+                return null;
+            }
+
+            foreach (Product componentOrPart in product.Products)
+            {
+                var newTreeElement = this.GetTreeElementFromProduct(componentOrPart, fileName);
+                if (newTreeElement != null)
+                {
+                    treeElement.Children.Add(newTreeElement);
+                }
+            }
+
+            return treeElement;
         }
     }
 }

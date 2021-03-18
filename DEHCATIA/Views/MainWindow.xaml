@@ -49,6 +49,7 @@
                                         <TextBlock Text="{Binding DstSourceViewModel.ConnectionStatus}"/>
                                     </StackPanel>
                                     <views:DstBrowserHeader DataContext="{Binding DstSourceViewModel.DstBrowserHeaderViewModel}" Grid.Row="1" />
+                                    <views:DstProductTree DataContext="{Binding DstSourceViewModel.DstProductTreeViewModel}" Grid.Row="2" />
                                 </Grid>
                             </Grid>
                         </dxdo:LayoutPanel>

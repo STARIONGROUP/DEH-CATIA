@@ -1,0 +1,75 @@
+<UserControl x:Class="DEHCATIA.Views.DstProductTree"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"              
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:behaviors="clr-namespace:DEHPCommon.UserInterfaces.Behaviors;assembly=DEHPCommon"
+             xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+             xmlns:catiaModules="clr-namespace:DEHCATIA.CatiaModules"
+             d:DesignHeight="100" d:DesignWidth="400" mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <Style x:Key="ThingIcon" TargetType="{x:Type Image}">
+                <Setter Property="Width" Value="28" />
+                <Setter Property="Height" Value="16" />
+                <Setter Property="Margin" Value="1" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+            </Style>
+            <HierarchicalDataTemplate DataType="{x:Type catiaModules:CatiaTreeElement}" ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged}">
+                <dx:MeasurePixelSnapper>
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                            <Image Style="{StaticResource ThingIcon}" Source="{dx:DXImage 'SvgImages/XAF/ModelEditor_Class_Object.svg'}"/>
+                        </dx:PixelSnapper>
+
+                        <ContentPresenter x:Name="defaultRowPresenter"
+                                          Content="{Binding}"
+                                          ContentTemplate="{Binding View.DefaultDataRowTemplate}"/>
+                    </StackPanel>
+                </dx:MeasurePixelSnapper>
+            </HierarchicalDataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <dx:LoadingDecorator BorderEffect="Default" BorderEffectColor="Blue" IsSplashScreenShown="{Binding IsBusy}" OwnerLock="LoadingContent">
+        <Grid>
+            <dxg:TreeListControl ItemsSource="{Binding RootElements}"
+                                 SelectedItem="{Binding SelectedElement}">
+                <dxmvvm:Interaction.Behaviors>
+                    <behaviors:ContextMenuBehavior/>
+                </dxmvvm:Interaction.Behaviors>
+                <dxg:TreeListControl.View>
+                    <dxg:TreeListView Name="View"
+                                      AllowEditing="False"
+                                      AutoWidth="False"
+                                      ExpandCollapseNodesOnNavigation="True"
+                                      ExpandStateFieldName="IsExpanded"
+                                      FixedLineWidth="0"
+                                      HorizontalScrollbarVisibility="Auto"
+                                      NavigationStyle="Cell"
+                                      ShowHorizontalLines="False"
+                                      ShowIndicator="False"
+                                      ShowNodeImages="False"
+                                      ShowVerticalLines="False"
+                                      TreeDerivationMode="HierarchicalDataTemplate"
+                                      TreeLineStyle="Solid"
+                                      VerticalScrollbarVisibility="Auto">
+                        <dxg:TreeListView.FocusedRow>
+                            <dynamic:ExpandoObject />
+                        </dxg:TreeListView.FocusedRow>
+                        <dxg:TreeListView.ContextMenu>
+                            <ContextMenu />
+                        </dxg:TreeListView.ContextMenu>
+                    </dxg:TreeListView>
+                </dxg:TreeListControl.View>
+                <dxg:TreeListControl.Columns>
+                    <dxg:TreeListColumn FieldName="Name" Fixed="Left"/>
+                    <dxg:TreeListColumn FieldName="PartNumber" Header="Part Number"/>
+                    <dxg:TreeListColumn FieldName="Type"/>
+                </dxg:TreeListControl.Columns>
+            </dxg:TreeListControl>
+        </Grid>
+    </dx:LoadingDecorator>
+</UserControl>
