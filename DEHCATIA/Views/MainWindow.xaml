@@ -30,7 +30,7 @@
             <dxdo:DockLayoutManager Grid.Row="0" AutoHideMode="Inline" FloatingMode="Desktop">
                 <dxdo:LayoutGroup AllowSplitters="True" Orientation="Vertical">
                     <dxdo:LayoutGroup Name="LayoutGroup" ItemHeight="7*" Orientation="Horizontal">
-                        <dxdo:LayoutPanel Name="DstPanel" AllowDock="False" MinWidth="200" VerticalAlignment="Stretch" dxdo:AutoHideGroup.AutoHideType="Left" AllowClose="False" AllowDrag="False" AllowFloat="False" AllowMove="False" Caption="CATIA">
+                        <dxdo:LayoutPanel Name="DstPanel" AllowHide="False" AllowDock="False" MinWidth="200" VerticalAlignment="Stretch" dxdo:AutoHideGroup.AutoHideType="Left" AllowClose="False" AllowDrag="False" AllowFloat="False" AllowMove="False" Caption="CATIA">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"></RowDefinition>
@@ -52,7 +52,7 @@
                                 </Grid>
                             </Grid>
                         </dxdo:LayoutPanel>
-                        <dxdo:LayoutPanel MinWidth="200" AllowDock="False" VerticalAlignment="Stretch" dxdo:AutoHideGroup.AutoHideType="Left" AllowClose="False" AllowDrag="False" AllowFloat="False" AllowMove="False" Caption="Impact">
+                        <dxdo:LayoutPanel AllowHide="False" MinWidth="200" AllowDock="False" VerticalAlignment="Stretch" dxdo:AutoHideGroup.AutoHideType="Left" AllowClose="False" AllowDrag="False" AllowFloat="False" AllowMove="False" Caption="Impact">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"></RowDefinition>
@@ -71,7 +71,7 @@
                                 </Grid>
                             </Grid>
                         </dxdo:LayoutPanel>
-                        <dxdo:LayoutPanel Name="HubPanel" AllowDock="False" MinWidth="200" VerticalAlignment="Stretch" dxdo:AutoHideGroup.AutoHideType="Left" AllowClose="False" AllowDrag="False" AllowFloat="False" AllowMove="False" Caption="Hub Data Source">
+                        <dxdo:LayoutPanel AllowHide="False" Name="HubPanel" AllowDock="False" MinWidth="200" VerticalAlignment="Stretch" dxdo:AutoHideGroup.AutoHideType="Left" AllowClose="False" AllowDrag="False" AllowFloat="False" AllowMove="False" Caption="Hub Data Source">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"></RowDefinition>
@@ -112,7 +112,7 @@
                         </dxdo:LayoutPanel>
                     </dxdo:LayoutGroup>
                     <dxdo:LayoutGroup ItemHeight="3*" Orientation="Horizontal">
-                        <dxdo:LayoutPanel HorizontalAlignment="Stretch" AllowClose="False" Caption="Mapping"  dxdo:AutoHideGroup.AutoHideType="Left" AllowDrag="False" AllowFloat="False" AllowMove="False" >
+                        <dxdo:LayoutPanel AllowHide="False" HorizontalAlignment="Stretch" AllowClose="False" Caption="Mapping"  dxdo:AutoHideGroup.AutoHideType="Left" AllowDrag="False" AllowFloat="False" AllowMove="False" >
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="9*" />

@@ -24,7 +24,7 @@
 
 namespace DEHCATIA.ViewModels.Interfaces
 {
-    using DEHCATIA.ViewModels.ProductTree;
+    using DEHCATIA.ViewModels.ProductTree.Rows;
 
     using ReactiveUI;
 
@@ -39,18 +39,13 @@ namespace DEHCATIA.ViewModels.Interfaces
         bool IsBusy { get; set; }
 
         /// <summary>
-        /// Gets the CATIA product tree.
-        /// </summary>
-        CatiaProductTree ProductTree { get; }
-
-        /// <summary>
         /// Gets the reactive list of root elements of the <see cref="ProductTree"/>.
         /// </summary>
-        ReactiveList<CatiaElement> RootElements { get; }
+        ReactiveList<ElementRowViewModel> RootElements { get; }
 
         /// <summary>
         /// Gets or sets the selected element.
         /// </summary>
-        CatiaElement SelectedElement { get; set; }
+        ElementRowViewModel SelectedElement { get; set; }
     }
 }

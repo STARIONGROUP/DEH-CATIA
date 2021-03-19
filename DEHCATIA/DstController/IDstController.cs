@@ -29,6 +29,7 @@ namespace DEHCATIA.DstController
     using CDP4Common.EngineeringModelData;
 
     using DEHCATIA.ViewModels.ProductTree;
+    using DEHCATIA.ViewModels.ProductTree.Rows;
 
     using INFITF;
 
@@ -37,11 +38,6 @@ namespace DEHCATIA.DstController
     /// </summary>
     public interface IDstController
     {
-        /// <summary>
-        /// Gets or sets the <see cref="ExternalIdentifierMap"/>
-        /// </summary>
-        ExternalIdentifierMap ExternalIdentifierMap { get; set; }
-
         /// <summary>
         /// Gets or sets whether there's a connection to a running CATIA client.
         /// </summary>
@@ -68,23 +64,15 @@ namespace DEHCATIA.DstController
         void DisconnectFromCatia();
 
         /// <summary>
-        /// Gets the CATIA product or specification tree as a <see cref="CatiaProductTree"/> of the <see cref="DstController.ActiveDocument"/>.
+        /// Gets the CATIA product or specification tree of the <see cref="DstController.ActiveDocument"/>.
         /// </summary>
-        /// <returns>The product tree in a <see cref="CatiaProductTree"/> form.</returns>
-        CatiaProductTree GetCatiaProductTreeFromActiveDocument();
+        /// <returns>The top <see cref="ElementRowViewModel"/></returns>
+        ElementRowViewModel GetCatiaProductTreeFromActiveDocument();
 
         /// <summary>
-        /// Gets the CATIA product or specification tree as a <see cref="CatiaProductTree"/> of a <see cref="CatiaDocument"/>.
+        /// Gets the CATIA product or specification tree of a <see cref="CatiaDocument"/>.
         /// </summary>
-        /// <param name="productDocument"></param>
-        /// <returns>The product tree in a <see cref="CatiaProductTree"/> form.</returns>
-        CatiaProductTree GetCatiaProductTreeFromDocument(CatiaDocument productDocument);
-
-        /// <summary>
-        /// Adds one correspondance to the <see cref="IDstController.IdCorrespondences"/>
-        /// </summary>
-        /// <param name="internalId">The thing that <see cref="externalId"/> corresponds to</param>
-        /// <param name="externalId">The external thing that <see cref="internalId"/> corresponds to</param>
-        void AddToExternalIdentifierMap(Guid internalId, string externalId);
+        /// <returns>The top <see cref="ElementRowViewModel"/></returns>
+        ElementRowViewModel GetCatiaProductTreeFromDocument();
     }
 }

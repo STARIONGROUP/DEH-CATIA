@@ -30,6 +30,7 @@ namespace DEHCATIA.ViewModels
     using DEHCATIA.DstController;
     using DEHCATIA.ViewModels.Interfaces;
     using DEHCATIA.ViewModels.ProductTree;
+    using DEHCATIA.ViewModels.ProductTree.Rows;
 
     using ReactiveUI;
 
@@ -58,28 +59,14 @@ namespace DEHCATIA.ViewModels
         }
 
         /// <summary>
-        /// Backing field for <see cref="ProductTree"/>
-        /// </summary>
-        private CatiaProductTree productTree;
-
-        /// <summary>
-        /// Gets the CATIA product tree.
-        /// </summary>
-        public CatiaProductTree ProductTree
-        {
-            get => this.productTree;
-            private set => this.RaiseAndSetIfChanged(ref this.productTree, value);
-        }
-
-        /// <summary>
         /// Backing field for the <see cref="SelectedElement"/>.
         /// </summary>
-        private CatiaElement selectedElement;
+        private ElementRowViewModel selectedElement;
 
         /// <summary>
         /// Gets or sets the selected tree element.
         /// </summary>
-        public CatiaElement SelectedElement
+        public ElementRowViewModel SelectedElement
         {
             get => this.selectedElement;
             set => this.RaiseAndSetIfChanged(ref this.selectedElement, value);
@@ -88,7 +75,7 @@ namespace DEHCATIA.ViewModels
         /// <summary>
         /// Gets the reactive list of root elements of the <see cref="ProductTree"/>.
         /// </summary>
-        public ReactiveList<CatiaElement> RootElements { get; } = new ReactiveList<CatiaElement>();
+        public ReactiveList<ElementRowViewModel> RootElements { get; } = new ReactiveList<ElementRowViewModel>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DstProductTreeViewModel"/> class.
@@ -100,8 +87,6 @@ namespace DEHCATIA.ViewModels
             this.WhenAnyValue(vm => vm.dstController.IsCatiaConnected)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProductTree());
-
-            this.WhenAnyValue(vm => vm.ProductTree).Subscribe(_ => this.UpdateRootElements());
         }
 
         /// <summary>
@@ -111,24 +96,8 @@ namespace DEHCATIA.ViewModels
         {
             this.IsBusy = true;
 
-            this.ProductTree = this.dstController.GetCatiaProductTreeFromActiveDocument();
-
-            this.IsBusy = false;
-        }
-
-        /// <summary>
-        /// Updates the <see cref="RootElements"/> after a CATIA connection update.
-        /// </summary>
-        private void UpdateRootElements()
-        {
-            this.IsBusy = true;
-
             this.RootElements.Clear();
-
-            if (this.ProductTree?.TopElement != null)
-            {
-                this.RootElements.Add(this.ProductTree.TopElement);
-            }
+            this.RootElements.Add(this.dstController.GetCatiaProductTreeFromActiveDocument());
 
             this.IsBusy = false;
         }

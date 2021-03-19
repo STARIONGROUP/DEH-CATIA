@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CatiaElement.cs" company="RHEA System S.A.">
+// <copyright file="ElementRowViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -22,7 +22,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.ViewModels.ProductTree
+namespace DEHCATIA.ViewModels.ProductTree.Rows
 {
     using DEHCATIA.Enumerations;
 
@@ -31,7 +31,7 @@ namespace DEHCATIA.ViewModels.ProductTree
     /// <summary>
     /// Represents an element in a CATIA product or specification tree.
     /// </summary>
-    public class CatiaElement : ReactiveObject
+    public class ElementRowViewModel : ReactiveObject
     {
         /// <summary>
         /// Backing field for <see cref="Name"/>
@@ -57,6 +57,16 @@ namespace DEHCATIA.ViewModels.ProductTree
         /// Backing field for <see cref="FileName"/>
         /// </summary>
         private string fileName;
+
+        /// <summary>
+        /// Backing field for <see cref="IsExpanded"/>
+        /// </summary>
+        private string isExpanded;
+
+        /// <summary>
+        /// Backing field for <see cref="IsHighlighted"/>
+        /// </summary>
+        private string isHighlighted;
 
         /// <summary>
         /// Gets or sets the element name.
@@ -104,8 +114,27 @@ namespace DEHCATIA.ViewModels.ProductTree
         }
 
         /// <summary>
+        /// Gets or sets a value whether the row is highlighted
+        /// </summary>
+        public string IsHighlighted
+        {
+            get => this.isHighlighted;
+            set => this.RaiseAndSetIfChanged(ref this.isHighlighted, value);
+        }
+
+
+        /// <summary>
+        /// Gets or sets a value whether the row is expanded
+        /// </summary>
+        public string IsExpanded
+        {
+            get => this.isExpanded;
+            set => this.RaiseAndSetIfChanged(ref this.isExpanded, value);
+        }
+
+        /// <summary>
         /// Gets or sets the child elements of this element.
         /// </summary>
-        public ReactiveList<CatiaElement> Children { get; set; } = new ReactiveList<CatiaElement>();
+        public ReactiveList<ElementRowViewModel> Children { get; set; } = new ReactiveList<ElementRowViewModel>();
     }
 }

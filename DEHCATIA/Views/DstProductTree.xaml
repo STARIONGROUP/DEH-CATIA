@@ -8,9 +8,10 @@
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              xmlns:behaviors="clr-namespace:DEHPCommon.UserInterfaces.Behaviors;assembly=DEHPCommon"
              xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
-             xmlns:productTree="clr-namespace:DEHCATIA.ViewModels.ProductTree"
              xmlns:converters="clr-namespace:DEHCATIA.Converters"
-             d:DesignHeight="100" d:DesignWidth="400" mc:Ignorable="d">
+             xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
+             xmlns:rows="clr-namespace:DEHCATIA.ViewModels.ProductTree.Rows"
+             d:DesignHeight="600" d:DesignWidth="400" mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
             <Style x:Key="ThingIcon" TargetType="{x:Type Image}">
@@ -20,34 +21,31 @@
                 <Setter Property="HorizontalAlignment" Value="Center" />
             </Style>
             <converters:ElementTypeToIconConverter x:Key="ElementTypeToIconConverter" />
-
-            <HierarchicalDataTemplate DataType="{x:Type productTree:CatiaElement}" ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged}">
+            <HierarchicalDataTemplate DataType="{x:Type rows:ElementRowViewModel}" ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
-                            <!--{dx:DXImage 'GrayScaleImages/Other/Bookmark_32x32.png'}-->
-                            <!--{dx:DXImage 'SvgImages/RichEdit/DocumentProperties.svg'}-->
-                            <!--{dx:DXImage 'SvgImages/RichEdit/New.svg'}-->
                             <Image Style="{StaticResource ThingIcon}" Source="{Binding Row.ElementType, Converter={StaticResource ElementTypeToIconConverter}}"/>
                         </dx:PixelSnapper>
-
-                        <ContentPresenter x:Name="defaultRowPresenter"
-                                          Content="{Binding}"
-                                          ContentTemplate="{Binding View.DefaultDataRowTemplate}"/>
+                        <ContentPresenter x:Name="defaultRowPresenter" Content="{Binding}" ContentTemplate="{Binding View.DefaultDataRowTemplate}"/>
                     </StackPanel>
                 </dx:MeasurePixelSnapper>
             </HierarchicalDataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
     <dx:LoadingDecorator BorderEffect="Default" BorderEffectColor="Blue" IsSplashScreenShown="{Binding IsBusy}" OwnerLock="LoadingContent">
-        <Grid>
-            <dxg:TreeListControl ItemsSource="{Binding RootElements}"
+        <dxdo:LayoutGroup AllowSplitters="True" Orientation="Vertical">
+            <dxdo:LayoutPanel AllowHide="False" ItemHeight="7*" Name="ProductPanel" AllowDock="False" MinWidth="200" VerticalAlignment="Stretch" 
+                              dxdo:AutoHideGroup.AutoHideType="Left" 
+                              AllowClose="False" AllowDrag="False" 
+                              AllowFloat="False" AllowMove="False" Caption="Product Tree">
+                <dxg:TreeListControl ItemsSource="{Binding RootElements}"
                                  SelectedItem="{Binding SelectedElement}">
-                <dxmvvm:Interaction.Behaviors>
-                    <behaviors:ContextMenuBehavior/>
-                </dxmvvm:Interaction.Behaviors>
-                <dxg:TreeListControl.View>
-                    <dxg:TreeListView Name="View"
+                    <dxmvvm:Interaction.Behaviors>
+                        <behaviors:ContextMenuBehavior/>
+                    </dxmvvm:Interaction.Behaviors>
+                    <dxg:TreeListControl.View>
+                        <dxg:TreeListView Name="View"
                                       AllowEditing="False"
                                       AutoWidth="False"
                                       ExpandCollapseNodesOnNavigation="True"
@@ -62,20 +60,80 @@
                                       TreeDerivationMode="HierarchicalDataTemplate"
                                       TreeLineStyle="Solid"
                                       VerticalScrollbarVisibility="Auto">
-                        <dxg:TreeListView.FocusedRow>
-                            <dynamic:ExpandoObject />
-                        </dxg:TreeListView.FocusedRow>
-                        <dxg:TreeListView.ContextMenu>
-                            <ContextMenu />
-                        </dxg:TreeListView.ContextMenu>
-                    </dxg:TreeListView>
-                </dxg:TreeListControl.View>
-                <dxg:TreeListControl.Columns>
-                    <dxg:TreeListColumn FieldName="Name" Fixed="Left"/>
-                    <dxg:TreeListColumn FieldName="PartNumber" Header="Part Number"/>
-                    <dxg:TreeListColumn FieldName="ElementType"/>
-                </dxg:TreeListControl.Columns>
-            </dxg:TreeListControl>
-        </Grid>
+                            <dxg:TreeListView.FocusedRow>
+                                <dynamic:ExpandoObject />
+                            </dxg:TreeListView.FocusedRow>
+                            <dxg:TreeListView.ContextMenu>
+                                <ContextMenu />
+                            </dxg:TreeListView.ContextMenu>
+                            <dxg:TreeListView.RowStyle>
+                                <Style TargetType="{x:Type dxg:RowControl}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Row.IsHighlighted}" Value="True">
+                                            <Setter Property="Background" Value="Yellow"/>
+                                            <Setter Property="FontWeight" Value="Bold" />
+                                            <Setter Property="Foreground" Value="Blue" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                    <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+                                </Style>
+                            </dxg:TreeListView.RowStyle>
+                        </dxg:TreeListView>
+                    </dxg:TreeListControl.View>
+                    <dxg:TreeListControl.Columns>
+                        <dxg:TreeListColumn FieldName="Name" Fixed="Left"/>
+                        <dxg:TreeListColumn FieldName="PartNumber" Header="Part Number"/>
+                        <dxg:TreeListColumn FieldName="ElementType" Header="Element Type"/>
+                    </dxg:TreeListControl.Columns>
+                </dxg:TreeListControl>
+            </dxdo:LayoutPanel>
+            <dxdo:LayoutPanel MaxHeight="260" ItemHeight="3*" Name="DetailPane" AllowDock="False" MinWidth="200" VerticalAlignment="Stretch" 
+                              dxdo:AutoHideGroup.AutoHideType="Left" AllowHide="False"
+                              AllowClose="False" AllowDrag="False" 
+                              AllowFloat="False" AllowMove="False" Caption="Details">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Label Margin="2" Grid.Row="0" Grid.Column="0" Content="Name:"></Label>
+                    <Label Margin="2" Grid.Row="0" Grid.Column="2" Content="ShortName:"></Label>
+                    <Label Margin="2" Grid.Row="1" Grid.Column="0" Content="ElementDefinition:"></Label>
+                    <Label Margin="2" Grid.Row="1" Grid.Column="2" Content="Mass Density:"></Label>
+                    <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" Text="{Binding SelectedElement.Name}"></TextBlock>
+                    <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="0" Grid.Column="3" Text="{Binding SelectedElement.ShortName}"></TextBlock>
+                    <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Text="{Binding SelectedElement.ElementDefinition.Iid}"></TextBlock>
+                    <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="1" Grid.Column="3" Text="{Binding SelectedElement.Name}"></TextBlock>
+
+                    <GroupBox Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="2" Header="Shape Info">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Label Margin="2" Grid.Row="0" Grid.Column="0" Content="Height:"></Label>
+                            <Label Margin="2" Grid.Row="1" Grid.Column="0" Content="Lenght:"></Label>
+                            <Label Margin="2" Grid.Row="2" Grid.Column="0" Content="Mass:"></Label>
+                            <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" Text="{Binding SelectedElement.Name}"></TextBlock>
+                            <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Text="{Binding SelectedElement.ShortName}"></TextBlock>
+                            <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="2" Grid.Column="1" Text="{Binding SelectedElement.ElementDefinition.Iid}"></TextBlock>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </dxdo:LayoutPanel>
+        </dxdo:LayoutGroup>
     </dx:LoadingDecorator>
 </UserControl>

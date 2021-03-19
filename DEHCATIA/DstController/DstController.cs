@@ -32,6 +32,7 @@ namespace DEHCATIA.DstController
 
     using DEHCATIA.Enumerations;
     using DEHCATIA.ViewModels.ProductTree;
+    using DEHCATIA.ViewModels.ProductTree.Rows;
 
     using INFITF;
 
@@ -50,12 +51,7 @@ namespace DEHCATIA.DstController
         /// Gets the logger for the <see cref="DstController"/>.
         /// </summary>
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
-
-        /// <summary>
-        /// Gets or sets the <see cref="ExternalIdentifierMap"/>
-        /// </summary>
-        public ExternalIdentifierMap ExternalIdentifierMap { get; set; }
-
+        
         /// <summary>
         /// Backing field for <see cref="IsCatiaConnected"/>.
         /// </summary>
@@ -106,57 +102,56 @@ namespace DEHCATIA.DstController
         }
 
         /// <summary>
-        /// Gets the CATIA product or specification tree as a <see cref="CatiaProductTree"/> of the <see cref="ActiveDocument"/>.
+        /// Gets the CATIA product or specification tree of the <see cref="ActiveDocument"/>.
         /// </summary>
-        /// <returns>The product tree in a <see cref="CatiaProductTree"/> form.</returns>
-        public CatiaProductTree GetCatiaProductTreeFromActiveDocument()
+        /// <returns>The top <see cref="ElementRowViewModel"/></returns>
+        public ElementRowViewModel GetCatiaProductTreeFromActiveDocument()
         {
             if (!this.IsCatiaConnected || this.ActiveDocument == null)
             {
                 return null;
             }
 
-            return this.GetCatiaProductTreeFromDocument(this.ActiveDocument);
+            return this.GetCatiaProductTreeFromDocument();
         }
 
         /// <summary>
-        /// Gets the CATIA product or specification tree as a <see cref="CatiaProductTree"/> of a <see cref="CatiaDocument"/>.
+        /// Gets the CATIA product or specification tree of a <see cref="CatiaDocument"/>.
         /// </summary>
-        /// <param name="productDocument"></param>
-        /// <returns>The product tree in a <see cref="CatiaProductTree"/> form.</returns>
-        public CatiaProductTree GetCatiaProductTreeFromDocument(CatiaDocument productDocument)
+        /// <returns>The top <see cref="ElementRowViewModel"/></returns>
+        public ElementRowViewModel GetCatiaProductTreeFromDocument()
         {
-            if (productDocument == null)
+            if (this.ActiveDocument == null)
             {
-                throw new ArgumentNullException(nameof(productDocument));
+                throw new ArgumentNullException(nameof(this.ActiveDocument));
             }
 
-            if (productDocument.ElementType != ElementType.CatProduct || productDocument.Document is not ProductDocument)
+            if (this.ActiveDocument.ElementType != ElementType.CatProduct || this.ActiveDocument.Document is not ProductDocument)
             {
                 this.logger.Error("Cannot open a product tree of a non .CATProduct file.");
                 return null;
             }
 
-            var productDoc = (ProductDocument)productDocument.Document;
+            var productDoc = (ProductDocument)this.ActiveDocument.Document;
 
-            var topElement = new CatiaElement()
+            var topElement = new ElementRowViewModel()
             {
                 Name = productDoc.Product.get_Name(),
                 PartNumber = productDoc.Product.get_PartNumber(),
                 Description = productDoc.Product.get_DescriptionRef(),
-                FileName = productDocument.Name,
+                FileName = this.ActiveDocument.Name,
                 ElementType = ElementType.CatProduct
             };
             
             foreach (Product prod in productDoc.Product.Products)
             {
-                if (this.GetTreeElementFromProduct(prod, productDocument.Name) is { } newElement)
+                if (this.GetTreeElementFromProduct(prod, this.ActiveDocument.Name) is { } newElement)
                 {
                     topElement.Children.Add(newElement);
                 }
             }
 
-            return new CatiaProductTree { TopElement = topElement };
+            return topElement;
         }
 
         /// <summary>
@@ -217,6 +212,7 @@ namespace DEHCATIA.DstController
             }
 
             string activeDocName;
+
             try
             {
                 activeDocName = this.CatiaApp.ActiveDocument.get_Name();
@@ -257,8 +253,8 @@ namespace DEHCATIA.DstController
         /// </summary>
         /// <param name="product">The COM product.</param>
         /// <param name="parentFileName">The parent file name of the product.</param>
-        /// <returns>The element on a <see cref="CatiaElement"/> form, or null if the <see cref="Product"/> couldn't be resolved.</returns>
-        private CatiaElement GetTreeElementFromProduct(Product product, string parentFileName)
+        /// <returns>The element on a <see cref="ElementRowViewModel"/> form, or null if the <see cref="Product"/> couldn't be resolved.</returns>
+        private ElementRowViewModel GetTreeElementFromProduct(Product product, string parentFileName)
         {
             if (product == null)
             {
@@ -317,50 +313,20 @@ namespace DEHCATIA.DstController
         }
 
         /// <summary>
-        /// Initializes a new <see cref="CatiaElement"/>
+        /// Initializes a new <see cref="ElementRowViewModel"/>
         /// </summary>
         /// <param name="product">The <see cref="Product"/></param>
         /// <param name="fileName">The file name</param>
         /// <returns></returns>
-        private CatiaElement InitializeElement(Product product, string fileName)
+        private ElementRowViewModel InitializeElement(Product product, string fileName)
         {
-            return new CatiaElement
+            return new ElementRowViewModel
             {
                 Name = product.get_Name(),
                 PartNumber = product.get_PartNumber(),
                 Description = product.get_DescriptionRef(),
                 FileName = fileName
             };
-        }
-
-        /// <summary>
-        /// Adds one correspondance to the <see cref="IDstController.IdCorrespondences"/>
-        /// </summary>
-        /// <param name="internalId">The thing that <see cref="externalId"/> corresponds to</param>
-        /// <param name="externalId">The external thing that <see cref="internalId"/> corresponds to</param>
-        public void AddToExternalIdentifierMap(Guid internalId, string externalId)
-        {
-            if (internalId == Guid.Empty)
-            {
-                return;
-            }
-
-            if (this.ExternalIdentifierMap.Correspondence
-                .FirstOrDefault(x => x.ExternalId == externalId
-                                     && x.InternalThing != internalId) is { } correspondence)
-            {
-                correspondence.InternalThing = internalId;
-            }
-
-            else if (!this.ExternalIdentifierMap.Correspondence
-                .Any(x => x.ExternalId == externalId && x.InternalThing == internalId))
-            {
-                this.ExternalIdentifierMap.Correspondence.Add(new IdCorrespondence()
-                {
-                    ExternalId = externalId,
-                    InternalThing = internalId
-                });
-            }
         }
     }
 }
