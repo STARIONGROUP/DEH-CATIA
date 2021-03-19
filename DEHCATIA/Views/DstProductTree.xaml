@@ -8,7 +8,8 @@
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              xmlns:behaviors="clr-namespace:DEHPCommon.UserInterfaces.Behaviors;assembly=DEHPCommon"
              xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
-             xmlns:catiaModules="clr-namespace:DEHCATIA.CatiaModules"
+             xmlns:productTree="clr-namespace:DEHCATIA.ViewModels.ProductTree"
+             xmlns:converters="clr-namespace:DEHCATIA.Converters"
              d:DesignHeight="100" d:DesignWidth="400" mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -18,11 +19,16 @@
                 <Setter Property="Margin" Value="1" />
                 <Setter Property="HorizontalAlignment" Value="Center" />
             </Style>
-            <HierarchicalDataTemplate DataType="{x:Type catiaModules:CatiaTreeElement}" ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged}">
+            <converters:ElementTypeToIconConverter x:Key="ElementTypeToIconConverter" />
+
+            <HierarchicalDataTemplate DataType="{x:Type productTree:CatiaElement}" ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
-                            <Image Style="{StaticResource ThingIcon}" Source="{dx:DXImage 'SvgImages/XAF/ModelEditor_Class_Object.svg'}"/>
+                            <!--{dx:DXImage 'GrayScaleImages/Other/Bookmark_32x32.png'}-->
+                            <!--{dx:DXImage 'SvgImages/RichEdit/DocumentProperties.svg'}-->
+                            <!--{dx:DXImage 'SvgImages/RichEdit/New.svg'}-->
+                            <Image Style="{StaticResource ThingIcon}" Source="{Binding Row.ElementType, Converter={StaticResource ElementTypeToIconConverter}}"/>
                         </dx:PixelSnapper>
 
                         <ContentPresenter x:Name="defaultRowPresenter"
@@ -67,7 +73,7 @@
                 <dxg:TreeListControl.Columns>
                     <dxg:TreeListColumn FieldName="Name" Fixed="Left"/>
                     <dxg:TreeListColumn FieldName="PartNumber" Header="Part Number"/>
-                    <dxg:TreeListColumn FieldName="Type"/>
+                    <dxg:TreeListColumn FieldName="ElementType"/>
                 </dxg:TreeListControl.Columns>
             </dxg:TreeListControl>
         </Grid>

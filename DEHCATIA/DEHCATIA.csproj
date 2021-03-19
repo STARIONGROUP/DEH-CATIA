@@ -99,7 +99,6 @@
     <PackageReference Include="DEHPCommon" Version="1.0.195" />
     <PackageReference Include="NLog" Version="4.6.8" />
     <PackageReference Include="NLog.Schema" Version="4.6.8" />
-    <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua" Version="1.4.363.107" />
     <PackageReference Include="reactiveui" Version="6.5.0" />
     <PackageReference Include="Rx-Linq" Version="2.2.5" />
     <PackageReference Include="Rx-PlatformServices" Version="2.2.5" />

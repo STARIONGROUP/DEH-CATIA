@@ -24,7 +24,7 @@
 
 namespace DEHCATIA.ViewModels.Interfaces
 {
-    using DEHCATIA.CatiaModules;
+    using DEHCATIA.ViewModels.ProductTree;
 
     using ReactiveUI;
 
@@ -46,11 +46,11 @@ namespace DEHCATIA.ViewModels.Interfaces
         /// <summary>
         /// Gets the reactive list of root elements of the <see cref="ProductTree"/>.
         /// </summary>
-        ReactiveList<CatiaTreeElement> RootElements { get; }
+        ReactiveList<CatiaElement> RootElements { get; }
 
         /// <summary>
         /// Gets or sets the selected element.
         /// </summary>
-        CatiaTreeElement SelectedElement { get; set; }
+        CatiaElement SelectedElement { get; set; }
     }
 }

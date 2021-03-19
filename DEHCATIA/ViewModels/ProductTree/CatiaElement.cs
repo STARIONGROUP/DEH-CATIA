@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CatiaTreeElement.cs" company="RHEA System S.A.">
+// <copyright file="CatiaElement.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -22,43 +22,90 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.CatiaModules
+namespace DEHCATIA.ViewModels.ProductTree
 {
-    using System.Collections.Generic;
+    using DEHCATIA.Enumerations;
+
+    using ReactiveUI;
 
     /// <summary>
     /// Represents an element in a CATIA product or specification tree.
     /// </summary>
-    public class CatiaTreeElement
+    public class CatiaElement : ReactiveObject
     {
+        /// <summary>
+        /// Backing field for <see cref="Name"/>
+        /// </summary>
+        private string name;
+
+        /// <summary>
+        /// Backing field for <see cref="PartNumber"/>
+        /// </summary>
+        private string partNumber;
+
+        /// <summary>
+        /// Backing field for <see cref="Description"/>
+        /// </summary>
+        private string description;
+
+        /// <summary>
+        /// Backing field for <see cref="ElementType"/>
+        /// </summary>
+        private ElementType elementType;
+
+        /// <summary>
+        /// Backing field for <see cref="FileName"/>
+        /// </summary>
+        private string fileName;
+
         /// <summary>
         /// Gets or sets the element name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name
+        {
+            get => this.name;
+            set => this.RaiseAndSetIfChanged(ref this.name, value);
+        }
 
         /// <summary>
         /// Gets or sets the element part number.
         /// </summary>
-        public string PartNumber { get; set; }
+        public string PartNumber
+        {
+            get => this.partNumber;
+            set => this.RaiseAndSetIfChanged(ref this.partNumber, value);
+        }
 
         /// <summary>
         /// Gets or sets the element description.
         /// </summary>
-        public string Description { get; set; }
+        public string Description
+        {
+            get => this.description;
+            set => this.RaiseAndSetIfChanged(ref this.description, value);
+        }
 
         /// <summary>
         /// Gets or sets the type.
         /// </summary>
-        public TreeElementType Type { get; set; }
+        public ElementType ElementType
+        {
+            get => this.elementType;
+            set => this.RaiseAndSetIfChanged(ref this.elementType, value);
+        }
 
         /// <summary>
         /// Gets or sets the file name of the document holding this element, if any (unless it's a Component).
         /// </summary>
-        public string FileName { get; set; }
+        public string FileName
+        {
+            get => this.fileName;
+            set => this.RaiseAndSetIfChanged(ref this.fileName, value);
+        }
 
         /// <summary>
         /// Gets or sets the child elements of this element.
         /// </summary>
-        public IList<CatiaTreeElement> Children { get; set; }
+        public ReactiveList<CatiaElement> Children { get; set; } = new ReactiveList<CatiaElement>();
     }
 }

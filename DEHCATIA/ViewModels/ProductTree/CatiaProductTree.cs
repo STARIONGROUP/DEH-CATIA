@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TreeElementType.cs" company="RHEA System S.A.">
+// <copyright file="CatiaProductTree.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -22,26 +22,27 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.CatiaModules
+namespace DEHCATIA.ViewModels.ProductTree
 {
+    using ReactiveUI;
+
     /// <summary>
-    /// The type of a CATIA product tree element.
+    /// A wrapper for the root of a CATIA product or specification tree.
     /// </summary>
-    public enum TreeElementType
+    public class CatiaProductTree : ReactiveObject
     {
         /// <summary>
-        /// An assembly may contain components
+        /// Backing field for <see cref="TopElement"/>
         /// </summary>
-        Assembly,
+        private CatiaElement topElement;
 
         /// <summary>
-        /// A component refers to a Part or assembly and is located as child of another assembly
+        /// The top element, or root, of a CATIA product or specification tree.
         /// </summary>
-        Component,
-
-        /// <summary>
-        /// A part contains the shape and is referred by components
-        /// </summary>
-        Part
+        public CatiaElement TopElement
+        {
+            get => this.topElement;
+            set => this.RaiseAndSetIfChanged(ref this.topElement, value);
+        }
     }
 }

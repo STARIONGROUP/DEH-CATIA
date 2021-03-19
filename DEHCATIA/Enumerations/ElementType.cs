@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DocumentType.cs" company="RHEA System S.A.">
+// <copyright file="ElementType.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -22,37 +22,42 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.CatiaModules
+namespace DEHCATIA.Enumerations
 {
     /// <summary>
-    /// The type of a CATIA document.
+    /// The type of a CATIA element.
     /// </summary>
-    public enum DocumentType
+    public enum ElementType
     {
+        /// <summary>
+        /// A default value for neither of the above document types
+        /// </summary>
+        Invalid = -1,
+
         /// <summary>
         /// A Product might contain components
         /// </summary>
-        CATProduct,
+        CatProduct,
 
         /// <summary>
         /// A Part is the outer leaf of the CATIA product tree and contains the shape or body with the shape inside
         /// </summary>
-        CATPart,
+        CatPart,
+
+        /// <summary>
+        /// The definition of a <see cref="CatPart"/>
+        /// </summary>
+        CatDefinition,
 
         /// <summary>
         /// A material might be attached to a Part inside CATIA.
         /// CATIA materials can be stored inside a material library
         /// </summary>
-        CATMaterial,
+        Material,
 
         /// <summary>
         /// A Component refers an Assembly or a Part file and contains position information
         /// </summary>
         Component,
-
-        /// <summary>
-        /// A default value for neither of the above document types
-        /// </summary>
-        InvalidCatiaDocument
     }
 }

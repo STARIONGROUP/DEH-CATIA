@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
         xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
         xmlns:views="clr-namespace:DEHCATIA.Views"
         xmlns:common="clr-namespace:DEHPCommon.UserInterfaces.Views;assembly=DEHPCommon"

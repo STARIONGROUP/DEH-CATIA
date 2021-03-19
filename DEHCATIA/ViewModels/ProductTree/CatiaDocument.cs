@@ -22,38 +22,87 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.CatiaModules
+namespace DEHCATIA.ViewModels.ProductTree
 {
+    using DEHCATIA.Enumerations;
+
     using INFITF;
+
+    using ReactiveUI;
 
     /// <summary>
     /// Represents an instance of a CATIA document.
     /// </summary>
-    public class CatiaDocument
+    public class CatiaDocument : ReactiveObject
     {
+        /// <summary>
+        /// Backing field for <see cref="Name"/>
+        /// </summary>
+        private string name;
+
+        /// <summary>
+        /// Backing field for <see cref="Path"/>
+        /// </summary>
+        private string path;
+
+        /// <summary>
+        /// Backing field for <see cref="FullName"/>
+        /// </summary>
+        private string fullName;
+
+        /// <summary>
+        /// Backing field for <see cref="Document"/>
+        /// </summary>
+        private Document document;
+
+        /// <summary>
+        /// Backing field for <see cref="ElementType"/>
+        /// </summary>
+        private ElementType elementType;
+
         /// <summary>
         /// Gets or sets the name of the document.
         /// </summary>
-        public string Name { get; set; }
+        public string Name
+        {
+            get => this.name;
+            set => this.RaiseAndSetIfChanged(ref this.name, value);
+        }
 
         /// <summary>
         /// Gets or sets the physical path of the document.
         /// </summary>
-        public string Path { get; set; }
+        public string Path
+        {
+            get => this.path;
+            set => this.RaiseAndSetIfChanged(ref this.path, value);
+        }
 
         /// <summary>
         /// Gets or sets the full name (compination of <see cref="Name"/> and <see cref="Path"/>) of the document. 
         /// </summary>
-        public string FullName { get; set; }
+        public string FullName
+        {
+            get => this.fullName;
+            set => this.RaiseAndSetIfChanged(ref this.fullName, value);
+        }
 
         /// <summary>
         /// Gets or sets the COM CATIA document.
         /// </summary>
-        public Document Document { get; set; }
+        public Document Document
+        {
+            get => this.document;
+            set => this.RaiseAndSetIfChanged(ref this.document, value);
+        }
 
         /// <summary>
         /// Gets or sets the document type.
         /// </summary>
-        public DocumentType DocumentType { get; set; }
+        public ElementType ElementType
+        {
+            get => this.elementType;
+            set => this.RaiseAndSetIfChanged(ref this.elementType, value);
+        }
     }
 }

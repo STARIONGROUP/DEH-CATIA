@@ -27,9 +27,9 @@ namespace DEHCATIA.ViewModels
     using System;
     using System.Reactive.Linq;
 
-    using DEHCATIA.CatiaModules;
     using DEHCATIA.DstController;
     using DEHCATIA.ViewModels.Interfaces;
+    using DEHCATIA.ViewModels.ProductTree;
 
     using ReactiveUI;
 
@@ -74,12 +74,12 @@ namespace DEHCATIA.ViewModels
         /// <summary>
         /// Backing field for the <see cref="SelectedElement"/>.
         /// </summary>
-        private CatiaTreeElement selectedElement;
+        private CatiaElement selectedElement;
 
         /// <summary>
         /// Gets or sets the selected tree element.
         /// </summary>
-        public CatiaTreeElement SelectedElement
+        public CatiaElement SelectedElement
         {
             get => this.selectedElement;
             set => this.RaiseAndSetIfChanged(ref this.selectedElement, value);
@@ -88,7 +88,7 @@ namespace DEHCATIA.ViewModels
         /// <summary>
         /// Gets the reactive list of root elements of the <see cref="ProductTree"/>.
         /// </summary>
-        public ReactiveList<CatiaTreeElement> RootElements { get; } = new ReactiveList<CatiaTreeElement>();
+        public ReactiveList<CatiaElement> RootElements { get; } = new ReactiveList<CatiaElement>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DstProductTreeViewModel"/> class.

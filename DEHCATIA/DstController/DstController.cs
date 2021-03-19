@@ -25,15 +25,16 @@
 namespace DEHCATIA.DstController
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.InteropServices;
 
-    using DEHCATIA.CatiaModules;
-
     using CDP4Common.EngineeringModelData;
 
+    using DEHCATIA.Enumerations;
+    using DEHCATIA.ViewModels.ProductTree;
+
     using INFITF;
+
     using ProductStructureTypeLib;
 
     using NLog;
@@ -121,39 +122,37 @@ namespace DEHCATIA.DstController
         /// <summary>
         /// Gets the CATIA product or specification tree as a <see cref="CatiaProductTree"/> of a <see cref="CatiaDocument"/>.
         /// </summary>
-        /// <param name="catiaDoc"></param>
+        /// <param name="productDocument"></param>
         /// <returns>The product tree in a <see cref="CatiaProductTree"/> form.</returns>
-        public CatiaProductTree GetCatiaProductTreeFromDocument(CatiaDocument catiaDoc)
+        public CatiaProductTree GetCatiaProductTreeFromDocument(CatiaDocument productDocument)
         {
-            if (catiaDoc == null)
+            if (productDocument == null)
             {
-                throw new ArgumentNullException(nameof(catiaDoc));
+                throw new ArgumentNullException(nameof(productDocument));
             }
 
-            if (catiaDoc.DocumentType != DocumentType.CATProduct || catiaDoc.Document is not ProductDocument)
+            if (productDocument.ElementType != ElementType.CatProduct || productDocument.Document is not ProductDocument)
             {
-                logger.Error("Cannot open a product tree of a non .CATProduct file.");
+                this.logger.Error("Cannot open a product tree of a non .CATProduct file.");
                 return null;
             }
 
-            var productDoc = (ProductDocument)catiaDoc.Document;
+            var productDoc = (ProductDocument)productDocument.Document;
 
-            var topElement = new CatiaTreeElement()
+            var topElement = new CatiaElement()
             {
                 Name = productDoc.Product.get_Name(),
                 PartNumber = productDoc.Product.get_PartNumber(),
                 Description = productDoc.Product.get_DescriptionRef(),
-                FileName = catiaDoc.Name,
-                Type = TreeElementType.Assembly,
-                Children = new List<CatiaTreeElement>()
+                FileName = productDocument.Name,
+                ElementType = ElementType.CatProduct
             };
-
+            
             foreach (Product prod in productDoc.Product.Products)
             {
-                var newTreeElement = this.GetTreeElementFromProduct(prod, catiaDoc.Name);
-                if (newTreeElement != null)
+                if (this.GetTreeElementFromProduct(prod, productDocument.Name) is { } newElement)
                 {
-                    topElement.Children.Add(newTreeElement);
+                    topElement.Children.Add(newElement);
                 }
             }
 
@@ -175,7 +174,7 @@ namespace DEHCATIA.DstController
             try
             {
                 // Attempts to get the documents from the current CATIA application in order to check whether it is running
-                var docs = this.CatiaApp.Documents;
+                _ = this.CatiaApp.Documents;
             }
             catch (COMException)
             {
@@ -234,7 +233,7 @@ namespace DEHCATIA.DstController
                 Path = this.CatiaApp.ActiveDocument.Path,
                 FullName = this.CatiaApp.ActiveDocument.FullName,
                 Document = this.CatiaApp.ActiveDocument,
-                DocumentType = this.GetDocumentTypeFromFileName(activeDocName)
+                ElementType = this.GetDocumentTypeFromFileName(activeDocName)
             };
         }
 
@@ -243,21 +242,14 @@ namespace DEHCATIA.DstController
         /// </summary>
         /// <param name="fileName">The CATIA full file name</param>
         /// <returns>The document type</returns>
-        private DocumentType GetDocumentTypeFromFileName(string fileName)
+        private ElementType GetDocumentTypeFromFileName(string fileName)
         {
-            int i = fileName.LastIndexOf('.');
-            string documentType = i < 0 ? "" : fileName.Substring(i + 1);
-            var values = (DocumentType[])Enum.GetValues(typeof(DocumentType));
+            var dotIndex = fileName.LastIndexOf('.');
+            var documentType = dotIndex < 0 ? "" : fileName.Substring(dotIndex + 1);
 
-            foreach (var type in values)
-            {
-                if (type.ToString().Equals(documentType))
-                {
-                    return type;
-                }
-            }
-
-            return DocumentType.InvalidCatiaDocument;
+            return Enum.TryParse(documentType, true, out ElementType elementType)
+                ? elementType
+                : ElementType.Invalid;
         }
 
         /// <summary>
@@ -265,8 +257,8 @@ namespace DEHCATIA.DstController
         /// </summary>
         /// <param name="product">The COM product.</param>
         /// <param name="parentFileName">The parent file name of the product.</param>
-        /// <returns>The element on a <see cref="CatiaTreeElement"/> form, or null if the <see cref="Product"/> couldn't be resolved.</returns>
-        private CatiaTreeElement GetTreeElementFromProduct(Product product, string parentFileName)
+        /// <returns>The element on a <see cref="CatiaElement"/> form, or null if the <see cref="Product"/> couldn't be resolved.</returns>
+        private CatiaElement GetTreeElementFromProduct(Product product, string parentFileName)
         {
             if (product == null)
             {
@@ -279,6 +271,7 @@ namespace DEHCATIA.DstController
             }
 
             string fileName;
+
             try
             {
                 var currentDocument = (Document)product.ReferenceProduct.Parent;
@@ -289,32 +282,31 @@ namespace DEHCATIA.DstController
                 return null;
             }
 
-            var treeElement = new CatiaTreeElement
-            {
-                Name = product.get_Name(),
-                PartNumber = product.get_PartNumber(),
-                Description = product.get_DescriptionRef(),
-                FileName = fileName,
-                Children = new List<CatiaTreeElement>()
-            };
+            var treeElement = this.InitializeElement(product, fileName);
 
             switch (this.GetDocumentTypeFromFileName(fileName))
             {
-                case DocumentType.CATProduct:
-                treeElement.Type = fileName.Equals(parentFileName) ? TreeElementType.Component : TreeElementType.Assembly;
-                break;
+                case ElementType.CatProduct:
+                    treeElement.ElementType = fileName.Equals(parentFileName) ? ElementType.Component : ElementType.CatProduct;
+                    break;
 
-                case DocumentType.CATPart:
-                treeElement.Type = TreeElementType.Part;
-                break;
+                case ElementType.CatPart:
+                    treeElement.ElementType = ElementType.CatPart;
 
-                default:
-                return null;
+                    if (product.ReferenceProduct is {} referenceProduct)
+                    {
+                        var element = this.InitializeElement(referenceProduct, fileName);
+                        element.ElementType = ElementType.CatDefinition;
+                        treeElement.Children.Add(element);
+                    }
+
+                    break;
             }
 
             foreach (Product componentOrPart in product.Products)
             {
                 var newTreeElement = this.GetTreeElementFromProduct(componentOrPart, fileName);
+
                 if (newTreeElement != null)
                 {
                     treeElement.Children.Add(newTreeElement);
@@ -324,6 +316,22 @@ namespace DEHCATIA.DstController
             return treeElement;
         }
 
+        /// <summary>
+        /// Initializes a new <see cref="CatiaElement"/>
+        /// </summary>
+        /// <param name="product">The <see cref="Product"/></param>
+        /// <param name="fileName">The file name</param>
+        /// <returns></returns>
+        private CatiaElement InitializeElement(Product product, string fileName)
+        {
+            return new CatiaElement
+            {
+                Name = product.get_Name(),
+                PartNumber = product.get_PartNumber(),
+                Description = product.get_DescriptionRef(),
+                FileName = fileName
+            };
+        }
 
         /// <summary>
         /// Adds one correspondance to the <see cref="IDstController.IdCorrespondences"/>
@@ -354,6 +362,5 @@ namespace DEHCATIA.DstController
                 });
             }
         }
-
     }
 }
