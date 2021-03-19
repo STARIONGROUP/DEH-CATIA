@@ -24,6 +24,10 @@
 
 namespace DEHCATIA.DstController
 {
+    using System;
+
+    using CDP4Common.EngineeringModelData;
+
     using DEHCATIA.CatiaModules;
 
     using INFITF;
@@ -34,9 +38,9 @@ namespace DEHCATIA.DstController
     public interface IDstController
     {
         /// <summary>
-        /// Gets the <see cref="Application"/> instance of a running CATIA client.
+        /// Gets or sets the <see cref="ExternalIdentifierMap"/>
         /// </summary>
-        Application CatiaApp { get; }
+        ExternalIdentifierMap ExternalIdentifierMap { get; set; }
 
         /// <summary>
         /// Gets the current active document from the running CATIA client.
@@ -49,7 +53,12 @@ namespace DEHCATIA.DstController
         bool IsCatiaConnected { get; set; }
 
         /// <summary>
-        /// Attempts to connect to a running CATIA client and sets the <see cref="CatiaApp"/> value if one is found.
+        /// Gets the <see cref="Application"/> instance of a running CATIA client.
+        /// </summary>
+        Application CatiaApp { get; }
+
+        /// <summary>
+        /// Attempts to connect to a running CATIA client and sets the <see cref="DstController.CatiaApp"/> value if one is found.
         /// </summary>
         void ConnectToCatia();
 
@@ -57,6 +66,13 @@ namespace DEHCATIA.DstController
         /// Disconnects from a running CATIA client.
         /// </summary>
         void DisconnectFromCatia();
+
+        /// <summary>
+        /// Adds one correspondance to the <see cref="IDstController.IdCorrespondences"/>
+        /// </summary>
+        /// <param name="internalId">The thing that <see cref="externalId"/> corresponds to</param>
+        /// <param name="externalId">The external thing that <see cref="internalId"/> corresponds to</param>
+        void AddToExternalIdentifierMap(Guid internalId, string externalId);
 
         /// <summary>
         /// Gets the CATIA product or specification tree as a <see cref="CatiaProductTree"/> of the <see cref="ActiveDocument"/>.

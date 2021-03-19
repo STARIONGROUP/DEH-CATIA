@@ -29,6 +29,8 @@ namespace DEHCATIA.ViewModels
 
     using DEHCATIA.ViewModels.Interfaces;
 
+    using DEHPCommon.UserInterfaces.ViewModels.NetChangePreview.Interfaces;
+
     using ReactiveUI;
 
     /// <summary>
@@ -67,13 +69,12 @@ namespace DEHCATIA.ViewModels
         /// <param name="hubDataSourceViewModel">A <see cref="IHubDataSourceViewModel"/></param>
         /// <param name="dstSourceViewModel">A <see cref="IDstDataSourceViewModel"/></param>/// 
         /// <param name="statusBarControlViewModel">The <see cref="IStatusBarControlViewModel"/></param>
-        /// <param name="netChangePreviewViewModel">The <see cref="INetChangePreviewViewModel"/></param>
-        public MainWindowViewModel(IHubDataSourceViewModel hubDataSourceViewModel, IDstDataSourceViewModel dstSourceViewModel, IStatusBarControlViewModel statusBarControlViewModel, INetChangePreviewViewModel netChangePreviewViewModel)
+        public MainWindowViewModel(IHubDataSourceViewModel hubDataSourceViewModel, IDstDataSourceViewModel dstSourceViewModel, 
+            IStatusBarControlViewModel statusBarControlViewModel)
         {
             this.HubDataSourceViewModel = hubDataSourceViewModel;
             this.DstSourceViewModel = dstSourceViewModel;
             this.StatusBarControlViewModel = statusBarControlViewModel;
-            this.NetChangePreviewViewModel = netChangePreviewViewModel;
         }
     }
 }

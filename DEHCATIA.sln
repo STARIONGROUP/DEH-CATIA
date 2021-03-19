@@ -9,6 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DEHCATIA.Tests", "DEHCATIA.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A61AA97C-DA9D-4062-8F7C-A6150CF3E38B}"
 	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
 		DEHCATIA-tests.nunit = DEHCATIA-tests.nunit
 		DEHCATIA.sln.DotSettings = DEHCATIA.sln.DotSettings
 		README.md = README.md

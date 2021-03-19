@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
-
-	<PropertyGroup>
+  <PropertyGroup>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net472</TargetFramework>
 		<RootNamespace>DEHCATIA</RootNamespace>
@@ -14,6 +13,7 @@
 		<FileVersion>1.0.0.0</FileVersion>
 		<LangVersion>latest</LangVersion>
 		<StartupObject>DEHCATIA.App</StartupObject>
+		<ApplicationIcon>icon.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -96,16 +96,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="DEHPCommon" Version="1.0.124" />
-		<PackageReference Include="DevExpress.WindowsDesktop.Wpf.Layout" Version="20.1.8" />
-		<PackageReference Include="DevExpress.Wpf.Core" Version="20.1.8" />
-		<PackageReference Include="DevExpress.Wpf.Grid" Version="20.1.8" />
-		<PackageReference Include="DevExpress.Wpf.Layout" Version="20.1.8" />
-		<PackageReference Include="DevExpress.Wpf.Navigation" Version="20.1.8" />
-		<PackageReference Include="DevExpress.Wpf.Reporting" Version="20.1.8" />
-		<PackageReference Include="reactiveui" Version="6.5.0" />
-		<PackageReference Include="Splat.Net40" Version="1.6.2" />
-	</ItemGroup>
+    <PackageReference Include="DEHPCommon" Version="1.0.195" />
+    <PackageReference Include="NLog" Version="4.6.8" />
+    <PackageReference Include="NLog.Schema" Version="4.6.8" />
+    <PackageReference Include="OPCFoundation.NetStandard.Opc.Ua" Version="1.4.363.107" />
+    <PackageReference Include="reactiveui" Version="6.5.0" />
+    <PackageReference Include="Rx-Linq" Version="2.2.5" />
+    <PackageReference Include="Rx-PlatformServices" Version="2.2.5" />
+    <PackageReference Include="Splat" Version="1.6.2" />
+  </ItemGroup>
 
 	<ItemGroup>
 		<Page Include="App.xaml" />
@@ -115,10 +114,24 @@
 		<Reference Include="System.Web" />
 	</ItemGroup>
 
+  <ItemGroup>
+    <Resource Include="Resources\logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 	<ItemGroup>
 	  <Page Update="Views\DstProductTree.xaml">
 	    <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 	  </Page>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="MappingRules\" />
 	</ItemGroup>
 
 </Project>

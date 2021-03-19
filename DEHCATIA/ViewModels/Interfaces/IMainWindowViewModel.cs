@@ -25,6 +25,7 @@
 namespace DEHCATIA.ViewModels.Interfaces
 {
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
+    using DEHPCommon.UserInterfaces.ViewModels.NetChangePreview.Interfaces;
 
     /// <summary>
     /// Interface definitions of methods and properties of the application Main window

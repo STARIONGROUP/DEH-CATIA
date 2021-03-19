@@ -93,4 +93,8 @@
     <ProjectReference Include="..\DEHCATIA\DEHCATIA.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="MappingRules\" />
+  </ItemGroup>
+
 </Project>

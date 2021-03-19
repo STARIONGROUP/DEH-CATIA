@@ -26,9 +26,12 @@ namespace DEHCATIA.DstController
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Runtime.InteropServices;
 
     using DEHCATIA.CatiaModules;
+
+    using CDP4Common.EngineeringModelData;
 
     using INFITF;
     using ProductStructureTypeLib;
@@ -46,6 +49,11 @@ namespace DEHCATIA.DstController
         /// Gets the logger for the <see cref="DstController"/>.
         /// </summary>
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
+        /// Gets or sets the <see cref="ExternalIdentifierMap"/>
+        /// </summary>
+        public ExternalIdentifierMap ExternalIdentifierMap { get; set; }
 
         /// <summary>
         /// Backing field for <see cref="IsCatiaConnected"/>.
@@ -315,5 +323,37 @@ namespace DEHCATIA.DstController
 
             return treeElement;
         }
+
+
+        /// <summary>
+        /// Adds one correspondance to the <see cref="IDstController.IdCorrespondences"/>
+        /// </summary>
+        /// <param name="internalId">The thing that <see cref="externalId"/> corresponds to</param>
+        /// <param name="externalId">The external thing that <see cref="internalId"/> corresponds to</param>
+        public void AddToExternalIdentifierMap(Guid internalId, string externalId)
+        {
+            if (internalId == Guid.Empty)
+            {
+                return;
+            }
+
+            if (this.ExternalIdentifierMap.Correspondence
+                .FirstOrDefault(x => x.ExternalId == externalId
+                                     && x.InternalThing != internalId) is { } correspondence)
+            {
+                correspondence.InternalThing = internalId;
+            }
+
+            else if (!this.ExternalIdentifierMap.Correspondence
+                .Any(x => x.ExternalId == externalId && x.InternalThing == internalId))
+            {
+                this.ExternalIdentifierMap.Correspondence.Add(new IdCorrespondence()
+                {
+                    ExternalId = externalId,
+                    InternalThing = internalId
+                });
+            }
+        }
+
     }
 }

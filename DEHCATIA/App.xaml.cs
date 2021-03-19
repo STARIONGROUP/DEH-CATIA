@@ -24,8 +24,10 @@
 
 namespace DEHCATIA
 {
+    using System;
     using System.Reflection;
     using System.Windows;
+    using System.Windows.Threading;
 
     using Autofac;
 
@@ -40,6 +42,8 @@ namespace DEHCATIA
 
     using DevExpress.Xpf.Core;
 
+    using NLog;
+
     using DXSplashScreenViewModel = DevExpress.Mvvm.DXSplashScreenViewModel;
     using SplashScreen = DEHPCommon.UserInterfaces.Views.SplashScreen;
 
@@ -49,29 +53,26 @@ namespace DEHCATIA
     public partial class App
     {
         /// <summary>
+        /// The <see cref="NLog"/> logger
+        /// </summary>
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
         /// Initializes a new <see cref="App"/>
         /// </summary>
         /// <param name="containerBuilder">An optional <see cref="Container"/></param>
         public App(ContainerBuilder containerBuilder = null)
         {
-            this.Exit += this.OnExit;
+            this.LogAppStart();
 
-            var splashScreenViewModel = new DXSplashScreenViewModel() { Title = "DEH-CATIA Adapter" };
+            AppDomain.CurrentDomain.UnhandledException += this.CurrentDomainUnhandledException;
+            var splashScreenViewModel = new DXSplashScreenViewModel() { Title = "DEH-CATIA Adapter", Logo = new Uri("pack://application:,,,/Resources/logo.png") };
             SplashScreenManager.Create(() => new SplashScreen(), splashScreenViewModel).ShowOnStartup();
 
             containerBuilder ??= new ContainerBuilder();
             RegisterTypes(containerBuilder);
             RegisterViewModels(containerBuilder);
             AppContainer.BuildContainer(containerBuilder);
-        }
-
-        /// <summary>
-        /// Occurs when the app closes, it makes sure any opc connection are properly closed
-        /// </summary>
-        /// <param name="sender">The <see cref="object"/> sender</param>
-        /// <param name="e">The <see cref="ExitEventArgs"/></param>
-        private void OnExit(object sender, ExitEventArgs e)
-        {
         }
 
         /// <summary>
@@ -88,6 +89,39 @@ namespace DEHCATIA
             base.OnStartup(e);
         }
 
+        /// <summary>
+        /// Add an entry in the <see cref="NLog"/> log that states that the app has started
+        /// </summary>
+        private void LogAppStart()
+        {
+            this.logger.Info("-----------------------------------------------------------------------------------------");
+            this.logger.Info($"Starting CATIA Adapter {Assembly.GetExecutingAssembly().GetName().Version}");
+            this.logger.Info("-----------------------------------------------------------------------------------------");
+        }
+
+        /// <summary>
+        /// Handles dispatcher unhandled exception
+        /// </summary>
+        /// <param name="sender">The <see cref="object"/> sender</param>
+        /// <param name="e">The <see cref="UnhandledExceptionEventArgs"/></param>
+        public void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            this.logger.Error(e.Exception);
+            e.Handled = true;
+        }
+
+        /// <summary>
+        /// Warn when an exception is thrown and log it 
+        /// </summary>
+        /// <param name="sender">The <see cref="object"/> sender</param>
+        /// <param name="e">The <see cref="UnhandledExceptionEventArgs"/></param>
+        private void CurrentDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            var errorMessage = $"{sender} has thrown {e.ExceptionObject.GetType()} \n\r {(e.ExceptionObject as Exception)?.Message}";
+            MessageBox.Show(errorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            this.logger.Error(e.ExceptionObject);
+        }
+        
         /// <summary>
         /// Registers the types that can be resolved by the <see cref="IContainer"/>
         /// </summary>
@@ -110,5 +144,5 @@ namespace DEHCATIA
             containerBuilder.RegisterType<DstBrowserHeaderViewModel>().As<IDstBrowserHeaderViewModel>();
             containerBuilder.RegisterType<DstProductTreeViewModel>().As<IDstProductTreeViewModel>();
         }
-    }
+    }   
 }
