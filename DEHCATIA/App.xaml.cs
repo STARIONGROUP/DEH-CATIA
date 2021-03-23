@@ -32,6 +32,7 @@ namespace DEHCATIA
     using Autofac;
 
     using DEHCATIA.DstController;
+    using DEHCATIA.Services.ComConnector;
     using DEHCATIA.ViewModels;
     using DEHCATIA.ViewModels.Interfaces;
     using DEHCATIA.Views;
@@ -130,6 +131,7 @@ namespace DEHCATIA
         {
             containerBuilder.RegisterType<MappingEngine>().As<IMappingEngine>().WithParameter(MappingEngine.ParameterName, Assembly.GetExecutingAssembly());
             containerBuilder.RegisterType<DstController.DstController>().As<IDstController>().SingleInstance();
+            containerBuilder.RegisterType<CatiaComService>().As<ICatiaComService>().SingleInstance();
         }
 
         /// <summary>

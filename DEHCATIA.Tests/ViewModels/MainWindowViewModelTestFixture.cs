@@ -58,7 +58,6 @@ namespace DEHCATIA.Tests.ViewModels
         {
             Assert.IsNotNull(this.viewModel.HubDataSourceViewModel);
             Assert.IsNotNull(this.viewModel.StatusBarControlViewModel);
-            Assert.IsNotNull(this.viewModel.NetChangePreviewViewModel);
             Assert.IsNull(this.viewModel.SwitchPanelBehavior);
         }
 
@@ -69,6 +68,7 @@ namespace DEHCATIA.Tests.ViewModels
             mock.Setup(x => x.Switch());
             mock.Setup(x => x.MappingDirection).Returns(MappingDirection.FromHubToDst);
             this.viewModel.SwitchPanelBehavior = mock.Object;
+            Assert.DoesNotThrow(() => this.viewModel.SwitchPanelBehavior.Switch());
         }
     }
 }

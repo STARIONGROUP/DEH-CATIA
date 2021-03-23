@@ -96,7 +96,6 @@
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -105,33 +104,15 @@
                         <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Label Margin="2" Grid.Row="0" Grid.Column="0" Content="Name:"></Label>
-                    <Label Margin="2" Grid.Row="0" Grid.Column="2" Content="ShortName:"></Label>
-                    <Label Margin="2" Grid.Row="1" Grid.Column="0" Content="ElementDefinition:"></Label>
-                    <Label Margin="2" Grid.Row="1" Grid.Column="2" Content="Mass Density:"></Label>
+                    <Label Margin="2" Grid.Row="0" Grid.Column="2" Content="Volume:"></Label>
+                    <Label Margin="2" Grid.Row="1" Grid.Column="0" Content="Mass:"></Label>
+                    <Label Margin="2" Grid.Row="1" Grid.Column="2" Content="Center of gravity:"></Label>
+                    <Label Margin="2" Grid.Row="2" Grid.Column="0" Content="Moment of Inertia:"></Label>
                     <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" Text="{Binding SelectedElement.Name}"></TextBlock>
-                    <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="0" Grid.Column="3" Text="{Binding SelectedElement.ShortName}"></TextBlock>
-                    <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Text="{Binding SelectedElement.ElementDefinition.Iid}"></TextBlock>
-                    <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="1" Grid.Column="3" Text="{Binding SelectedElement.Name}"></TextBlock>
-
-                    <GroupBox Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="2" Header="Shape Info">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"></RowDefinition>
-                                <RowDefinition Height="Auto"></RowDefinition>
-                                <RowDefinition Height="Auto"></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <Label Margin="2" Grid.Row="0" Grid.Column="0" Content="Height:"></Label>
-                            <Label Margin="2" Grid.Row="1" Grid.Column="0" Content="Lenght:"></Label>
-                            <Label Margin="2" Grid.Row="2" Grid.Column="0" Content="Mass:"></Label>
-                            <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" Text="{Binding SelectedElement.Name}"></TextBlock>
-                            <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Text="{Binding SelectedElement.ShortName}"></TextBlock>
-                            <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="2" Grid.Column="1" Text="{Binding SelectedElement.ElementDefinition.Iid}"></TextBlock>
-                        </Grid>
-                    </GroupBox>
+                    <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="0" Grid.Column="3" Text="{Binding SelectedElement.Volume}"></TextBlock>
+                    <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Text="{Binding SelectedElement.Mass}"></TextBlock>
+                    <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="1" Grid.Column="3"  Text="{Binding SelectedElement.CenterOfGravity}"></TextBlock>
+                    <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3"  Text="{Binding SelectedElement.MomentOfInertia}"></TextBlock>
                 </Grid>
             </dxdo:LayoutPanel>
         </dxdo:LayoutGroup>

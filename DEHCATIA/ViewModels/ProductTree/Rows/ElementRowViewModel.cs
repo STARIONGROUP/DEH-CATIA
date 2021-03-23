@@ -24,7 +24,12 @@
 
 namespace DEHCATIA.ViewModels.ProductTree.Rows
 {
+    using System;
+
     using DEHCATIA.Enumerations;
+    using DEHCATIA.ViewModels.ProductTree.Parameters;
+
+    using DevExpress.Mvvm.Native;
 
     using ReactiveUI;
 
@@ -67,6 +72,31 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// Backing field for <see cref="IsHighlighted"/>
         /// </summary>
         private string isHighlighted;
+
+        /// <summary>
+        /// Backing field for <see cref="Shape"/>
+        /// </summary>
+        private CatiaShape shape;
+
+        /// <summary>
+        /// Backing field for <see cref="Volume"/>
+        /// </summary>
+        private DoubleWithUnitParameter volume;
+
+        /// <summary>
+        /// Backing field for <see cref="Mass"/>
+        /// </summary>
+        private DoubleWithUnitParameter mass;
+
+        /// <summary>
+        /// Backing field for <see cref="CenterOfGravity"/>
+        /// </summary>
+        private CenterOfGravityParameter centerOfGravity;
+
+        /// <summary>
+        /// Backing field for <see cref="MomentOfInertia"/>
+        /// </summary>
+        private MomentOfInertiaParameter momentOfInertia;
 
         /// <summary>
         /// Gets or sets the element name.
@@ -121,8 +151,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
             get => this.isHighlighted;
             set => this.RaiseAndSetIfChanged(ref this.isHighlighted, value);
         }
-
-
+        
         /// <summary>
         /// Gets or sets a value whether the row is expanded
         /// </summary>
@@ -131,10 +160,60 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
             get => this.isExpanded;
             set => this.RaiseAndSetIfChanged(ref this.isExpanded, value);
         }
+        
+        /// <summary>
+        /// Gets or sets the shape this <see cref="ElementRowViewModel"/> represents
+        /// </summary>
+        public CatiaShape Shape
+        {
+            get => this.shape;
+            set => this.RaiseAndSetIfChanged(ref this.shape, value);
+        }
+        
+        /// <summary>
+        /// Gets or sets the Volume
+        /// </summary>
+        public DoubleWithUnitParameter Volume
+        {
+            get => this.volume;
+            set => this.RaiseAndSetIfChanged(ref this.volume, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the Mass
+        /// </summary>
+        public DoubleWithUnitParameter Mass
+        {
+            get => this.mass;
+            set => this.RaiseAndSetIfChanged(ref this.mass, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the Center of gravity
+        /// </summary>
+        public CenterOfGravityParameter CenterOfGravity
+        {
+            get => this.centerOfGravity;
+            set => this.RaiseAndSetIfChanged(ref this.centerOfGravity, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the moment of inertia
+        /// </summary>
+        public MomentOfInertiaParameter MomentOfInertia
+        {
+            get => this.momentOfInertia;
+            set => this.RaiseAndSetIfChanged(ref this.momentOfInertia, value);
+        }
 
         /// <summary>
         /// Gets or sets the child elements of this element.
         /// </summary>
         public ReactiveList<ElementRowViewModel> Children { get; set; } = new ReactiveList<ElementRowViewModel>();
+
+        /// <summary>
+        /// Gets or sets the <see cref="IDstParameter"/> this element contains
+        /// </summary>
+        public ReactiveList<IDstParameter> Parameters { get; set; } = new ReactiveList<IDstParameter>();
     }
 }

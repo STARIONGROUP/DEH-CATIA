@@ -27,6 +27,7 @@ namespace DEHCATIA.Tests.ViewModels
     using System.Runtime.InteropServices;
 
     using DEHCATIA.DstController;
+    using DEHCATIA.Services.ComConnector;
     using DEHCATIA.ViewModels;
 
     using INFITF;
@@ -42,16 +43,18 @@ namespace DEHCATIA.Tests.ViewModels
         private Mock<Application> catiaApp;
 
         private DstBrowserHeaderViewModel viewModel;
+        private Mock<ICatiaComService> comService;
 
         [SetUp]
         public void Setup()
         {
             this.dstController = new Mock<IDstController>();
+            this.comService = new Mock<ICatiaComService>();
             this.catiaApp = new Mock<Application>();
 
             this.dstController.Setup(c => c.IsCatiaConnected).Returns(false);
 
-            this.viewModel = new DstBrowserHeaderViewModel(this.dstController.Object);
+            this.viewModel = new DstBrowserHeaderViewModel(this.dstController.Object, this.comService.Object);
         }
 
         [Test]
@@ -75,7 +78,7 @@ namespace DEHCATIA.Tests.ViewModels
             this.catiaApp.Setup(a => a.ActiveDocument.get_CurrentFilter()).Returns("dummy filter");
 
             this.dstController.Setup(c => c.IsCatiaConnected).Returns(true);
-            this.dstController.Setup(c => c.CatiaApp).Returns(catiaApp.Object);
+            this.comService.Setup(c => c.CatiaApp).Returns(this.catiaApp.Object);
 
             this.viewModel.UpdateProperties();
 

@@ -53,7 +53,7 @@ namespace DEHCATIA.Enumerations
         /// A material might be attached to a Part inside CATIA.
         /// CATIA materials can be stored inside a material library
         /// </summary>
-        Material,
+        CatMaterial,
 
         /// <summary>
         /// A Component refers an Assembly or a Part file and contains position information

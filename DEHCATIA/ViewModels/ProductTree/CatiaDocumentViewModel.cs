@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CatiaDocument.cs" company="RHEA System S.A.">
+// <copyright file="CatiaDocumentViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -25,6 +25,7 @@
 namespace DEHCATIA.ViewModels.ProductTree
 {
     using DEHCATIA.Enumerations;
+    using DEHCATIA.ViewModels.ProductTree.Parameters;
 
     using INFITF;
 
@@ -33,7 +34,7 @@ namespace DEHCATIA.ViewModels.ProductTree
     /// <summary>
     /// Represents an instance of a CATIA document.
     /// </summary>
-    public class CatiaDocument : ReactiveObject
+    public class CatiaDocumentViewModel : ReactiveObject
     {
         /// <summary>
         /// Backing field for <see cref="Name"/>
@@ -79,7 +80,7 @@ namespace DEHCATIA.ViewModels.ProductTree
         }
 
         /// <summary>
-        /// Gets or sets the full name (compination of <see cref="Name"/> and <see cref="Path"/>) of the document. 
+        /// Gets or sets the full name (combination of <see cref="Name"/> and <see cref="Path"/>) of the document. 
         /// </summary>
         public string FullName
         {
@@ -103,6 +104,23 @@ namespace DEHCATIA.ViewModels.ProductTree
         {
             get => this.elementType;
             set => this.RaiseAndSetIfChanged(ref this.elementType, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the collection of <see cref="IDstParameter"/>
+        /// </summary>
+        public ReactiveList<IDstParameter> Parameters { get; set; } = new ReactiveList<IDstParameter>();
+
+        /// <summary>
+        /// Initializes a new <see cref="CatiaDocumentViewModel"/>
+        /// </summary>
+        public CatiaDocumentViewModel(Document document, ElementType elementType)
+        {
+            this.Path = document.Path;
+            this.Name = document.get_Name();
+            this.ElementType = elementType;
+            this.Document = document;
+            this.FullName = document.FullName;
         }
     }
 }

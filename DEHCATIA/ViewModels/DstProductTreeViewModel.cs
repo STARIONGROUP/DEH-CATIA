@@ -25,12 +25,14 @@
 namespace DEHCATIA.ViewModels
 {
     using System;
+    using System.Diagnostics;
     using System.Reactive.Linq;
 
     using DEHCATIA.DstController;
     using DEHCATIA.ViewModels.Interfaces;
-    using DEHCATIA.ViewModels.ProductTree;
     using DEHCATIA.ViewModels.ProductTree.Rows;
+
+    using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using ReactiveUI;
 
@@ -43,6 +45,11 @@ namespace DEHCATIA.ViewModels
         /// The <see cref="IDstController"/>.
         /// </summary>
         private readonly IDstController dstController;
+
+        /// <summary>
+        /// The <see cref="IStatusBarControlViewModel"/>
+        /// </summary>
+        private readonly IStatusBarControlViewModel statusBar;
 
         /// <summary>
         /// Backing field for <see cref="IsBusy"/>
@@ -80,9 +87,12 @@ namespace DEHCATIA.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="DstProductTreeViewModel"/> class.
         /// </summary>
-        public DstProductTreeViewModel(IDstController dstController)
+        /// <param name="dstController">The <see cref="IDstController"/></param>
+        /// <param name="statusBar">The <see cref="IStatusBarControlViewModel"/></param>
+        public DstProductTreeViewModel(IDstController dstController, IStatusBarControlViewModel statusBar)
         {
             this.dstController = dstController;
+            this.statusBar = statusBar;
 
             this.WhenAnyValue(vm => vm.dstController.IsCatiaConnected)
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -94,10 +104,20 @@ namespace DEHCATIA.ViewModels
         /// </summary>
         private void UpdateProductTree()
         {
+            this.RootElements.Clear();
             this.IsBusy = true;
 
-            this.RootElements.Clear();
-            this.RootElements.Add(this.dstController.GetCatiaProductTreeFromActiveDocument());
+            if (this.dstController.IsCatiaConnected)
+            {
+                this.statusBar.Append("Processing the Catia product tree in progress");
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
+
+                this.RootElements.Add(this.dstController.GetProductTree());
+
+                stopwatch.Stop();
+                this.statusBar.Append($"Processing the Catia product tree was done in {stopwatch.Elapsed:g}");
+            }
 
             this.IsBusy = false;
         }

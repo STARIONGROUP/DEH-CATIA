@@ -75,6 +75,7 @@ namespace DEHCATIA.ViewModels
             this.HubDataSourceViewModel = hubDataSourceViewModel;
             this.DstSourceViewModel = dstSourceViewModel;
             this.StatusBarControlViewModel = statusBarControlViewModel;
+            this.StatusBarControlViewModel.Append($"Welcome to the DEH Catia adapter!");
         }
     }
 }
