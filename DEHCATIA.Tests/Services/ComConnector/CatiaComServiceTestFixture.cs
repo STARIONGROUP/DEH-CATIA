@@ -24,8 +24,6 @@
 
 namespace DEHCATIA.Tests.Services.ComConnector
 {
-    using CDP4Common.Helpers;
-
     using DEHCATIA.Services.ComConnector;
 
     using NUnit.Framework;
@@ -49,8 +47,6 @@ namespace DEHCATIA.Tests.Services.ComConnector
         }
 
         [Test]
-
-        //[Ignore("Please make sure a CATIA client is running")]
         public void VerifyCatiaConnection()
         {
             //this.service.CatiaApp = this.catiaApp.

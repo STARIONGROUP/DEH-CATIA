@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CenterOfGravityParameter.cs" company="RHEA System S.A.">
+// <copyright file="CatiaViewModelBase.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -22,24 +22,27 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.ViewModels.ProductTree.Parameters
+namespace DEHCATIA.ViewModels.ProductTree
 {
-    public class CenterOfGravityParameter : DstParameter<(double X, double Y, double Z)>
+    using ReactiveUI;
+
+    /// <summary>
+    /// Base view model for all view models that represents object from catia
+    /// </summary>
+    public class CatiaViewModelBase : ReactiveObject, ICatiaViewModelBase
     {
         /// <summary>
-        /// Initializes a new <see cref="DstParameter{TValueType}"/>
+        /// Backing field for <see cref="Name"/>
         /// </summary>
-        /// <param name="value">The value</param>
-        public CenterOfGravityParameter((double X, double Y, double Z) value) : base(default, value)
-        {
-            this.ShortName = "CenterOfGravity";
-        }
+        private string name;
 
-        /// <summary>Returns a string that represents the current object.</summary>
-        /// <returns>A string that represents the current object.</returns>
-        public override string ToString()
+        /// <summary>
+        /// Gets or sets the name.
+        /// </summary>
+        public string Name
         {
-            return $"X {this.Value.X} | Y {this.Value.Y} | Z {this.Value.Z}";
+            get => this.name;
+            set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
     }
 }

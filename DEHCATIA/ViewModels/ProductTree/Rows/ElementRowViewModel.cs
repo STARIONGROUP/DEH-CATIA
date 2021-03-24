@@ -76,27 +76,27 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// <summary>
         /// Backing field for <see cref="Shape"/>
         /// </summary>
-        private CatiaShape shape;
+        private CatiaShapeViewModel shape;
 
         /// <summary>
         /// Backing field for <see cref="Volume"/>
         /// </summary>
-        private DoubleWithUnitParameter volume;
+        private DoubleWithUnitParameterViewModel volume;
 
         /// <summary>
         /// Backing field for <see cref="Mass"/>
         /// </summary>
-        private DoubleWithUnitParameter mass;
+        private DoubleWithUnitParameterViewModel mass;
 
         /// <summary>
         /// Backing field for <see cref="CenterOfGravity"/>
         /// </summary>
-        private CenterOfGravityParameter centerOfGravity;
+        private CenterOfGravityParameterViewModel centerOfGravity;
 
         /// <summary>
         /// Backing field for <see cref="MomentOfInertia"/>
         /// </summary>
-        private MomentOfInertiaParameter momentOfInertia;
+        private MomentOfInertiaParameterViewModel momentOfInertia;
 
         /// <summary>
         /// Gets or sets the element name.
@@ -164,7 +164,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// <summary>
         /// Gets or sets the shape this <see cref="ElementRowViewModel"/> represents
         /// </summary>
-        public CatiaShape Shape
+        public CatiaShapeViewModel Shape
         {
             get => this.shape;
             set => this.RaiseAndSetIfChanged(ref this.shape, value);
@@ -173,7 +173,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// <summary>
         /// Gets or sets the Volume
         /// </summary>
-        public DoubleWithUnitParameter Volume
+        public DoubleWithUnitParameterViewModel Volume
         {
             get => this.volume;
             set => this.RaiseAndSetIfChanged(ref this.volume, value);
@@ -182,7 +182,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// <summary>
         /// Gets or sets the Mass
         /// </summary>
-        public DoubleWithUnitParameter Mass
+        public DoubleWithUnitParameterViewModel Mass
         {
             get => this.mass;
             set => this.RaiseAndSetIfChanged(ref this.mass, value);
@@ -191,7 +191,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// <summary>
         /// Gets or sets the Center of gravity
         /// </summary>
-        public CenterOfGravityParameter CenterOfGravity
+        public CenterOfGravityParameterViewModel CenterOfGravity
         {
             get => this.centerOfGravity;
             set => this.RaiseAndSetIfChanged(ref this.centerOfGravity, value);
@@ -200,7 +200,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// <summary>
         /// Gets or sets the moment of inertia
         /// </summary>
-        public MomentOfInertiaParameter MomentOfInertia
+        public MomentOfInertiaParameterViewModel MomentOfInertia
         {
             get => this.momentOfInertia;
             set => this.RaiseAndSetIfChanged(ref this.momentOfInertia, value);
@@ -212,8 +212,8 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         public ReactiveList<ElementRowViewModel> Children { get; set; } = new ReactiveList<ElementRowViewModel>();
 
         /// <summary>
-        /// Gets or sets the <see cref="IDstParameter"/> this element contains
+        /// Gets or sets the <see cref="IDstParameterViewModel"/> this element contains
         /// </summary>
-        public ReactiveList<IDstParameter> Parameters { get; set; } = new ReactiveList<IDstParameter>();
+        public ReactiveList<IDstParameterViewModel> Parameters { get; set; } = new ReactiveList<IDstParameterViewModel>();
     }
 }

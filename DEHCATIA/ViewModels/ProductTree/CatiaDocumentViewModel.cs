@@ -34,13 +34,8 @@ namespace DEHCATIA.ViewModels.ProductTree
     /// <summary>
     /// Represents an instance of a CATIA document.
     /// </summary>
-    public class CatiaDocumentViewModel : ReactiveObject
+    public class CatiaDocumentViewModel : CatiaViewModelBase
     {
-        /// <summary>
-        /// Backing field for <see cref="Name"/>
-        /// </summary>
-        private string name;
-
         /// <summary>
         /// Backing field for <see cref="Path"/>
         /// </summary>
@@ -60,16 +55,7 @@ namespace DEHCATIA.ViewModels.ProductTree
         /// Backing field for <see cref="ElementType"/>
         /// </summary>
         private ElementType elementType;
-
-        /// <summary>
-        /// Gets or sets the name of the document.
-        /// </summary>
-        public string Name
-        {
-            get => this.name;
-            set => this.RaiseAndSetIfChanged(ref this.name, value);
-        }
-
+        
         /// <summary>
         /// Gets or sets the physical path of the document.
         /// </summary>
@@ -107,9 +93,9 @@ namespace DEHCATIA.ViewModels.ProductTree
         }
 
         /// <summary>
-        /// Gets or sets the collection of <see cref="IDstParameter"/>
+        /// Gets or sets the collection of <see cref="IDstParameterViewModel"/>
         /// </summary>
-        public ReactiveList<IDstParameter> Parameters { get; set; } = new ReactiveList<IDstParameter>();
+        public ReactiveList<IDstParameterViewModel> Parameters { get; set; } = new ReactiveList<IDstParameterViewModel>();
 
         /// <summary>
         /// Initializes a new <see cref="CatiaDocumentViewModel"/>

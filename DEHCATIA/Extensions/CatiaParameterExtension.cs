@@ -42,8 +42,8 @@ namespace DEHCATIA.Extensions
         /// from the <paramref name="parameter"/> <see cref="Parameter.ValueAsString"/>
         /// </summary>
         /// <param name="parameter">The extended <see cref="Parameter"/></param>
-        /// <returns>A <see cref="DoubleWithUnitValue"/></returns>
-        public static DoubleWithUnitValue GetDoubleWithUnitValue(this Parameter parameter)
+        /// <returns>A <see cref="DoubleWithUnitValueViewModel"/></returns>
+        public static DoubleWithUnitValueViewModel GetDoubleWithUnitValue(this Parameter parameter)
         {
             var value = parameter.ValueAsString();
 
@@ -57,7 +57,7 @@ namespace DEHCATIA.Extensions
             if (double.TryParse(match.Value.Replace(',', '.'),
                 NumberStyles.Any, CultureInfo.InvariantCulture, out var valueDouble))
             {
-                return new DoubleWithUnitValue()
+                return new DoubleWithUnitValueViewModel()
                 {
                     Value = valueDouble,
                     UnitString = value.Substring(match.Length)

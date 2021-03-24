@@ -26,9 +26,11 @@ namespace DEHCATIA.Services.ComConnector
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
+    using System.Threading;
 
     using DEHCATIA.Enumerations;
     using DEHCATIA.ViewModels.ProductTree;
@@ -320,6 +322,8 @@ namespace DEHCATIA.Services.ComConnector
                 Description = product.get_DescriptionRef(),
                 FileName = fileName,
             };
+
+            this.AddInertiaParameters(product.Analyze, element);
             
             return element;
         }
@@ -328,10 +332,10 @@ namespace DEHCATIA.Services.ComConnector
         /// Parses all <paramref name="parameters"/> parameter
         /// </summary>
         /// <param name="parameters">The <see cref="Product"/></param>
-        /// <returns>A collection of <see cref="IDstParameter"/></returns>
-        private IEnumerable<IDstParameter> ParseParameters(Parameters parameters)
+        /// <returns>A collection of <see cref="IDstParameterViewModel"/></returns>
+        private IEnumerable<IDstParameterViewModel> ParseParameters(Parameters parameters)
         {
-            var collection = new List<IDstParameter>();
+            var collection = new List<IDstParameterViewModel>();
 
             foreach (var parameter in parameters.OfType<Parameter>())
             {
@@ -344,17 +348,17 @@ namespace DEHCATIA.Services.ComConnector
 
                 if (parameter is RealParam realParam)
                 {
-                    collection.Add(new DoubleWithUnitParameter(parameter));
+                    collection.Add(new DoubleWithUnitParameterViewModel(parameter));
                     continue;
                 }
 
                 if (bool.TryParse(valueAsString, out var booleanValue))
                 {
-                    collection.Add(new BooleanParameter(parameter, booleanValue));
+                    collection.Add(new BooleanParameterViewModel(parameter, booleanValue));
                 }
                 else
                 {
-                    collection.Add(new StringParameter(parameter, valueAsString));
+                    collection.Add(new StringParameterViewModel(parameter, valueAsString));
                 }
             }
 
@@ -395,7 +399,6 @@ namespace DEHCATIA.Services.ComConnector
             }
 
             element.Parameters.AddRange(this.ParseParameters(partDocument.Part.Parameters));
-            this.AddInertiaParameters(partDocument, element);
         }
 
         /// <summary>
@@ -427,19 +430,19 @@ namespace DEHCATIA.Services.ComConnector
         /// Gets the Mass from analyse object
         /// </summary>
         /// <param name="analyze">the object where to receive data from</param>
-        /// <returns>A <see cref="DoubleWithUnitParameter"/></returns>1
-        private DoubleWithUnitParameter GetMass(Analyze analyze)
+        /// <returns>A <see cref="DoubleWithUnitParameterViewModel"/></returns>1
+        private DoubleWithUnitParameterViewModel GetMass(Analyze analyze)
         {
             try
             {
-                return new DoubleWithUnitParameter(new DoubleWithUnitValue()
+                return new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel()
                 {
                     Value = analyze.Mass,
                     CatiaSymbol = "kg",
                     UnitString = "kg"
                 })
                 {
-                    ShortName = "mass_with_margin"
+                    Name = "mass_with_margin"
                 };
             }
             catch (COMException exception)
@@ -454,11 +457,11 @@ namespace DEHCATIA.Services.ComConnector
         /// </summary>
         /// <param name="analyze">the object where to receive data from</param>
         /// <returns>The parameter Volume</returns>
-        private DoubleWithUnitParameter GetVolume(Analyze analyze)
+        private DoubleWithUnitParameterViewModel GetVolume(Analyze analyze)
         {
             try
             {
-                return new DoubleWithUnitParameter(new DoubleWithUnitValue()
+                return new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel()
                     {
                         // Volume comes back as milimeters3, so conversion to meter3 is neccessary
                         Value = analyze.Volume / 1000000000,
@@ -466,7 +469,7 @@ namespace DEHCATIA.Services.ComConnector
                         UnitString = "m³"
                 })
                 {
-                    ShortName = "Vol"
+                    Name = "Vol"
                 };
             }
             catch (COMException exception)
@@ -481,7 +484,7 @@ namespace DEHCATIA.Services.ComConnector
         /// </summary>
         /// <param name="analyzeOrInertia">the object where to receive data from</param>
         /// <returns>The moments of inertia</returns>
-        private MomentOfInertiaParameter GetMomentOfInertia(AnyObject analyzeOrInertia)
+        private MomentOfInertiaParameterViewModel GetMomentOfInertia(AnyObject analyzeOrInertia)
         {
             var array = new dynamic[9];
             var values = new double[9];
@@ -514,15 +517,15 @@ namespace DEHCATIA.Services.ComConnector
                 return null;
             }
 
-            return new MomentOfInertiaParameter(new MomentOfInertia(values));
+            return new MomentOfInertiaParameterViewModel(new MomentOfInertiaViewModel(values));
         }
 
         /// <summary>
         /// Gets the centre of gravity from analyse or inertia object
         /// </summary>
         /// <param name="analyzeOrInertia">the object where to receive data from</param>
-        /// <returns>A <see cref="CenterOfGravityParameter"/></returns>
-        private CenterOfGravityParameter GetCenterOfGravity(AnyObject analyzeOrInertia)
+        /// <returns>A <see cref="CenterOfGravityParameterViewModel"/></returns>
+        private CenterOfGravityParameterViewModel GetCenterOfGravity(AnyObject analyzeOrInertia)
         {
             var array = new dynamic[3];
             var value = default((double X, double Y, double Z));
@@ -556,7 +559,7 @@ namespace DEHCATIA.Services.ComConnector
                 return null;
             }
 
-            return new CenterOfGravityParameter(value);
+            return new CenterOfGravityParameterViewModel(value);
         }
 
         /// <summary>

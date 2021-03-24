@@ -36,7 +36,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
     /// Represents one <see cref="Parameter"/>
     /// </summary>
     /// <typeparam name="TValueType">The type of the value that parameter holds</typeparam>
-    public abstract class DstParameter<TValueType> : ReactiveObject, IDstParameter
+    public abstract class DstParameterViewModel<TValueType> : CatiaViewModelBase, IDstParameterViewModel
     {
         /// <summary>
         /// Backing field for <see cref="Parameter"/>
@@ -47,11 +47,6 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
         /// Backing field for <see cref="IsQuantityKind"/>
         /// </summary>
         private bool isQuantityKind;
-
-        /// <summary>
-        /// Backing field for <see cref="ShortName"/>
-        /// </summary>
-        private string shortName;
 
         /// <summary>
         /// Backing field for <see cref="Value"/>
@@ -90,16 +85,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
             get => this.isQuantityKind;
             set => this.RaiseAndSetIfChanged(ref this.isQuantityKind, value);
         }
-
-        /// <summary>
-        /// Gets or sets the short name
-        /// </summary>
-        public string ShortName
-        {
-            get => this.shortName;
-            set => this.RaiseAndSetIfChanged(ref this.shortName, value);
-        }
-
+        
         /// <summary>
         /// Gets or sets the Value
         /// </summary>
@@ -137,16 +123,16 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
         }
 
         /// <summary>
-        /// Initializes a new <see cref="DstParameter{TValueType}"/>
+        /// Initializes a new <see cref="DstParameterViewModel{TValueType}"/>
         /// </summary>
         /// <param name="parameter">The <see cref="Parameter"/></param>
         /// <param name="value">The value</param>
-        protected DstParameter(Parameter parameter, TValueType value)
+        protected DstParameterViewModel(Parameter parameter, TValueType value)
         {
             this.Parameter = parameter;
             this.IsQuantityKind = parameter is RealParam;
             this.ModelCode = parameter?.get_Name().Replace("\\", ".");
-            this.ShortName = Path.GetFileName(parameter?.get_Name());
+            this.Name = Path.GetFileName(parameter?.get_Name());
             this.Value = value;
             this.Comment = parameter?.get_Comment();
             this.ValueString = parameter?.ValueAsString();

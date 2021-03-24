@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DoubleWithUnitParameter.cs" company="RHEA System S.A.">
+// <copyright file="BooleanParameterViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -24,37 +24,20 @@
 
 namespace DEHCATIA.ViewModels.ProductTree.Parameters
 {
-    using DEHCATIA.Extensions;
-
     using KnowledgewareTypeLib;
 
     /// <summary>
-    /// Represents a <see cref="Parameter"/>
+    /// Represents a <see cref="bool"/> <see cref="Parameter"/>
     /// </summary>
-    public class DoubleWithUnitParameter : DstParameter<DoubleWithUnitValue>
+    public class BooleanParameterViewModel : DstParameterViewModel<bool>
     {
         /// <summary>
-        /// Initializes a new <see cref="DstParameter{TValueType}"/>
+        /// Initializes a new <see cref="DstParameterViewModel{TValueType}"/>
         /// </summary>
-        /// <param name="parameter">The <see cref="parameter"></see>
-        public DoubleWithUnitParameter(Parameter parameter) : base(parameter, default)
+        /// <param name="parameter">The <see cref="Parameter"/></param>
+        /// <param name="value">The value</param>
+        public BooleanParameterViewModel(Parameter parameter, bool value) : base(parameter, value)
         {
-            this.Value = parameter.GetDoubleWithUnitValue();
-        }
-
-        /// <summary>
-        /// Initializes a new <see cref="DstParameter{TValueType}"/>
-        /// </summary>
-        /// <param name="value">The <see cref="DoubleWithUnitValue"/> value</param>
-        public DoubleWithUnitParameter(DoubleWithUnitValue value) : base(default, value)
-        {
-        }
-        
-        /// <summary>Returns a string that represents the current object.</summary>
-        /// <returns>A string that represents the current object.</returns>
-        public override string ToString()
-        {
-            return $"{this.Value}";
         }
     }
 }

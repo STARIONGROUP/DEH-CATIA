@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MomentOfInertia.cs" company="RHEA System S.A.">
+// <copyright file="MomentOfInertiaViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -26,10 +26,12 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
 {
     using System.Collections.Generic;
 
+    using ReactiveUI;
+
     /// <summary>
-    /// This <see cref="MomentOfInertia"/> represents a moment of inertia
+    /// This <see cref="MomentOfInertiaViewModel"/> represents a moment of inertia
     /// </summary>
-    public struct MomentOfInertia
+    public struct MomentOfInertiaViewModel
     {
         /// <summary>
         /// The XX value
@@ -77,10 +79,10 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
         public double Izz { get; set; }
 
         /// <summary>
-        /// Initializes a new <see cref="MomentOfInertia"/>
+        /// Initializes a new <see cref="MomentOfInertiaViewModel"/>
         /// </summary>
-        /// <param name="values">A array of double that contains the values that defines one <see cref="MomentOfInertia"/></param>
-        public MomentOfInertia(IReadOnlyList<double> values)
+        /// <param name="values">A array of double that contains the values that defines one <see cref="MomentOfInertiaViewModel"/></param>
+        public MomentOfInertiaViewModel(IReadOnlyList<double> values)
         {
             this.Ixx = values[0];
             this.Iyx = values[1];
@@ -91,6 +93,27 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
             this.Ixz = values[6];
             this.Iyz = values[7];
             this.Izz = values[8];
+        }
+
+        /// <summary>
+        /// Gets the values as a list of anonymous type for display purpose
+        /// </summary>
+        public ReactiveList<object> AsRows => new ReactiveList<object>(
+            new List<object>()
+                {
+                    new { Name = "X", X=this.ValueToString(this.Ixx), Y=this.ValueToString(this.Iyx), Z=this.ValueToString(this.Izx) },
+                    new { Name = "Y", X=this.ValueToString(this.Ixy), Y=this.ValueToString(this.Iyy), Z=this.ValueToString(this.Izy) },
+                    new { Name = "Z", X=this.ValueToString(this.Ixz), Y=this.ValueToString(this.Iyz), Z=this.ValueToString(this.Izz) },
+                });
+        
+        /// <summary>
+        /// Append the unit to the <paramref name="value"/>
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <returns>A string</returns>
+        private string ValueToString(double value)
+        {
+            return $"{value} kgxm2";
         }
 
         /// <summary>Returns a string that represents the current object.</summary>

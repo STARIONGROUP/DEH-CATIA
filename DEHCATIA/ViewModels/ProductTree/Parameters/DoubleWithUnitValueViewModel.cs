@@ -31,7 +31,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
     /// <summary>
     /// Represents a <see cref="double"/> with one unit
     /// </summary>
-    public class DoubleWithUnitValue : ReactiveObject
+    public class DoubleWithUnitValueViewModel : ReactiveObject
     {
         /// <summary>
         /// Backing field for <see cref="Value"/>

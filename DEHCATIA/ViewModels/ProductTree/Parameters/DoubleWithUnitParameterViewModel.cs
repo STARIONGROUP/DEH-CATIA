@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CenterOfGravityParameter.cs" company="RHEA System S.A.">
+// <copyright file="DoubleWithUnitParameterViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -24,22 +24,37 @@
 
 namespace DEHCATIA.ViewModels.ProductTree.Parameters
 {
-    public class MomentOfInertiaParameter : DstParameter<MomentOfInertia>
+    using DEHCATIA.Extensions;
+
+    using KnowledgewareTypeLib;
+
+    /// <summary>
+    /// Represents a <see cref="Parameter"/>
+    /// </summary>
+    public class DoubleWithUnitParameterViewModel : DstParameterViewModel<DoubleWithUnitValueViewModel>
     {
         /// <summary>
-        /// Initializes a new <see cref="DstParameter{TValueType}"/>
+        /// Initializes a new <see cref="DstParameterViewModelViewModel{TValueType}"/>
         /// </summary>
-        /// <param name="value">The value</param>
-        public MomentOfInertiaParameter(MomentOfInertia value) : base(default, value)
+        /// <param name="parameter">The <see cref="parameter"></see>
+        public DoubleWithUnitParameterViewModel(Parameter parameter) : base(parameter, default)
         {
-            this.ShortName = "MomentOfInertia";
+            this.Value = parameter.GetDoubleWithUnitValue();
         }
 
+        /// <summary>
+        /// Initializes a new <see cref="DstParameterViewModelViewModel{TValueType}"/>
+        /// </summary>
+        /// <param name="value">The <see cref="DoubleWithUnitValueViewModel"/> value</param>
+        public DoubleWithUnitParameterViewModel(DoubleWithUnitValueViewModel value) : base(default, value)
+        {
+        }
+        
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>
         public override string ToString()
         {
-            return $"{this.Value.ToString()}";
+            return $"{this.Value}";
         }
     }
 }

@@ -11,6 +11,7 @@
              xmlns:converters="clr-namespace:DEHCATIA.Converters"
              xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
              xmlns:rows="clr-namespace:DEHCATIA.ViewModels.ProductTree.Rows"
+             xmlns:dxpg="http://schemas.devexpress.com/winfx/2008/xaml/pivotgrid"
              d:DesignHeight="600" d:DesignWidth="400" mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -87,32 +88,80 @@
                     </dxg:TreeListControl.Columns>
                 </dxg:TreeListControl>
             </dxdo:LayoutPanel>
-            <dxdo:LayoutPanel MaxHeight="260" ItemHeight="3*" Name="DetailPane" AllowDock="False" MinWidth="200" VerticalAlignment="Stretch" 
+            <dxdo:LayoutPanel  ItemHeight="7*" Name="DetailPane" AllowDock="False" MinWidth="200" VerticalAlignment="Top" 
                               dxdo:AutoHideGroup.AutoHideType="Left" AllowHide="False"
                               AllowClose="False" AllowDrag="False" 
                               AllowFloat="False" AllowMove="False" Caption="Details">
-                <Grid Margin="10">
+                <Grid Margin="10" MaxHeight="400">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Label Margin="2" Grid.Row="0" Grid.Column="0" Content="Name:"></Label>
-                    <Label Margin="2" Grid.Row="0" Grid.Column="2" Content="Volume:"></Label>
+                    <Label Margin="2" Grid.Row="1" Grid.Column="2" Content="Volume:"></Label>
                     <Label Margin="2" Grid.Row="1" Grid.Column="0" Content="Mass:"></Label>
-                    <Label Margin="2" Grid.Row="1" Grid.Column="2" Content="Center of gravity:"></Label>
-                    <Label Margin="2" Grid.Row="2" Grid.Column="0" Content="Moment of Inertia:"></Label>
-                    <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" Text="{Binding SelectedElement.Name}"></TextBlock>
-                    <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="0" Grid.Column="3" Text="{Binding SelectedElement.Volume}"></TextBlock>
-                    <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Text="{Binding SelectedElement.Mass}"></TextBlock>
-                    <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="1" Grid.Column="3"  Text="{Binding SelectedElement.CenterOfGravity}"></TextBlock>
-                    <TextBlock Margin="2" VerticalAlignment="Center" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3"  Text="{Binding SelectedElement.MomentOfInertia}"></TextBlock>
+                    <Label Margin="2" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Content="Center of gravity:"></Label>
+                    <Label Margin="2" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Content="Moment of Inertia:"></Label>
+                    <Label Margin="2" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="1" Content="{Binding SelectedElement.Name}"></Label>
+                    <Label Margin="2" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="3" Content="{Binding SelectedElement.Volume}"></Label>
+                    <Label Margin="2" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1" Content="{Binding SelectedElement.Mass}"></Label>
+                    <dxg:GridControl Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3"
+                                     ToolTip="Center of Gravity" MaxHeight="50" 
+                                     HorizontalAlignment="Left" VerticalAlignment="Stretch" 
+                                     AllowUpdateTwoWayBoundPropertiesOnSynchronization="False" AutoGenerateColumns="None"
+                                     EnableSmartColumnsGeneration="False"
+                                     ItemsSource="{Binding SelectedElement.CenterOfGravity.AsRow}"
+                                     SelectionMode="Row">
+                        <dxg:GridControl.View>
+                            <dxg:TableView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AllowColumnMoving="True" AllowEditing="False" 
+                                           AllowGrouping="True" AutoWidth="true" IsDetailButtonVisibleBinding="{x:Null}" 
+                                           ShowFilterPanelMode="Never" ShowGroupPanel="False" 
+                                           VerticalScrollbarVisibility="Auto"
+                                           IndicatorWidth="30">
+                            </dxg:TableView>
+                        </dxg:GridControl.View>
+                        <dxg:GridControl.Columns>
+                            <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="X" />
+                            <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="Y" />
+                            <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="Z" />
+                        </dxg:GridControl.Columns>
+                    </dxg:GridControl>
+                    <dxg:GridControl Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3"
+                                     ToolTip="Mass Moment of Inertia" MaxHeight="210" 
+                                     HorizontalAlignment="Left" VerticalAlignment="Stretch" 
+                                     AllowUpdateTwoWayBoundPropertiesOnSynchronization="False" AutoGenerateColumns="None"
+                                     EnableSmartColumnsGeneration="False"
+                                     ItemsSource="{Binding SelectedElement.MomentOfInertia.Value.AsRows}"
+                                     SelectionMode="Row">
+                        <dxg:GridControl.View>
+                            <dxg:TableView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AllowColumnMoving="True" AllowEditing="False" 
+                                           AllowGrouping="True" AutoWidth="true" IsDetailButtonVisibleBinding="{x:Null}" 
+                                           ShowFilterPanelMode="Never" ShowGroupPanel="False" 
+                                           VerticalScrollbarVisibility="Auto"
+                                           IndicatorWidth="30">
+                                <dxg:TableView.RowIndicatorContentTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="Black" Background="#F8F8F8" BorderThickness=".2">
+                                            <TextBlock HorizontalAlignment="Center"  Text="{Binding Row.Name}" />
+                                        </Border>
+                                    </DataTemplate>
+                                </dxg:TableView.RowIndicatorContentTemplate>
+                            </dxg:TableView>
+                        </dxg:GridControl.View>
+                        <dxg:GridControl.Columns>
+                            <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="X" />
+                            <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="Y" />
+                            <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="Z" />
+                        </dxg:GridControl.Columns>
+                    </dxg:GridControl>
                 </Grid>
             </dxdo:LayoutPanel>
         </dxdo:LayoutGroup>

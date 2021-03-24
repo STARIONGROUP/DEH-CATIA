@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="StringParameter.cs" company="RHEA System S.A.">
+// <copyright file="CenterOfGravityParameterViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -24,20 +24,35 @@
 
 namespace DEHCATIA.ViewModels.ProductTree.Parameters
 {
-    using KnowledgewareTypeLib;
+    using System.Collections.Generic;
 
-    /// <summary>
-    /// Represents a <see cref="string"/> <see cref="Parameter"/> 
-    /// </summary>
-    public class StringParameter : DstParameter<string>
+    using ReactiveUI;
+
+    public class CenterOfGravityParameterViewModel : DstParameterViewModel<(double X, double Y, double Z)>
     {
         /// <summary>
-        /// Initializes a new <see cref="DstParameter{TValueType}"/>
+        /// Initializes a new <see cref="DstParameterViewModel{TValueType}"/>
         /// </summary>
-        /// <param name="parameter">The <see crDstParameter{TValueType}ype}.Parameter"/></param>
         /// <param name="value">The value</param>
-        public StringParameter(Parameter parameter, string value) : base(parameter, value)
+        public CenterOfGravityParameterViewModel((double X, double Y, double Z) value) : base(default, value)
         {
+            this.Name = "CenterOfGravity";
+        }
+
+        /// <summary>
+        /// Gets a collection reprentation of the <see cref="DstParameterViewModel{TValueType}.Value"/> for display purpose
+        /// </summary>
+        public ReactiveList<object> AsRow => new ReactiveList<object>(
+            new List<object>()
+            {
+                new {X = $"{this.Value.X} mm", Y = $"{this.Value.Y} mm", Z = $"{this.Value.Z} mm"}
+            });
+
+        /// <summary>Returns a string that represents the current object.</summary>
+        /// <returns>A string that represents the current object.</returns>
+        public override string ToString()
+        {
+            return $"X {this.Value.X} | Y {this.Value.Y} | Z {this.Value.Z}";
         }
     }
 }

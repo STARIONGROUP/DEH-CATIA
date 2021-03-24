@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BooleanParameter.cs" company="RHEA System S.A.">
+// <copyright file="IBaseParameter.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -24,20 +24,33 @@
 
 namespace DEHCATIA.ViewModels.ProductTree.Parameters
 {
+    using CDP4Common.SiteDirectoryData;
+
     using KnowledgewareTypeLib;
 
     /// <summary>
-    /// Represents a <see cref="bool"/> <see cref="Parameter"/>
+    /// Interface definition for <see cref="DstParameterViewModelViewModel{TValueType}"/>
     /// </summary>
-    public class BooleanParameter : DstParameter<bool>
+    public interface IDstParameterViewModel
     {
         /// <summary>
-        /// Initializes a new <see cref="DstParameter{TValueType}"/>
+        /// Gets or sets the represented <see cref="KnowledgewareTypeLib.Parameter"/>
         /// </summary>
-        /// <param name="parameter">The <see crDstParameter{TValueType}ype}.Parameter"/></param>
-        /// <param name="value">The value</param>
-        public BooleanParameter(Parameter parameter, bool value) : base(parameter, value)
-        {
-        }
+        Parameter Parameter { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the represented parameter is a <see cref="QuantityKind"/>
+        /// </summary>
+        bool IsQuantityKind { get; set; }
+
+        /// <summary>
+        /// Gets or sets the short name
+        /// </summary>
+        string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Value as string
+        /// </summary>
+        string ValueString { get; set; }
     }
 }

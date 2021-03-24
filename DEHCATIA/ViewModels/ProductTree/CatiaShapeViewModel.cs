@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CatiaShape.cs" company="RHEA System S.A.">
+// <copyright file="CatiaShapeViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -30,9 +30,9 @@ namespace DEHCATIA.ViewModels.ProductTree
     using ReactiveUI;
 
     /// <summary>
-    /// Represents a Catia Shape
+    /// Represents a Catia Shape with its geometric parameters
     /// </summary>
-    public class CatiaShape : ReactiveObject
+    public class CatiaShapeViewModel : CatiaViewModelBase
     {
         /// <summary>
         /// Backing field for <see cref="ShapeKind"/>
@@ -42,37 +42,37 @@ namespace DEHCATIA.ViewModels.ProductTree
         /// <summary>
         /// Backing field for <see cref="ReferenceUrl"/>
         /// </summary>
-        private DoubleWithUnitValue referenceUrl;
+        private DoubleWithUnitValueViewModel referenceUrl;
 
         /// <summary>
         /// Backing field for <see cref="WidthOrDiameter"/>
         /// </summary>
-        private DoubleWithUnitValue widthOrDiameter;
+        private DoubleWithUnitValueViewModel widthOrDiameter;
 
         /// <summary>
         /// Backing field for <see cref="Height"/>
         /// </summary>
-        private DoubleWithUnitValue height;
+        private DoubleWithUnitValueViewModel height;
 
         /// <summary>
         /// Backing field for <see cref="Length"/>
         /// </summary>
-        private DoubleWithUnitValue length;
+        private DoubleWithUnitValueViewModel length;
 
         /// <summary>
         /// Backing field for <see cref="LengthSupport"/>
         /// </summary>
-        private DoubleWithUnitValue lengthSupport;
+        private DoubleWithUnitValueViewModel lengthSupport;
 
         /// <summary>
         /// Backing field for <see cref="Angle"/>
         /// </summary>
-        private DoubleWithUnitValue angle;
+        private DoubleWithUnitValueViewModel angle;
 
         /// <summary>
         /// Backing field for <see cref="AngleSupport"/>
         /// </summary>
-        private DoubleWithUnitValue angleSupport;
+        private DoubleWithUnitValueViewModel angleSupport;
 
         /// <summary>
         /// Backing field for <see cref="Edges"/>
@@ -82,7 +82,7 @@ namespace DEHCATIA.ViewModels.ProductTree
         /// <summary>
         /// Backing field for <see cref="Thickness"/>
         /// </summary>
-        private DoubleWithUnitValue thickness;
+        private DoubleWithUnitValueViewModel thickness;
 
         /// <summary>
         /// Backing field for <see cref="ExternalShape"/>
@@ -101,7 +101,7 @@ namespace DEHCATIA.ViewModels.ProductTree
         /// <summary>
         /// Gets or sets the reference Url
         /// </summary>
-        public DoubleWithUnitValue ReferenceUrl
+        public DoubleWithUnitValueViewModel ReferenceUrl
         {
             get => this.referenceUrl;
             set => this.RaiseAndSetIfChanged(ref this.referenceUrl, value);
@@ -110,7 +110,7 @@ namespace DEHCATIA.ViewModels.ProductTree
         /// <summary>
         /// Gets the dimension along the x-direction of a cartesian shape (does no apply to a body of revolution shape)
         /// </summary>
-        public DoubleWithUnitValue Length
+        public DoubleWithUnitValueViewModel Length
         {
             get => this.length;
             set => this.RaiseAndSetIfChanged(ref this.length, value);
@@ -119,7 +119,7 @@ namespace DEHCATIA.ViewModels.ProductTree
         /// <summary>
         /// Gets or sets the width or diameter
         /// </summary>
-        public DoubleWithUnitValue WidthOrDiameter
+        public DoubleWithUnitValueViewModel WidthOrDiameter
         {
             get => this.widthOrDiameter;
             set => this.RaiseAndSetIfChanged(ref this.widthOrDiameter, value);
@@ -128,7 +128,7 @@ namespace DEHCATIA.ViewModels.ProductTree
         /// <summary>
         /// Gets or sets the height
         /// </summary>
-        public DoubleWithUnitValue Height
+        public DoubleWithUnitValueViewModel Height
         {
             get => this.height;
             set => this.RaiseAndSetIfChanged(ref this.height, value);
@@ -137,7 +137,7 @@ namespace DEHCATIA.ViewModels.ProductTree
         /// <summary>
         /// Gets or sets the length support
         /// </summary>
-        public DoubleWithUnitValue LengthSupport
+        public DoubleWithUnitValueViewModel LengthSupport
         {
             get => this.lengthSupport;
             set => this.RaiseAndSetIfChanged(ref this.lengthSupport, value);
@@ -146,7 +146,7 @@ namespace DEHCATIA.ViewModels.ProductTree
         /// <summary>
         /// Gets or sets the Angle of a body of revolution shape (does not apply to a cartesian shape)
         /// </summary>
-        public DoubleWithUnitValue Angle
+        public DoubleWithUnitValueViewModel Angle
         {
             get => this.angle;
             set => this.RaiseAndSetIfChanged(ref this.angle, value);
@@ -155,7 +155,7 @@ namespace DEHCATIA.ViewModels.ProductTree
         /// <summary>
         /// Gets or sets the top Angle of a cone shape (only applies to a cone shape)
         /// </summary>
-        public DoubleWithUnitValue AngleSupport
+        public DoubleWithUnitValueViewModel AngleSupport
         {
             get => this.angleSupport;
             set => this.RaiseAndSetIfChanged(ref this.angleSupport, value);
@@ -164,14 +164,14 @@ namespace DEHCATIA.ViewModels.ProductTree
         /// <summary>
         /// Gets or sets the thickness is the wall thickness of a cylinder. If defined the shape becomes a hollow shape 
         /// </summary>
-        public DoubleWithUnitValue Thickness
+        public DoubleWithUnitValueViewModel Thickness
         {
             get => this.thickness;
             set => this.RaiseAndSetIfChanged(ref this.thickness, value);
         }
 
         /// <summary>
-        /// Gets or sets the ShortName of the external shape reference of the compound shape parameter
+        /// Gets or sets the Name of the external shape reference of the compound shape parameter
         /// </summary>
         public string ExternalShape
         {

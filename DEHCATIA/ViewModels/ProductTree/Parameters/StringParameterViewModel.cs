@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IBaseParameter.cs" company="RHEA System S.A.">
+// <copyright file="StringParameterViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -24,33 +24,20 @@
 
 namespace DEHCATIA.ViewModels.ProductTree.Parameters
 {
-    using CDP4Common.SiteDirectoryData;
-
     using KnowledgewareTypeLib;
 
     /// <summary>
-    /// Interface definition for <see cref="DstParameter{TValueType}"/>
+    /// Represents a <see cref="string"/> <see cref="Parameter"/> 
     /// </summary>
-    public interface IDstParameter
+    public class StringParameterViewModel : DstParameterViewModel<string>
     {
         /// <summary>
-        /// Gets or sets the represented <see cref="KnowledgewareTypeLib.Parameter"/>
+        /// Initializes a new <see cref="DstParameterViewModel{TValueType}"/>
         /// </summary>
-        Parameter Parameter { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the represented parameter is a <see cref="QuantityKind"/>
-        /// </summary>
-        bool IsQuantityKind { get; set; }
-
-        /// <summary>
-        /// Gets or sets the short name
-        /// </summary>
-        string ShortName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Value as string
-        /// </summary>
-        string ValueString { get; set; }
+        /// <param name="parameter">The <see cref="Parameter"/></param>
+        /// <param name="value">The value</param>
+        public StringParameterViewModel(Parameter parameter, string value) : base(parameter, value)
+        {
+        }
     }
 }
