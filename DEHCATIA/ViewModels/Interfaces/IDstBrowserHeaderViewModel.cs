@@ -24,6 +24,9 @@
 
 namespace DEHCATIA.ViewModels.Interfaces
 {
+    /// <summary>
+    /// Definition of properties and methods for <see cref="DstBrowserHeaderViewModel"/>.
+    /// </summary>
     public interface IDstBrowserHeaderViewModel
     {
         /// <summary>

@@ -24,9 +24,20 @@
 
 namespace DEHCATIA.DstController
 {
+    using System;
+    using System.Diagnostics;
     using System.Runtime.InteropServices;
 
+    using DEHCATIA.Enumerations;
+    using DEHCATIA.Services.ComConnector;
+    using DEHCATIA.ViewModels.ProductTree;
+    using DEHCATIA.ViewModels.ProductTree.Rows;
+
+    using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
+
     using INFITF;
+
+    using ProductStructureTypeLib;
 
     using NLog;
 
@@ -43,6 +54,16 @@ namespace DEHCATIA.DstController
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
+        /// The <see cref="ICatiaComService"/>
+        /// </summary>
+        private readonly ICatiaComService catiaComService;
+
+        /// <summary>
+        /// The <see cref="IStatusBarControlViewModel"/>
+        /// </summary>
+        private readonly IStatusBarControlViewModel statusBar;
+
+        /// <summary>
         /// Backing field for <see cref="IsCatiaConnected"/>.
         /// </summary>
         private bool isCatiaConnected;
@@ -57,78 +78,43 @@ namespace DEHCATIA.DstController
         }
 
         /// <summary>
-        /// Gets the <see cref="Application"/> instance of a running CATIA client.
-        /// </summary>
-        public Application CatiaApp { get; private set; }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="DstController"/>.
         /// </summary>
-        public DstController()
+        /// <param name="catiaComService">The <see cref="ICatiaComService"/></param>
+        /// <param name="statusBar"></param>
+        public DstController(ICatiaComService catiaComService, IStatusBarControlViewModel statusBar)
         {
+            this.catiaComService = catiaComService;
+            this.statusBar = statusBar;
+
+            this.WhenAnyValue(x => x.catiaComService.IsCatiaConnected)
+                .Subscribe(x => this.IsCatiaConnected = x);
         }
 
         /// <summary>
-        /// Attempts to connect to a running CATIA client and sets the <see cref="CatiaApp"/> value if one is found.
+        /// Retrieves the product tree
+        /// </summary>
+        /// <returns>The root <see cref="ElementRowViewModel"/></returns>
+        public ElementRowViewModel GetProductTree()
+        {
+            var productTree = this.catiaComService.GetProductTree();
+            return productTree;
+        }
+
+        /// <summary>
+        /// Connects to the Catia running instance
         /// </summary>
         public void ConnectToCatia()
         {
-            this.IsCatiaConnected = this.CheckAndSetCatiaAppIfAvailable();
+            this.catiaComService.Connect();
         }
 
         /// <summary>
-        /// Disconnects from a running CATIA client.
+        /// Disconnect from the Catia running instance
         /// </summary>
         public void DisconnectFromCatia()
         {
-            this.CatiaApp = null;
-            this.IsCatiaConnected = false;
-        }
-
-        /// <summary>
-        /// Check whether a CATIA application is valid as COM object.
-        /// </summary>
-        /// <returns>True when CATIA is available, otherwise false.</returns>
-        private bool CheckAndSetCatiaAppIfAvailable()
-        {
-            if (this.CatiaApp == null)
-            {
-                this.CatiaApp = this.FindCatiaApplication();
-                return this.CatiaApp != null;
-            }
-
-            try
-            {
-                // Attempts to get the documents from the current CATIA application in order to check whether it is running
-                var docs = this.CatiaApp.Documents;
-            }
-            catch (COMException)
-            {
-                this.CatiaApp = null;
-                return this.CheckAndSetCatiaAppIfAvailable();
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Finds a running CATIA client.
-        /// </summary>
-        /// <returns>The CATIA <see cref="Application"/>, or null if not found.</returns>
-        private Application FindCatiaApplication()
-        {
-            object catiaApplication = null;
-
-            try
-            {
-                catiaApplication = Marshal.GetActiveObject("CATIA.Application");
-            }
-            catch (COMException e)
-            {
-                this.logger.Error(e, "No running instance of the CATIA application was found.");
-            }
-
-            return catiaApplication as Application;
+            this.catiaComService.Disconnect();
         }
     }
 }

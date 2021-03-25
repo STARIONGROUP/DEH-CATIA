@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDstController.cs" company="RHEA System S.A.">
+// <copyright file="DstProductTree.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -22,34 +22,21 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.DstController
+namespace DEHCATIA.Views
 {
-    using DEHCATIA.ViewModels.ProductTree.Rows;
+    using System.Windows.Controls;
 
     /// <summary>
-    /// Interface definition for <see cref="DstController"/>
+    /// Interaction logic for <see cref="DstProductTree"/> XAML.
     /// </summary>
-    public interface IDstController
+    public partial class DstProductTree : UserControl
     {
         /// <summary>
-        /// Gets or sets whether there's a connection to a running CATIA client.
+        /// Initializes a new instance of the <see cref="DstProductTree"/> class.
         /// </summary>
-        bool IsCatiaConnected { get; set; }
-
-        /// <summary>
-        /// Retrieves the product tree
-        /// </summary>
-        /// <returns>The root <see cref="ElementRowViewModel"/></returns>
-        ElementRowViewModel GetProductTree();
-
-        /// <summary>
-        /// Connects to the Catia running instance
-        /// </summary>
-        void ConnectToCatia();
-
-        /// <summary>
-        /// Disconnect from the Catia running instance
-        /// </summary>
-        void DisconnectFromCatia();
+        public DstProductTree()
+        {
+            this.InitializeComponent();
+        }
     }
 }

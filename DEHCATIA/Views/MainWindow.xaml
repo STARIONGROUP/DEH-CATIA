@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
         xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
         xmlns:views="clr-namespace:DEHCATIA.Views"
         xmlns:common="clr-namespace:DEHPCommon.UserInterfaces.Views;assembly=DEHPCommon"
@@ -31,7 +30,7 @@
             <dxdo:DockLayoutManager Grid.Row="0" AutoHideMode="Inline" FloatingMode="Desktop">
                 <dxdo:LayoutGroup AllowSplitters="True" Orientation="Vertical">
                     <dxdo:LayoutGroup Name="LayoutGroup" ItemHeight="7*" Orientation="Horizontal">
-                        <dxdo:LayoutPanel Name="DstPanel" AllowDock="False" MinWidth="200" VerticalAlignment="Stretch" dxdo:AutoHideGroup.AutoHideType="Left" AllowClose="False" AllowDrag="False" AllowFloat="False" AllowMove="False" Caption="CATIA">
+                        <dxdo:LayoutPanel Name="DstPanel" AllowHide="False" AllowDock="False" MinWidth="200" VerticalAlignment="Stretch" dxdo:AutoHideGroup.AutoHideType="Left" AllowClose="False" AllowDrag="False" AllowFloat="False" AllowMove="False" Caption="CATIA">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"></RowDefinition>
@@ -49,10 +48,11 @@
                                         <TextBlock Text="{Binding DstSourceViewModel.ConnectionStatus}"/>
                                     </StackPanel>
                                     <views:DstBrowserHeader DataContext="{Binding DstSourceViewModel.DstBrowserHeaderViewModel}" Grid.Row="1" />
+                                    <views:DstProductTree DataContext="{Binding DstSourceViewModel.DstProductTreeViewModel}" Grid.Row="2" />
                                 </Grid>
                             </Grid>
                         </dxdo:LayoutPanel>
-                        <dxdo:LayoutPanel MinWidth="200" AllowDock="False" VerticalAlignment="Stretch" dxdo:AutoHideGroup.AutoHideType="Left" AllowClose="False" AllowDrag="False" AllowFloat="False" AllowMove="False" Caption="Impact">
+                        <dxdo:LayoutPanel AllowHide="False" MinWidth="200" AllowDock="False" VerticalAlignment="Stretch" dxdo:AutoHideGroup.AutoHideType="Left" AllowClose="False" AllowDrag="False" AllowFloat="False" AllowMove="False" Caption="Impact">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"></RowDefinition>
@@ -71,7 +71,7 @@
                                 </Grid>
                             </Grid>
                         </dxdo:LayoutPanel>
-                        <dxdo:LayoutPanel Name="HubPanel" AllowDock="False" MinWidth="200" VerticalAlignment="Stretch" dxdo:AutoHideGroup.AutoHideType="Left" AllowClose="False" AllowDrag="False" AllowFloat="False" AllowMove="False" Caption="Hub Data Source">
+                        <dxdo:LayoutPanel AllowHide="False" Name="HubPanel" AllowDock="False" MinWidth="200" VerticalAlignment="Stretch" dxdo:AutoHideGroup.AutoHideType="Left" AllowClose="False" AllowDrag="False" AllowFloat="False" AllowMove="False" Caption="Hub Data Source">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"></RowDefinition>
@@ -112,7 +112,7 @@
                         </dxdo:LayoutPanel>
                     </dxdo:LayoutGroup>
                     <dxdo:LayoutGroup ItemHeight="3*" Orientation="Horizontal">
-                        <dxdo:LayoutPanel HorizontalAlignment="Stretch" AllowClose="False" Caption="Mapping"  dxdo:AutoHideGroup.AutoHideType="Left" AllowDrag="False" AllowFloat="False" AllowMove="False" >
+                        <dxdo:LayoutPanel AllowHide="False" HorizontalAlignment="Stretch" AllowClose="False" Caption="Mapping"  dxdo:AutoHideGroup.AutoHideType="Left" AllowDrag="False" AllowFloat="False" AllowMove="False" >
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="9*" />

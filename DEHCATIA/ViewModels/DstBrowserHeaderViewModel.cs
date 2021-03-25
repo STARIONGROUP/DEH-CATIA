@@ -26,8 +26,10 @@ namespace DEHCATIA.ViewModels
 {
     using System;
     using System.Reactive.Linq;
+    using System.Runtime.InteropServices;
 
     using DEHCATIA.DstController;
+    using DEHCATIA.Services.ComConnector;
     using DEHCATIA.ViewModels.Interfaces;
     using DEHCATIA.Views;
 
@@ -42,6 +44,11 @@ namespace DEHCATIA.ViewModels
         /// The <see cref="IDstController"/>.
         /// </summary>
         private readonly IDstController dstController;
+
+        /// <summary>
+        /// The <see cref="ICatiaComService"/>
+        /// </summary>
+        private readonly ICatiaComService catiaComService;
 
         /// <summary>
         /// Backing field for <see cref="WorkBenchId"/>.
@@ -71,9 +78,12 @@ namespace DEHCATIA.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="DstBrowserHeaderViewModel"/> class.
         /// </summary>
-        public DstBrowserHeaderViewModel(IDstController dstController)
+        /// <param name="dstController">The <see cref="IDstController"/></param>
+        /// <param name="catiaComService">The <see cref="ICatiaComService"/></param>
+        public DstBrowserHeaderViewModel(IDstController dstController, ICatiaComService catiaComService)
         {
             this.dstController = dstController;
+            this.catiaComService = catiaComService;
 
             this.WhenAnyValue(vm => vm.dstController.IsCatiaConnected)
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -132,7 +142,7 @@ namespace DEHCATIA.ViewModels
         {
             if (this.dstController.IsCatiaConnected)
             {
-                var catiaApp = this.dstController.CatiaApp;
+                var catiaApp = this.catiaComService.CatiaApp;
 
                 this.WorkBenchId = catiaApp.GetWorkbenchId();
                 this.DocumentsCount = catiaApp.Documents.Count;
@@ -142,7 +152,7 @@ namespace DEHCATIA.ViewModels
                 {
                     this.ActiveDocumentCurrentFilter = catiaApp.ActiveDocument.get_CurrentFilter();
                 }
-                catch (Exception)
+                catch (COMException)
                 {
                     this.ActiveDocumentCurrentFilter = "Active document has no filters";
                 }
@@ -151,7 +161,7 @@ namespace DEHCATIA.ViewModels
                 {
                     this.ActiveDocumentCurrentLayer = catiaApp.ActiveDocument.get_CurrentLayer();
                 }
-                catch (Exception)
+                catch (COMException)
                 {
 
                     this.ActiveDocumentCurrentLayer = "Active document has no layers";

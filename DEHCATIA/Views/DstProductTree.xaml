@@ -1,0 +1,169 @@
+<UserControl x:Class="DEHCATIA.Views.DstProductTree"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"              
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:behaviors="clr-namespace:DEHPCommon.UserInterfaces.Behaviors;assembly=DEHPCommon"
+             xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+             xmlns:converters="clr-namespace:DEHCATIA.Converters"
+             xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
+             xmlns:rows="clr-namespace:DEHCATIA.ViewModels.ProductTree.Rows"
+             xmlns:dxpg="http://schemas.devexpress.com/winfx/2008/xaml/pivotgrid"
+             d:DesignHeight="600" d:DesignWidth="400" mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <Style x:Key="ThingIcon" TargetType="{x:Type Image}">
+                <Setter Property="Width" Value="28" />
+                <Setter Property="Height" Value="16" />
+                <Setter Property="Margin" Value="1" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+            </Style>
+            <converters:ElementTypeToIconConverter x:Key="ElementTypeToIconConverter" />
+            <HierarchicalDataTemplate DataType="{x:Type rows:ElementRowViewModel}" ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged}">
+                <dx:MeasurePixelSnapper>
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                            <Image Style="{StaticResource ThingIcon}" Source="{Binding Row.ElementType, Converter={StaticResource ElementTypeToIconConverter}}"/>
+                        </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter" Content="{Binding}" ContentTemplate="{Binding View.DefaultDataRowTemplate}"/>
+                    </StackPanel>
+                </dx:MeasurePixelSnapper>
+            </HierarchicalDataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <dx:LoadingDecorator BorderEffect="Default" BorderEffectColor="Blue" IsSplashScreenShown="{Binding IsBusy}" OwnerLock="LoadingContent">
+        <dxdo:LayoutGroup AllowSplitters="True" Orientation="Vertical">
+            <dxdo:LayoutPanel AllowHide="False" ItemHeight="7*" Name="ProductPanel" AllowDock="False" MinWidth="200" VerticalAlignment="Stretch" 
+                              dxdo:AutoHideGroup.AutoHideType="Left" 
+                              AllowClose="False" AllowDrag="False" 
+                              AllowFloat="False" AllowMove="False" Caption="Product Tree">
+                <dxg:TreeListControl ItemsSource="{Binding RootElements}"
+                                 SelectedItem="{Binding SelectedElement}">
+                    <dxmvvm:Interaction.Behaviors>
+                        <behaviors:ContextMenuBehavior/>
+                    </dxmvvm:Interaction.Behaviors>
+                    <dxg:TreeListControl.View>
+                        <dxg:TreeListView Name="View"
+                                      AllowEditing="False"
+                                      AutoWidth="False"
+                                      ExpandCollapseNodesOnNavigation="True"
+                                      ExpandStateFieldName="IsExpanded"
+                                      FixedLineWidth="0"
+                                      HorizontalScrollbarVisibility="Auto"
+                                      NavigationStyle="Cell"
+                                      ShowHorizontalLines="False"
+                                      ShowIndicator="False"
+                                      ShowNodeImages="False"
+                                      ShowVerticalLines="False"
+                                      TreeDerivationMode="HierarchicalDataTemplate"
+                                      TreeLineStyle="Solid"
+                                      VerticalScrollbarVisibility="Auto">
+                            <dxg:TreeListView.FocusedRow>
+                                <dynamic:ExpandoObject />
+                            </dxg:TreeListView.FocusedRow>
+                            <dxg:TreeListView.ContextMenu>
+                                <ContextMenu />
+                            </dxg:TreeListView.ContextMenu>
+                            <dxg:TreeListView.RowStyle>
+                                <Style TargetType="{x:Type dxg:RowControl}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Row.IsHighlighted}" Value="True">
+                                            <Setter Property="Background" Value="Yellow"/>
+                                            <Setter Property="FontWeight" Value="Bold" />
+                                            <Setter Property="Foreground" Value="Blue" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                    <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+                                </Style>
+                            </dxg:TreeListView.RowStyle>
+                        </dxg:TreeListView>
+                    </dxg:TreeListControl.View>
+                    <dxg:TreeListControl.Columns>
+                        <dxg:TreeListColumn FieldName="Name" Fixed="Left"/>
+                        <dxg:TreeListColumn FieldName="PartNumber" Header="Part Number"/>
+                        <dxg:TreeListColumn FieldName="ElementType" Header="Element Type"/>
+                    </dxg:TreeListControl.Columns>
+                </dxg:TreeListControl>
+            </dxdo:LayoutPanel>
+            <dxdo:LayoutPanel  ItemHeight="7*" Name="DetailPane" AllowDock="False" MinWidth="200" VerticalAlignment="Top" 
+                              dxdo:AutoHideGroup.AutoHideType="Left" AllowHide="False"
+                              AllowClose="False" AllowDrag="False" 
+                              AllowFloat="False" AllowMove="False" Caption="Details">
+                <Grid Margin="10" MaxHeight="400">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Label Margin="2" Grid.Row="0" Grid.Column="0" Content="Name:"></Label>
+                    <Label Margin="2" Grid.Row="1" Grid.Column="2" Content="Volume:"></Label>
+                    <Label Margin="2" Grid.Row="1" Grid.Column="0" Content="Mass:"></Label>
+                    <Label Margin="2" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Content="Center of gravity:"></Label>
+                    <Label Margin="2" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Content="Moment of Inertia:"></Label>
+                    <Label Margin="2" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="1" Content="{Binding SelectedElement.Name}"></Label>
+                    <Label Margin="2" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="3" Content="{Binding SelectedElement.Volume}"></Label>
+                    <Label Margin="2" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1" Content="{Binding SelectedElement.Mass}"></Label>
+                    <dxg:GridControl Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3"
+                                     ToolTip="Center of Gravity" MaxHeight="50" 
+                                     HorizontalAlignment="Left" VerticalAlignment="Stretch" 
+                                     AllowUpdateTwoWayBoundPropertiesOnSynchronization="False" AutoGenerateColumns="None"
+                                     EnableSmartColumnsGeneration="False"
+                                     ItemsSource="{Binding SelectedElement.CenterOfGravity.AsRow}"
+                                     SelectionMode="Row">
+                        <dxg:GridControl.View>
+                            <dxg:TableView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AllowColumnMoving="True" AllowEditing="False" 
+                                           AllowGrouping="True" AutoWidth="true" IsDetailButtonVisibleBinding="{x:Null}" 
+                                           ShowFilterPanelMode="Never" ShowGroupPanel="False" 
+                                           VerticalScrollbarVisibility="Auto"
+                                           IndicatorWidth="30">
+                            </dxg:TableView>
+                        </dxg:GridControl.View>
+                        <dxg:GridControl.Columns>
+                            <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="X" />
+                            <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="Y" />
+                            <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="Z" />
+                        </dxg:GridControl.Columns>
+                    </dxg:GridControl>
+                    <dxg:GridControl Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3"
+                                     ToolTip="Mass Moment of Inertia" MaxHeight="210" 
+                                     HorizontalAlignment="Left" VerticalAlignment="Stretch" 
+                                     AllowUpdateTwoWayBoundPropertiesOnSynchronization="False" AutoGenerateColumns="None"
+                                     EnableSmartColumnsGeneration="False"
+                                     ItemsSource="{Binding SelectedElement.MomentOfInertia.Value.AsRows}"
+                                     SelectionMode="Row">
+                        <dxg:GridControl.View>
+                            <dxg:TableView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AllowColumnMoving="True" AllowEditing="False" 
+                                           AllowGrouping="True" AutoWidth="true" IsDetailButtonVisibleBinding="{x:Null}" 
+                                           ShowFilterPanelMode="Never" ShowGroupPanel="False" 
+                                           VerticalScrollbarVisibility="Auto"
+                                           IndicatorWidth="30">
+                                <dxg:TableView.RowIndicatorContentTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="Black" Background="#F8F8F8" BorderThickness=".2">
+                                            <TextBlock HorizontalAlignment="Center"  Text="{Binding Row.Name}" />
+                                        </Border>
+                                    </DataTemplate>
+                                </dxg:TableView.RowIndicatorContentTemplate>
+                            </dxg:TableView>
+                        </dxg:GridControl.View>
+                        <dxg:GridControl.Columns>
+                            <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="X" />
+                            <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="Y" />
+                            <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="Z" />
+                        </dxg:GridControl.Columns>
+                    </dxg:GridControl>
+                </Grid>
+            </dxdo:LayoutPanel>
+        </dxdo:LayoutGroup>
+    </dx:LoadingDecorator>
+</UserControl>

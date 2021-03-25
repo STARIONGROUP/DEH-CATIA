@@ -1,55 +1,56 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDstController.cs" company="RHEA System S.A.">
-//    Copyright (c) 2021 RHEA System S.A.
-//
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
-//
-//    This file is part of DEHCATIA
-//
-//    The DEHCATIA is free software; you can redistribute it and/or
+// <copyright file="IBaseParameter.cs" company="RHEA System S.A.">
+//    Copyright (c) 2020-2021 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
+// 
+//    This file is part of DEHPEcosimPro
+// 
+//    The DEHPEcosimPro is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Lesser General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or (at your option) any later version.
-//
-//    The DEHCATIA is distributed in the hope that it will be useful,
+// 
+//    The DEHPEcosimPro is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Lesser General Public License for more details.
-//
+// 
 //    You should have received a copy of the GNU Lesser General Public License
 //    along with this program; if not, write to the Free Software Foundation,
 //    Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.DstController
+namespace DEHCATIA.ViewModels.ProductTree.Parameters
 {
-    using DEHCATIA.ViewModels.ProductTree.Rows;
+    using CDP4Common.SiteDirectoryData;
+
+    using KnowledgewareTypeLib;
 
     /// <summary>
-    /// Interface definition for <see cref="DstController"/>
+    /// Interface definition for <see cref="DstParameterViewModelViewModel{TValueType}"/>
     /// </summary>
-    public interface IDstController
+    public interface IDstParameterViewModel
     {
         /// <summary>
-        /// Gets or sets whether there's a connection to a running CATIA client.
+        /// Gets or sets the represented <see cref="KnowledgewareTypeLib.Parameter"/>
         /// </summary>
-        bool IsCatiaConnected { get; set; }
+        Parameter Parameter { get; set; }
 
         /// <summary>
-        /// Retrieves the product tree
+        /// Gets or sets a value indicating whether the represented parameter is a <see cref="QuantityKind"/>
         /// </summary>
-        /// <returns>The root <see cref="ElementRowViewModel"/></returns>
-        ElementRowViewModel GetProductTree();
+        bool IsQuantityKind { get; set; }
 
         /// <summary>
-        /// Connects to the Catia running instance
+        /// Gets or sets the short name
         /// </summary>
-        void ConnectToCatia();
+        string Name { get; set; }
 
         /// <summary>
-        /// Disconnect from the Catia running instance
+        /// Gets or sets the Value as string
         /// </summary>
-        void DisconnectFromCatia();
+        string ValueString { get; set; }
     }
 }

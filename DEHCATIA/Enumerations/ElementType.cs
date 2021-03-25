@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDstController.cs" company="RHEA System S.A.">
+// <copyright file="ElementType.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -22,34 +22,42 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.DstController
+namespace DEHCATIA.Enumerations
 {
-    using DEHCATIA.ViewModels.ProductTree.Rows;
-
     /// <summary>
-    /// Interface definition for <see cref="DstController"/>
+    /// The type of a CATIA element.
     /// </summary>
-    public interface IDstController
+    public enum ElementType
     {
         /// <summary>
-        /// Gets or sets whether there's a connection to a running CATIA client.
+        /// A default value for neither of the above document types
         /// </summary>
-        bool IsCatiaConnected { get; set; }
+        Invalid = -1,
 
         /// <summary>
-        /// Retrieves the product tree
+        /// A Product might contain components
         /// </summary>
-        /// <returns>The root <see cref="ElementRowViewModel"/></returns>
-        ElementRowViewModel GetProductTree();
+        CatProduct,
 
         /// <summary>
-        /// Connects to the Catia running instance
+        /// A Part is the outer leaf of the CATIA product tree and contains the shape or body with the shape inside
         /// </summary>
-        void ConnectToCatia();
+        CatPart,
 
         /// <summary>
-        /// Disconnect from the Catia running instance
+        /// The definition of a <see cref="CatPart"/>
         /// </summary>
-        void DisconnectFromCatia();
+        CatDefinition,
+
+        /// <summary>
+        /// A material might be attached to a Part inside CATIA.
+        /// CATIA materials can be stored inside a material library
+        /// </summary>
+        CatMaterial,
+
+        /// <summary>
+        /// A Component refers an Assembly or a Part file and contains position information
+        /// </summary>
+        Component,
     }
 }

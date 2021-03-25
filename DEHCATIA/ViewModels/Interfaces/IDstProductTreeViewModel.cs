@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDstController.cs" company="RHEA System S.A.">
+// <copyright file="IDstProductTreeViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
@@ -22,34 +22,30 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.DstController
+namespace DEHCATIA.ViewModels.Interfaces
 {
     using DEHCATIA.ViewModels.ProductTree.Rows;
 
+    using ReactiveUI;
+
     /// <summary>
-    /// Interface definition for <see cref="DstController"/>
+    /// Definition of properties and methods for <see cref="DstProductTreeViewModel"/>.
     /// </summary>
-    public interface IDstController
+    public interface IDstProductTreeViewModel
     {
         /// <summary>
-        /// Gets or sets whether there's a connection to a running CATIA client.
+        /// Gets or sets the assert indicating whether the view is busy
         /// </summary>
-        bool IsCatiaConnected { get; set; }
+        bool IsBusy { get; set; }
 
         /// <summary>
-        /// Retrieves the product tree
+        /// Gets the reactive list of root elements of the <see cref="ProductTree"/>.
         /// </summary>
-        /// <returns>The root <see cref="ElementRowViewModel"/></returns>
-        ElementRowViewModel GetProductTree();
+        ReactiveList<ElementRowViewModel> RootElements { get; }
 
         /// <summary>
-        /// Connects to the Catia running instance
+        /// Gets or sets the selected element.
         /// </summary>
-        void ConnectToCatia();
-
-        /// <summary>
-        /// Disconnect from the Catia running instance
-        /// </summary>
-        void DisconnectFromCatia();
+        ElementRowViewModel SelectedElement { get; set; }
     }
 }

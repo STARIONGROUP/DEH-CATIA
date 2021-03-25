@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DstControllerTestFixture.cs" company="RHEA System S.A.">
+// <copyright file="DstProductTreeViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -22,65 +22,51 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.Tests.DstController
+namespace DEHCATIA.Tests.ViewModels
 {
-    using System.Reactive.Concurrency;
-
     using DEHCATIA.DstController;
-    using DEHCATIA.Services.ComConnector;
+    using DEHCATIA.ViewModels;
     using DEHCATIA.ViewModels.ProductTree.Rows;
 
+    using DEHPCommon.Enumerators;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using Moq;
 
     using NUnit.Framework;
 
-    using ReactiveUI;
-
     [TestFixture]
-    public class DstControllerTestFixture
+    public class DstProductTreeViewModelTestFixture
     {
-        private DstController controller;
-        private Mock<ICatiaComService> comService;
+        private DstProductTreeViewModel viewModel;
+        private Mock<IDstController> dstController;
         private Mock<IStatusBarControlViewModel> statusBar;
 
         [SetUp]
         public void Setup()
         {
-            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
-            this.comService = new Mock<ICatiaComService>();
+            this.dstController = new Mock<IDstController>();
             this.statusBar = new Mock<IStatusBarControlViewModel>();
-            this.controller = new DstController(this.comService.Object, this.statusBar.Object);
-        }
-        
-        [Test]
-        public void VerifyConnectDisconnectToCatia()
-        {
-            Assert.IsFalse(this.controller.IsCatiaConnected);   
 
-            Assert.DoesNotThrow(() => this.controller.ConnectToCatia());
-            Assert.DoesNotThrow(() => this.controller.DisconnectFromCatia());
-            this.comService.Verify(x => x.Connect(), Times.Once);
-            this.comService.Verify(x => x.Disconnect(), Times.Once);
+            this.viewModel = new DstProductTreeViewModel(this.dstController.Object, this.statusBar.Object);
         }
 
         [Test]
-        public void VerifyGetProductTree()
+        public void VerifyProperties()
         {
-            Assert.IsFalse(this.controller.IsCatiaConnected);
-            this.comService.Setup(x => x.GetProductTree()).Returns(default(ElementRowViewModel));
-            Assert.IsNull(this.controller.GetProductTree());
-            this.comService.Verify(x => x.GetProductTree(), Times.Once);
+            Assert.IsEmpty(this.viewModel.RootElements);
+            Assert.IsNull(this.viewModel.SelectedElement);
+            Assert.IsFalse(this.viewModel.IsBusy);
         }
 
         [Test]
-        public void VerifyIsConnected()
+        public void VerifyUpdateProductTree()
         {
-            Assert.IsFalse(this.controller.IsCatiaConnected);
-            this.comService.Setup(x => x.IsCatiaConnected).Returns(true);
-            this.controller = new DstController(this.comService.Object, this.statusBar.Object);
-            Assert.IsTrue(this.controller.IsCatiaConnected);
+            this.dstController.Setup(x => x.GetProductTree()).Returns(new ElementRowViewModel());
+            this.dstController.Setup(x => x.IsCatiaConnected).Returns(true);
+            this.viewModel = new DstProductTreeViewModel(this.dstController.Object, this.statusBar.Object);
+            this.statusBar.Verify(x => x.Append(It.IsAny<string>(), StatusBarMessageSeverity.Info), Times.Exactly(2));
+            Assert.IsNotEmpty(this.viewModel.RootElements);
         }
     }
 }
