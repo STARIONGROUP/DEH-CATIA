@@ -219,20 +219,14 @@ namespace DEHCATIA.DstController
                 this.RegisterAndCommitElements<ElementDefinition>(iterationClone, transaction);
                 this.RegisterAndCommitElements<ElementUsage>(iterationClone, transaction);
                 transaction.CreateOrUpdate(iterationClone);
+                transaction.CreateOrUpdate(iterationClone);
                 await this.hubController.Write(transaction);
-                this.statusBar.Append($"Element Definition(s) have been updated");
+                this.statusBar.Append($"Element(s) have been updated");
 
-                //this.RefreshElementDefinitionFromCache();
-
-                this.statusBar.Append($"Element Usage(s) have been updated");
-                
                 await this.UpdateParametersValueSets();
                 this.statusBar.Append($"Parameter and Parameter Overrides have been updated");
 
                 await this.hubController.Refresh();
-
-                //this.hubController.GetThingById(this.ExternalIdentifierMap.Iid, this.hubController.OpenIteration, out ExternalIdentifierMap map);
-                //this.ExternalIdentifierMap = map.Clone(true);
 
                 this.DstMapResult.Clear();
 
@@ -246,59 +240,6 @@ namespace DEHCATIA.DstController
         }
 
         /// <summary>
-        /// Refreshes references of <see cref="ElementDefinition"/>s referenced by <see cref="ElementUsage"/>s
-        /// </summary>
-        private void RefreshElementDefinitionFromCache()
-        {
-            var parentCache = new Dictionary<Guid, ElementDefinition>();
-
-            foreach (var (parent, element) in this.DstMapResult)
-            {
-                if (!(element is ElementUsage elementUsage) || parent is null)
-                {
-                    continue;
-                }
-                
-                if (this.hubController.GetThingById(parent.ElementDefinition.Iid, this.hubController.OpenIteration,
-                    out ElementDefinition parentElementDefinition))
-                {
-                    parent.ElementDefinition = parentElementDefinition.Clone(false);
-
-                    this.logger.Info($"Parent ElementDefinition {parentElementDefinition.Name} with Iid " +
-                                     $"{parentElementDefinition.Iid} has been found in the cache.");
-                }
-                else
-                {
-                    this.logger.Info($"Parent ElementDefinition {elementUsage.ElementDefinition.Name} with Iid " +
-                                     $"{elementUsage.ElementDefinition.Iid} has not been found in the cache.");
-                }
-
-                if (this.hubController.GetThingById(elementUsage.ElementDefinition.Iid, this.hubController.OpenIteration, 
-                    out ElementDefinition elementDefinition))
-                {
-                    if (parentCache.TryGetValue(elementDefinition.Iid, out var cachedParent))
-                    {
-                        elementUsage.ElementDefinition = cachedParent;
-                    }
-                    else
-                    {
-                        elementUsage.ElementDefinition = elementDefinition.Clone(false);
-                        parentCache.Add(elementDefinition.Iid, elementUsage.ElementDefinition);
-                    }
-                    
-                    this.logger.Info($"ElementDefinition {elementUsage.ElementDefinition.Name} with Iid " +
-                                     $"{elementUsage.ElementDefinition.Iid} has been found in the cache.\n\rThe ElementUsage " +
-                                     $"{elementUsage.Name} with Iid references it now.");
-                }
-                else
-                {
-                    this.logger.Info($"ElementDefinition {elementUsage.ElementDefinition.Name} with Iid " +
-                                     $"{elementUsage.ElementDefinition.Iid} has not been found in the cache.");
-                }
-            }
-        }
-
-        /// <summary>
         /// Adds to the <paramref name="transaction"/> the collection of <typeparamref name="TElement"/>
         /// </summary>
         /// <typeparam name="TElement">The type of <see cref="ElementBase"/> to process</typeparam>
@@ -307,46 +248,36 @@ namespace DEHCATIA.DstController
         /// <returns>A <see cref="Task"/></returns>
         private void RegisterAndCommitElements<TElement>(Iteration iterationClone, ThingTransaction transaction) where TElement : ElementBase
         {
-            try
+            foreach (var (parent, element) in this.DstMapResult)
             {
-                foreach (var (parent, element) in this.DstMapResult)
+                if (!(element is TElement))
                 {
-                    if (!(element is TElement))
-                    {
-                        continue;
-                    }
-
-                    if (element is ElementDefinition elementDefinition)
-                    {
-                        if (elementDefinition.Iid == Guid.Empty)
-                        {
-                            iterationClone.Element.Add(elementDefinition);
-                        }
-
-                        this.UpdateTransaction(transaction, elementDefinition);
-                        
-                        foreach (var parameter in elementDefinition.Parameter)
-                        {
-                            this.UpdateTransaction(transaction, parameter);
-                        }
-                    }
-                    else if (element is ElementUsage elementUsage)
-                    {
-                        this.UpdateTransaction(transaction, elementUsage);
-                        
-                        foreach (var parameter in elementUsage.ParameterOverride)
-                        {
-                            this.UpdateTransaction(transaction, parameter);
-                        }
-                    }
+                    continue;
                 }
 
-                //this.PersistExternalIdentifierMap(transaction, iterationClone);
+                if (element is ElementDefinition elementDefinition)
+                {
+                    if (elementDefinition.Iid == Guid.Empty)
+                    {
+                        iterationClone.Element.Add(elementDefinition);
+                    }
 
-            }
-            catch (Exception e)
-            {
-                this.logger.Error(e);
+                    this.UpdateTransaction(transaction, elementDefinition);
+                    
+                    foreach (var parameter in elementDefinition.Parameter)
+                    {
+                        this.UpdateTransaction(transaction, parameter);
+                    }
+                }
+                else if (element is ElementUsage elementUsage)
+                {
+                    this.UpdateTransaction(transaction, elementUsage);
+                    
+                    foreach (var parameter in elementUsage.ParameterOverride)
+                    {
+                        this.UpdateTransaction(transaction, parameter);
+                    }
+                }
             }
         }
 
@@ -436,8 +367,6 @@ namespace DEHCATIA.DstController
         /// <param name="valueSet">The <see cref="IValueSet"/> of reference</param>
         private void UpdateValueSet(ParameterValueSetBase clone, IValueSet valueSet)
         {
-            //this.exchangeHistory.Append(clone, valueSet);
-
             clone.Computed = valueSet.Computed;
             clone.ValueSwitch = valueSet.ValueSwitch;
         }
@@ -455,12 +384,12 @@ namespace DEHCATIA.DstController
             {
                 thing.Iid = Guid.NewGuid();
                 transaction.Create(thing);
-                //this.exchangeHistory.Append(thing, ChangeKind.Create);
+                this.exchangeHistory.Append(thing, ChangeKind.Create);
             }
             else
             {
                 transaction.CreateOrUpdate(thing);
-                //this.exchangeHistory.Append(clone, ChangeKind.Update);
+                this.exchangeHistory.Append(thing, ChangeKind.Update);
             }
         }
         

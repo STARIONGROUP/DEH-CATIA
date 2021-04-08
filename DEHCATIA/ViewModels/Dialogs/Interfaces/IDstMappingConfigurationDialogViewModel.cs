@@ -73,15 +73,5 @@ namespace DEHCATIA.ViewModels.Dialogs.Interfaces
         /// Gets the collection of <see cref="ElementRowViewModel"/>
         /// </summary>
         ReactiveList<ElementRowViewModel> Elements { get; }
-
-        /// <summary>
-        /// Initializes this view model properties
-        /// </summary>
-        void Initialize();
-
-        /// <summary>
-        /// Initializes this view model <see cref="ICommand"/> and <see cref="Observable"/>
-        /// </summary>
-        void InitializesCommandsAndObservableSubscriptions();
     }
 }

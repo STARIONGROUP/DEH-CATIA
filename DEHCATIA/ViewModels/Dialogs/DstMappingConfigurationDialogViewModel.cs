@@ -28,6 +28,7 @@ namespace DEHCATIA.ViewModels.Dialogs
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
     using System.Windows.Input;
 
     using CDP4Common.CommonData;
@@ -40,6 +41,8 @@ namespace DEHCATIA.ViewModels.Dialogs
 
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
+
+    using DevExpress.Xpo.DB.Helpers;
 
     using ReactiveUI;
 
@@ -139,10 +142,9 @@ namespace DEHCATIA.ViewModels.Dialogs
         /// <summary>
         /// Initializes this view model properties
         /// </summary>
-        public void Initialize()
+        private void Initialize()
         {
-            this.WhenAny(x => x.Elements.CountChanged,
-                    x => x.Value.Where(c => c > 0))
+            this.Elements.CountChanged.Where(c => c > 0)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ =>
                 {
@@ -199,18 +201,15 @@ namespace DEHCATIA.ViewModels.Dialogs
         /// <summary>
         /// Initializes this view model <see cref="ICommand"/> and <see cref="Observable"/>
         /// </summary>
-        public void InitializesCommandsAndObservableSubscriptions()
+        private void InitializesCommandsAndObservableSubscriptions()
         {
             this.ContinueCommand = ReactiveCommand.Create(
                 this.WhenAnyValue(x => x.CanContinue),
                 RxApp.MainThreadScheduler);
 
-            this.ContinueCommand.Subscribe(_ => this.ExecuteContinueCommand(
-                () =>
-                {
-                    this.DstController.Map(this.Elements.ToList());
-                    this.StatusBar.Append($"Mapping in progress");
-                }));
+            this.ContinueCommand
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.ExecuteContinueCommand(this.ContinueCommandExecute));
 
             if (!(this.Elements.FirstOrDefault() is {} element))
             {
@@ -233,6 +232,14 @@ namespace DEHCATIA.ViewModels.Dialogs
 
             this.WhenAnyValue(x => x.SelectedThing)
                 .Subscribe(x => this.AreHubFieldsEditable = x == this.Elements.FirstOrDefault());
+        }
+
+        /// <summary>
+        /// Executes the <see cref="MappingConfigurationDialogViewModel.ContinueCommand"/>
+        /// </summary>
+        private void ContinueCommandExecute()
+        {
+            this.DstController.Map(this.Elements.ToList());
         }
 
         /// <summary>
@@ -273,7 +280,7 @@ namespace DEHCATIA.ViewModels.Dialogs
         private void UpdateAvailableActualFiniteStates()
         {
             this.AvailableActualFiniteStates.Clear();
-
+            
             this.AvailableActualFiniteStates.AddRange(
                 this.HubController.OpenIteration.ActualFiniteStateList.SelectMany(x => x.ActualState));
 

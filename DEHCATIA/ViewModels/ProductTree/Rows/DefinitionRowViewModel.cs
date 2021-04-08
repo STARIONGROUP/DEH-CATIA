@@ -40,23 +40,9 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
     public class DefinitionRowViewModel : ElementRowViewModel
     {
         /// <summary>
-        /// Backing field for <see cref="Shape"/>
-        /// </summary>
-        private CatiaShapeViewModel shape;
-
-        /// <summary>
         /// Gets or sets the type.
         /// </summary>
         public override ElementType ElementType => ElementType.CatDefinition;
-
-        /// <summary>
-        /// Gets or sets the shape collection
-        /// </summary>
-        public CatiaShapeViewModel Shape
-        {
-            get => this.shape;
-            set => this.RaiseAndSetIfChanged(ref this.shape, value);
-        }
 
         /// <summary>
         /// Initializes a new <see cref="DefinitionRowViewModel"/>

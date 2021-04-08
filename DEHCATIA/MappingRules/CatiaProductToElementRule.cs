@@ -52,7 +52,7 @@ namespace DEHCATIA.MappingRules
     /// <summary>
     /// Rule definition that transforms a collection of <see cref="ElementRowViewModel"/> to a collection <see cref="ElementDefinition"/>
     /// </summary>
-    public class CatiaProductToElementDefinitionRule : MappingRule<List<ElementRowViewModel>, List<(ElementRowViewModel Parent, ElementBase Element)>>
+    public class CatiaProductToElementRule : MappingRule<List<ElementRowViewModel>, List<(ElementRowViewModel Parent, ElementBase Element)>>
     {
         /// <summary>
         /// The current class logger
@@ -192,7 +192,7 @@ namespace DEHCATIA.MappingRules
                                                     Name = elementRow.Name,
                                                     ShortName = elementRow.Name,
                                                     Owner = this.hubController.CurrentDomainOfExpertise
-                                                }.Clone(true);
+                                                };
         }
 
         /// <summary>
@@ -213,10 +213,10 @@ namespace DEHCATIA.MappingRules
         /// <returns>An <see cref="ElementUsage"/></returns>
         private ElementUsage GetOrCreateElementUsage(ElementDefinition elementDefinition, string name, ElementDefinition parent)
         {
-            var firstOrDefault = this.hubController.OpenIteration.Element
-                .FirstOrDefault(x => x.Name == parent.Name);
+            var container = this.hubController.OpenIteration.Element
+                .FirstOrDefault(x => x.Name == parent?.Name);
 
-            var elementUsage = firstOrDefault?.ContainedElement
+            var elementUsage = container?.ContainedElement
                 .FirstOrDefault(x => x.Name == name)?.Clone(true);
 
             if (elementUsage is null)
@@ -227,9 +227,9 @@ namespace DEHCATIA.MappingRules
                     ShortName = name,
                     ElementDefinition = elementDefinition,
                     Owner = this.hubController.CurrentDomainOfExpertise
-                }.Clone(true);
+                };
 
-                parent.ContainedElement.Add(elementUsage);
+                parent?.ContainedElement.Add(elementUsage);
             }
 
             return elementUsage;

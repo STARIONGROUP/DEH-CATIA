@@ -33,7 +33,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
     /// The <see cref="MassMomentOfInertiaViewModel"/> represents a value that has meaning only by combining 9 values like for the Moment of Inertia,
     /// Unit is kgxm2 Kilograms by Meter²
     /// </summary>
-    public struct MassMomentOfInertiaViewModel
+    public class MassMomentOfInertiaViewModel
     {
         /// <summary>
         /// The XX value
@@ -102,6 +102,13 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
             this.Izz = values[8];
 
             this.Values = values.ToArray();
+        }
+
+        /// <summary>
+        /// Initializes a new <see cref="MassMomentOfInertiaViewModel"/> with the default value
+        /// </summary>
+        public MassMomentOfInertiaViewModel() : this(new [] { .1, 0, 0, 0, 1, 0, 0, 0, 1 })
+        {
         }
 
         /// <summary>

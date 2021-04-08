@@ -507,11 +507,9 @@ namespace DEHCATIA.Services.ComConnector
         {
             try
             {
-                return new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel()
+                return new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(analyze.Mass, "kg")
                 {
-                    Value = analyze.Mass,
-                    CatiaSymbol = "kg",
-                    UnitString = "kg"
+                    CatiaSymbol = "kg"
                 })
                 {
                     Name = "mass_with_margin"
@@ -533,13 +531,13 @@ namespace DEHCATIA.Services.ComConnector
         {
             try
             {
-                return new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel()
+                return new DoubleWithUnitParameterViewModel(
+                    
+                    // Volume comes back as milimeters3, so conversion to meter3 is neccessary
+                    new DoubleWithUnitValueViewModel(analyze.Volume / 1000000000, "m3")
                     {
-                        // Volume comes back as milimeters3, so conversion to meter3 is neccessary
-                        Value = analyze.Volume / 1000000000,
-                        CatiaSymbol = "m3",
-                        UnitString = "m³"
-                })
+                        CatiaSymbol = "m3"
+                    })
                 {
                     Name = "Vol"
                 };

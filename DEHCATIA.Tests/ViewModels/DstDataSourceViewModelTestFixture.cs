@@ -30,6 +30,7 @@ namespace DEHCATIA.Tests.ViewModels
     using DEHCATIA.ViewModels;
     using DEHCATIA.ViewModels.Interfaces;
     using DEHPCommon.Services.NavigationService;
+    using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using Moq;
 
@@ -46,6 +47,7 @@ namespace DEHCATIA.Tests.ViewModels
         private Mock<IDstProductTreeViewModel> dstProductTree;
 
         private DstDataSourceViewModel viewModel;
+        private Mock<IStatusBarControlViewModel> statusBar;
 
         [SetUp]
         public void Setup()
@@ -56,8 +58,11 @@ namespace DEHCATIA.Tests.ViewModels
             this.navigationService = new Mock<INavigationService>();
             this.dstBrowserHeader = new Mock<IDstBrowserHeaderViewModel>();
             this.dstProductTree = new Mock<IDstProductTreeViewModel>();
+            this.dstProductTree = new Mock<IDstProductTreeViewModel>();
+            this.statusBar = new Mock<IStatusBarControlViewModel>();
 
-            this.viewModel = new DstDataSourceViewModel(this.navigationService.Object, this.dstController.Object, this.dstBrowserHeader.Object, this.dstProductTree.Object);
+            this.viewModel = new DstDataSourceViewModel(this.navigationService.Object, this.dstController.Object, this.dstBrowserHeader.Object, 
+                this.dstProductTree.Object, this.statusBar.Object);
         }
 
         [Test]

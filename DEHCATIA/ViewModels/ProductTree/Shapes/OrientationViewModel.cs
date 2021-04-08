@@ -27,9 +27,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
     using System;
     using System.Collections.Generic;
     using System.Linq;
-
-    using DevExpress.CodeParser;
-
+    
     using ReactiveUI;
 
     /// <summary>

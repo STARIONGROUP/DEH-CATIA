@@ -24,12 +24,16 @@
 
 namespace DEHCATIA.Tests.ViewModels
 {
+    using DEHCATIA.DstController;
+
     using DEHPCommon.Enumerators;
     using DEHPCommon.UserInterfaces.Behaviors;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using DEHCATIA.ViewModels;
     using DEHCATIA.ViewModels.Interfaces;
+
+    using DEHPCommon.Services.NavigationService;
 
     using Moq;
 
@@ -42,6 +46,9 @@ namespace DEHCATIA.Tests.ViewModels
         private Mock<IHubDataSourceViewModel> hubDataSourceViewModel;
         private Mock<IDstDataSourceViewModel> dstSourceViewModel;
         private MainWindowViewModel viewModel;
+        private Mock<INavigationService> navigationService;
+        private Mock<ITransferControlViewModel> transferControl;
+        private Mock<IDstController> dstController;
 
         [SetUp]
         public void Setup()
@@ -49,8 +56,12 @@ namespace DEHCATIA.Tests.ViewModels
             this.statusBarViewModel = new Mock<IStatusBarControlViewModel>();
             this.hubDataSourceViewModel = new Mock<IHubDataSourceViewModel>();
             this.dstSourceViewModel = new Mock<IDstDataSourceViewModel>();
+            this.navigationService = new Mock<INavigationService>();
+            this.transferControl = new Mock<ITransferControlViewModel>();
+            this.dstController = new Mock<IDstController>();
 
-            this.viewModel = new MainWindowViewModel(this.hubDataSourceViewModel.Object, this.dstSourceViewModel.Object, this.statusBarViewModel.Object);
+            this.viewModel = new MainWindowViewModel(this.hubDataSourceViewModel.Object, this.dstSourceViewModel.Object,
+                this.statusBarViewModel.Object, this.navigationService.Object, this.transferControl.Object, this.dstController.Object);
         }
 
         [Test]

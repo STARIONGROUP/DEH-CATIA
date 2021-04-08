@@ -224,11 +224,10 @@ namespace DEHCATIA.ViewModels
                 this.logger.Debug("End assigning SelectedThings to the dialog Variables");
 
                 timer.Stop();
-                this.statusBar.Append($"Mapping configuration loaded in {timer.ElapsedMilliseconds} ms");
+                this.statusBar.Append($"Existing mapped elements refreshed in {timer.ElapsedMilliseconds} ms");
 
                 this.logger.Debug("Calling NavigationService to open the DstMappingConfigurationDialog");
                 this.navigationService.ShowDialog<DstMappingConfigurationDialog, IDstMappingConfigurationDialogViewModel>(viewModel);
-                this.statusBar.Append($"Mapping in progress");
                 this.logger.Debug("Map command execute end");
             }
             catch (Exception e)

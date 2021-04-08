@@ -24,6 +24,8 @@
 
 namespace DEHCATIA.Tests.Services.ComConnector
 {
+    using System.Threading;
+
     using DEHCATIA.Services.ComConnector;
 
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
@@ -36,6 +38,7 @@ namespace DEHCATIA.Tests.Services.ComConnector
     {
         private CatiaComService service;
         private Mock<IStatusBarControlViewModel> statusBar;
+        private CancellationToken cancellationToken;
 
         [SetUp]
         public void Setup()
@@ -72,7 +75,7 @@ namespace DEHCATIA.Tests.Services.ComConnector
         {
             //this.service.CatiaApp = this.catiaApp.
             Assert.DoesNotThrow(() => this.service.Connect());
-            Assert.IsNotNull(this.service.GetProductTree());
+            Assert.IsNotNull(this.service.GetProductTree(this.cancellationToken));
         }
     }
 }

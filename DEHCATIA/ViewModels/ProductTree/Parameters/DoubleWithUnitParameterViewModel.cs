@@ -34,7 +34,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
     public class DoubleWithUnitParameterViewModel : DstParameterViewModel<DoubleWithUnitValueViewModel>
     {
         /// <summary>
-        /// Initializes a new <see cref="DstParameterViewModelViewModel{TValueType}"/>
+        /// Initializes a new <see cref="DoubleWithUnitParameterViewModel"/>
         /// </summary>
         /// <param name="parameter">The <see cref="parameter"></see>
         public DoubleWithUnitParameterViewModel(Parameter parameter) : base(parameter, default)
@@ -43,7 +43,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
         }
 
         /// <summary>
-        /// Initializes a new <see cref="DstParameterViewModelViewModel{TValueType}"/>
+        /// Initializes a new <see cref="DoubleWithUnitParameterViewModel"/>
         /// </summary>
         /// <param name="value">The <see cref="DoubleWithUnitValueViewModel"/> value</param>
         public DoubleWithUnitParameterViewModel(DoubleWithUnitValueViewModel value) : base(default, value)

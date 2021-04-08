@@ -57,11 +57,7 @@ namespace DEHCATIA.Extensions
             if (double.TryParse(match.Value.Replace(',', '.'),
                 NumberStyles.Any, CultureInfo.InvariantCulture, out var valueDouble))
             {
-                return new DoubleWithUnitValueViewModel()
-                {
-                    Value = valueDouble,
-                    UnitString = value.Substring(match.Length)
-                };
+                return new DoubleWithUnitValueViewModel(valueDouble, value.Substring(match.Length));
             }
 
             return default;

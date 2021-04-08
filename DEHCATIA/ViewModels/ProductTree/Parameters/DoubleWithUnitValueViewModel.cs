@@ -88,6 +88,17 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
             get => this.catiaSymbol;
             set => this.RaiseAndSetIfChanged(ref this.catiaSymbol, value);
         }
+        
+        /// <summary>
+        /// Initializes a new <see cref="DoubleWithUnitValueViewModel"/>
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <param name="unit">The unit</param>
+        public DoubleWithUnitValueViewModel(double value, string unit = "-")
+        {
+            this.Value = value;
+            this.UnitString = unit;
+        }
 
         /// <summary>
         /// Overides the ToString

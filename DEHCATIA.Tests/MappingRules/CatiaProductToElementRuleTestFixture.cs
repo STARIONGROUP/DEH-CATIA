@@ -36,8 +36,10 @@ namespace DEHCATIA.Tests.MappingRules
 
     using DEHCATIA.DstController;
     using DEHCATIA.MappingRules;
-    using DEHCATIA.ViewModels.ProductTree;
+    using DEHCATIA.Services.ParameterTypeService;
+    using DEHCATIA.ViewModels.ProductTree.Parameters;
     using DEHCATIA.ViewModels.ProductTree.Rows;
+    using DEHCATIA.ViewModels.ProductTree.Shapes;
 
     using DEHPCommon;
     using DEHPCommon.HubController.Interfaces;
@@ -46,10 +48,12 @@ namespace DEHCATIA.Tests.MappingRules
 
     using NUnit.Framework;
 
+    using ProductStructureTypeLib;
+
     [TestFixture]
-    public class CatiaProductToElementDefinitionRuleTestFixture
+    public class CatiaProductToElementRuleTestFixture
     {
-        private CatiaProductToElementDefinitionRule rule;
+        private CatiaProductToElementRule rule;
         private Mock<IHubController> hubController;
         private Mock<IDstController> dstController;
         private Uri uri;
@@ -57,6 +61,9 @@ namespace DEHCATIA.Tests.MappingRules
         private DomainOfExpertise domain;
         private Mock<ISession> session;
         private Iteration iteration;
+        private Mock<Product> product0;
+        private Mock<Product> product1;
+        private Mock<IParameterTypeService> parameterTypeService;
 
         [SetUp]
         public void Setup()
@@ -91,32 +98,80 @@ namespace DEHCATIA.Tests.MappingRules
             this.hubController.Setup(x => x.GetSiteDirectory()).Returns(new SiteDirectory());
 
             this.dstController = new Mock<IDstController>();
+            this.parameterTypeService = new Mock<IParameterTypeService>();
+
+            this.parameterTypeService.Setup(x => x.MomentOfInertia).Returns(new CompoundParameterType()
+            {
+                Name = "MoI", ShortName = "MoI"
+            });
 
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterInstance(this.hubController.Object).As<IHubController>();
             containerBuilder.RegisterInstance(this.dstController.Object).As<IDstController>();
+            containerBuilder.RegisterInstance(this.parameterTypeService.Object).As<IParameterTypeService>();
             AppContainer.Container = containerBuilder.Build();
 
-            this.rule = new CatiaProductToElementDefinitionRule();
+            this.product0 = new Mock<Product>();
+            this.product1 = new Mock<Product>();
+
+            this.rule = new CatiaProductToElementRule();
         }
 
         [Test]
         public void VerifyTransform()
         {
-            var products = new List<ElementRowViewModel>()
+            var rootElement = new ElementRowViewModel(this.product0.Object, string.Empty)
             {
-                new ElementRowViewModel(),
-                new ElementRowViewModel()
+                Name = "RootElementRow",
+                CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
+                Volume = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(42)),
+                MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
+                Shape = new CatiaShapeViewModel()
                 {
-                    //ElementDefinition = new ElementDefinition()
+                    PositionOrientation = new CatiaShapePositionOrientationViewModel(
+                        new[] { .1, 0, 0, 0, 1, 0, 0, 0, 1 }, new[] { .0, 0, 0 })
                 }
             };
+            
+            var usageRowViewModel = new UsageRowViewModel(this.product1.Object, string.Empty)
+            {
+                Name = "UsageRow",
+                CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
+                Volume = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(42)),
+                MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
+                Shape = new CatiaShapeViewModel()
+                {
+                    PositionOrientation = new CatiaShapePositionOrientationViewModel(
+                        new[] { .1, 0, 0, 0, 1, 0, 0, 0, 1 }, new[] { .0, 0, 0 })
+                },
+                Parent = rootElement
+            };
 
-            var result = new List<ElementDefinition>();
+            var definitionRowViewModel = new DefinitionRowViewModel(this.product1.Object, string.Empty)
+            {
+                Name = "DefinitionRow",
+                CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
+                Volume = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(42)),
+                MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
+                Shape = new CatiaShapeViewModel()
+                {
+                    PositionOrientation = new CatiaShapePositionOrientationViewModel(
+                        new[] { .1, 0, 0, 0, 1, 0, 0, 0, 1 }, new[] { .0, 0, 0 })
+                },
+                Parent = usageRowViewModel
+            };
+            
+            usageRowViewModel.Children.Add(definitionRowViewModel);
+            rootElement.Children.Add(usageRowViewModel);
+            
+            var result = new List<(ElementRowViewModel Parent, ElementBase Element)>();
 
-            Assert.DoesNotThrow(() => result = this.rule.Transform(products));
+            Assert.DoesNotThrow(() => result = this.rule.Transform(new List<ElementRowViewModel>(){rootElement}));
             Assert.IsNotNull(result);
-            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual(3, result.Count);
         }
     }
 }

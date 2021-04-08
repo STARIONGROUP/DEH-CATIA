@@ -90,11 +90,6 @@ namespace DEHCATIA.Services.ParameterTypeService
         private readonly IHubController hubController;
 
         /// <summary>
-        /// The <see cref="IStatusBarControlViewModel"/>
-        /// </summary>
-        private readonly IStatusBarControlViewModel statusBar;
-        
-        /// <summary>
         /// The local reference to the actual collection of available <see cref="ParameterType"/>
         /// </summary>
         private List<ParameterType> parameterTypes;
@@ -163,11 +158,9 @@ namespace DEHCATIA.Services.ParameterTypeService
         /// Initializes a new <see cref="ParameterTypeService"/>
         /// </summary>
         /// <param name="hubController">The <see cref="IHubController"/></param>
-        /// <param name="statusBar">The <see cref="IStatusBarControlViewModel"/></param>
-        public ParameterTypeService(IHubController hubController, IStatusBarControlViewModel statusBar)
+        public ParameterTypeService(IHubController hubController)
         {
             this.hubController = hubController;
-            this.statusBar = statusBar;
 
             CDPMessageBus.Current.Listen<SessionEvent>()
                 .Where(x => x.Status == SessionStatus.EndUpdate)
@@ -216,9 +209,7 @@ namespace DEHCATIA.Services.ParameterTypeService
             }
             else
             {
-                this.logger.Info($"No ParameterType found with the shortname: {parameterTypeShortName}",
-                    StatusBarMessageSeverity.Warning);
-
+                this.logger.Info($"No ParameterType found with the shortname: {parameterTypeShortName}");
                 return null;
             }
         }

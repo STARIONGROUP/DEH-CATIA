@@ -108,14 +108,17 @@ namespace DEHCATIA.ViewModels.Dialogs
         protected virtual void ExecuteContinueCommand(Action mapCommand)
         {
             this.IsBusy = true;
+            this.StatusBar.Append($"The mapping operation is in progress...");
 
             try
             {
                 mapCommand?.Invoke();
                 this.CloseWindowBehavior?.Close();
+                this.StatusBar.Append($"The mapping operation is done.");
             }
             catch (Exception exception)
             {
+                this.StatusBar.Append($"The mapping operation did not complete successfully: {exception.Message}");
                 this.logger.Error(exception);
             }
             finally
