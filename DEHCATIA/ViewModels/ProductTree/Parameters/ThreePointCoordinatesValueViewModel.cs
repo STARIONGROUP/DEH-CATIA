@@ -1,17 +1,17 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DoubleWithUnitParameterViewModel.cs" company="RHEA System S.A.">
+// <copyright file="ThreePointCoordinatesValueViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
-//    This file is part of DEHCATIA
+//    This file is part of DEHPEcosimPro
 // 
-//    The DEHCATIA is free software; you can redistribute it and/or
+//    The DEHPEcosimPro is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Lesser General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or (at your option) any later version.
 // 
-//    The DEHCATIA is distributed in the hope that it will be useful,
+//    The DEHPEcosimPro is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Lesser General Public License for more details.
@@ -24,37 +24,43 @@
 
 namespace DEHCATIA.ViewModels.ProductTree.Parameters
 {
-    using DEHCATIA.Extensions;
+    using System.Collections.Generic;
 
-    using KnowledgewareTypeLib;
+    using ReactiveUI;
 
     /// <summary>
-    /// Represents a <see cref="Parameter"/>
+    /// The <see cref="ThreePointCoordinatesValueViewModel"/> represents a value that holds 3 values expressable as X,Y,Z
     /// </summary>
-    public class DoubleWithUnitParameterViewModel : DstParameterViewModel<DoubleWithUnitValueViewModel>
+    public abstract class ThreePointCoordinatesValueViewModel : DstParameterViewModel<(double X, double Y, double Z)>
     {
         /// <summary>
-        /// Initializes a new <see cref="DstParameterViewModelViewModel{TValueType}"/>
+        /// Initializes a new <see cref="DstParameterViewModel{TValueType}"/>
         /// </summary>
-        /// <param name="parameter">The <see cref="parameter"></see>
-        public DoubleWithUnitParameterViewModel(Parameter parameter) : base(parameter, default)
+        /// <param name="value">The value</param>
+        protected ThreePointCoordinatesValueViewModel((double X, double Y, double Z) value) : base(default, value)
         {
-            this.Value = parameter.GetDoubleWithUnitValue();
+            this.Name = "CenterOfGravity";
         }
 
         /// <summary>
-        /// Initializes a new <see cref="DstParameterViewModelViewModel{TValueType}"/>
+        /// Gets a collection reprentation of the <see cref="DstParameterViewModel{TValueType}.Value"/> for display purpose
         /// </summary>
-        /// <param name="value">The <see cref="DoubleWithUnitValueViewModel"/> value</param>
-        public DoubleWithUnitParameterViewModel(DoubleWithUnitValueViewModel value) : base(default, value)
-        {
-        }
-        
+        public ReactiveList<object> AsRow => new ReactiveList<object>(
+            new List<object>()
+            {
+                new {X = $"{this.Value.X} mm", Y = $"{this.Value.Y} mm", Z = $"{this.Value.Z} mm"}
+            });
+
+        /// <summary>
+        /// Gets the value as an array of double
+        /// </summary>
+        public double[] Values => new[] { this.Value.X, this.Value.Y, this.Value.Z };
+
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>
         public override string ToString()
         {
-            return $"{this.Value}";
+            return $"X {this.Value.X} | Y {this.Value.Y} | Z {this.Value.Z}";
         }
     }
 }

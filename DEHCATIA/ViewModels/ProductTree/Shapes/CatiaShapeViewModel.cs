@@ -4,14 +4,14 @@
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
-//    This file is part of DEHPEcosimPro
+//    This file is part of DEHCATIA
 // 
-//    The DEHPEcosimPro is free software; you can redistribute it and/or
+//    The DEHCATIA is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Lesser General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or (at your option) any later version.
 // 
-//    The DEHPEcosimPro is distributed in the hope that it will be useful,
+//    The DEHCATIA is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Lesser General Public License for more details.
@@ -22,7 +22,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.ViewModels.ProductTree
+namespace DEHCATIA.ViewModels.ProductTree.Shapes
 {
     using DEHCATIA.Enumerations;
     using DEHCATIA.ViewModels.ProductTree.Parameters;
@@ -88,6 +88,11 @@ namespace DEHCATIA.ViewModels.ProductTree
         /// Backing field for <see cref="ExternalShape"/>
         /// </summary>
         private string externalShape;
+
+        /// <summary>
+        /// Backing field for <see cref="PositionOrientation"/>
+        /// </summary>
+        private CatiaShapePositionOrientationViewModel positionOrientation;
 
         /// <summary>
         /// Gets or sets the <see cref="Enumerations.ShapeKind"/>
@@ -186,6 +191,15 @@ namespace DEHCATIA.ViewModels.ProductTree
         {
             get => this.edges;
             set => this.RaiseAndSetIfChanged(ref this.edges, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the position and the orientation of this <see cref="CatiaShapeViewModel"/>
+        /// </summary>
+        public CatiaShapePositionOrientationViewModel PositionOrientation
+        {
+            get => this.positionOrientation;
+            set => this.RaiseAndSetIfChanged(ref this.positionOrientation, value);
         }
     }
 }

@@ -24,6 +24,8 @@
 
 namespace DEHCATIA.ViewModels.Interfaces
 {
+    using System.Threading;
+
     using DEHCATIA.ViewModels.ProductTree.Rows;
 
     using ReactiveUI;
@@ -39,13 +41,23 @@ namespace DEHCATIA.ViewModels.Interfaces
         bool IsBusy { get; set; }
 
         /// <summary>
+        /// Gets or sets the selected tree element.
+        /// </summary>
+        ElementRowViewModel SelectedElement { get; set; }
+
+        /// <summary>
+        /// The root element resulting of getting the product tree
+        /// </summary>
+        ElementRowViewModel RootElement { get; set; }
+
+        /// <summary>
         /// Gets the reactive list of root elements of the <see cref="ProductTree"/>.
         /// </summary>
         ReactiveList<ElementRowViewModel> RootElements { get; }
 
         /// <summary>
-        /// Gets or sets the selected element.
+        /// Gets the <see cref="CancellationTokenSource"/> that cancels the task which retrieves the product tree
         /// </summary>
-        ElementRowViewModel SelectedElement { get; set; }
+        CancellationTokenSource CancelToken { get; }
     }
 }

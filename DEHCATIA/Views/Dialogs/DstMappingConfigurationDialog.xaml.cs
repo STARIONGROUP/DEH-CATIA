@@ -1,43 +1,42 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="StringParameterViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2020-2021 RHEA System S.A.
-// 
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
-// 
+// <copyright file="DstMappingConfigurationDialog.xaml.cs" company="RHEA System S.A.">
+//    Copyright (c) 2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
 //    This file is part of DEHCATIA
-// 
+//
 //    The DEHCATIA is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Lesser General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or (at your option) any later version.
-// 
+//
 //    The DEHCATIA is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Lesser General Public License for more details.
-// 
+//
 //    You should have received a copy of the GNU Lesser General Public License
 //    along with this program; if not, write to the Free Software Foundation,
 //    Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.ViewModels.ProductTree.Parameters
+namespace DEHCATIA.Views.Dialogs
 {
-    using KnowledgewareTypeLib;
+    using DevExpress.Xpf.Core;
 
     /// <summary>
-    /// Represents a <see cref="string"/> <see cref="Parameter"/> 
+    /// Interaction logic for DstMappingConfigurationDialog.xaml
     /// </summary>
-    public class StringParameterViewModel : DstParameterViewModel<string>
+    public partial class DstMappingConfigurationDialog : DXDialogWindow
     {
         /// <summary>
-        /// Initializes a new <see cref="DstParameterViewModel{TValueType}"/>
+        /// Initializes a new <see cref="DstMappingConfigurationDialog"/>
         /// </summary>
-        /// <param name="parameter">The <see cref="Parameter"/></param>
-        /// <param name="value">The value</param>
-        public StringParameterViewModel(Parameter parameter, string value) : base(parameter, value)
+        public DstMappingConfigurationDialog()
         {
+            this.InitializeComponent();
         }
     }
 }

@@ -1,17 +1,17 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MomentOfInertiaViewModel.cs" company="RHEA System S.A.">
+// <copyright file="NinePointsCoordinatesValueViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
-//    This file is part of DEHPEcosimPro
+//    This file is part of DEHCATIA
 // 
-//    The DEHPEcosimPro is free software; you can redistribute it and/or
+//    The DEHCATIA is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Lesser General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or (at your option) any later version.
 // 
-//    The DEHPEcosimPro is distributed in the hope that it will be useful,
+//    The DEHCATIA is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Lesser General Public License for more details.
@@ -25,13 +25,15 @@
 namespace DEHCATIA.ViewModels.ProductTree.Parameters
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     using ReactiveUI;
 
     /// <summary>
-    /// This <see cref="MomentOfInertiaViewModel"/> represents a moment of inertia
+    /// The <see cref="MassMomentOfInertiaViewModel"/> represents a value that has meaning only by combining 9 values like for the Moment of Inertia,
+    /// Unit is kgxm2 Kilograms by Meter²
     /// </summary>
-    public struct MomentOfInertiaViewModel
+    public struct MassMomentOfInertiaViewModel
     {
         /// <summary>
         /// The XX value
@@ -79,10 +81,15 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
         public double Izz { get; set; }
 
         /// <summary>
-        /// Initializes a new <see cref="MomentOfInertiaViewModel"/>
+        /// The initial collection of values that defines the represented <see cref="MassMomentOfInertiaViewModel"/>
         /// </summary>
-        /// <param name="values">A array of double that contains the values that defines one <see cref="MomentOfInertiaViewModel"/></param>
-        public MomentOfInertiaViewModel(IReadOnlyList<double> values)
+        public double[] Values { get; }
+
+        /// <summary>
+        /// Initializes a new <see cref="MassMomentOfInertiaViewModel"/>
+        /// </summary>
+        /// <param name="values">A array of double that contains the values that defines one <see cref="MassMomentOfInertiaViewModel"/></param>
+        public MassMomentOfInertiaViewModel(IReadOnlyList<double> values)
         {
             this.Ixx = values[0];
             this.Iyx = values[1];
@@ -93,6 +100,8 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
             this.Ixz = values[6];
             this.Iyz = values[7];
             this.Izz = values[8];
+
+            this.Values = values.ToArray();
         }
 
         /// <summary>

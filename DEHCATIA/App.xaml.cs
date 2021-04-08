@@ -33,13 +33,17 @@ namespace DEHCATIA
 
     using DEHCATIA.DstController;
     using DEHCATIA.Services.ComConnector;
+    using DEHCATIA.Services.ParameterTypeService;
     using DEHCATIA.ViewModels;
+    using DEHCATIA.ViewModels.Dialogs;
+    using DEHCATIA.ViewModels.Dialogs.Interfaces;
     using DEHCATIA.ViewModels.Interfaces;
     using DEHCATIA.Views;
 
     using DEHPCommon;
     using DEHPCommon.MappingEngine;
     using DEHPCommon.Services.NavigationService;
+    using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using DevExpress.Xpf.Core;
 
@@ -132,6 +136,7 @@ namespace DEHCATIA
             containerBuilder.RegisterType<MappingEngine>().As<IMappingEngine>().WithParameter(MappingEngine.ParameterName, Assembly.GetExecutingAssembly());
             containerBuilder.RegisterType<DstController.DstController>().As<IDstController>().SingleInstance();
             containerBuilder.RegisterType<CatiaComService>().As<ICatiaComService>().SingleInstance();
+            containerBuilder.RegisterType<ParameterTypeService>().As<IParameterTypeService>().SingleInstance();
         }
 
         /// <summary>
@@ -142,9 +147,11 @@ namespace DEHCATIA
         {
             containerBuilder.RegisterType<MainWindowViewModel>().As<IMainWindowViewModel>().SingleInstance();
             containerBuilder.RegisterType<HubDataSourceViewModel>().As<IHubDataSourceViewModel>();
-            containerBuilder.RegisterType<DstDataSourceViewModel>().As<IDstDataSourceViewModel>();
+            containerBuilder.RegisterType<DstDataSourceViewModel>().As<IDstDataSourceViewModel>().SingleInstance();
             containerBuilder.RegisterType<DstBrowserHeaderViewModel>().As<IDstBrowserHeaderViewModel>();
-            containerBuilder.RegisterType<DstProductTreeViewModel>().As<IDstProductTreeViewModel>();
+            containerBuilder.RegisterType<DstProductTreeViewModel>().As<IDstProductTreeViewModel>().SingleInstance();
+            containerBuilder.RegisterType<CatiaTransferControlViewModel>().As<ITransferControlViewModel>().SingleInstance();
+            containerBuilder.RegisterType<DstMappingConfigurationDialogViewModel>().As<IDstMappingConfigurationDialogViewModel>();
         }
     }   
 }

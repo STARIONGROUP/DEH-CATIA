@@ -24,12 +24,13 @@
 
 namespace DEHCATIA.ViewModels.ProductTree.Rows
 {
-    using System;
+    using CDP4Common.EngineeringModelData;
 
     using DEHCATIA.Enumerations;
     using DEHCATIA.ViewModels.ProductTree.Parameters;
+    using DEHCATIA.ViewModels.ProductTree.Shapes;
 
-    using DevExpress.Mvvm.Native;
+    using ProductStructureTypeLib;
 
     using ReactiveUI;
 
@@ -99,6 +100,26 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         private MomentOfInertiaParameterViewModel momentOfInertia;
 
         /// <summary>
+        /// Backing field for <see cref="ElementDefinition"/>
+        /// </summary>
+        private ElementDefinition elementDefinition;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedActualFiniteState"/>
+        /// </summary>
+        private ActualFiniteState selectedActualFiniteState;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedOption"/>
+        /// </summary>
+        private Option selectedOption;
+
+        /// <summary>
+        /// Backing field for <see cref="Parent"/>
+        /// </summary>
+        private ElementRowViewModel parent;
+
+        /// <summary>
         /// Gets or sets the element name.
         /// </summary>
         public string Name
@@ -128,7 +149,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// <summary>
         /// Gets or sets the type.
         /// </summary>
-        public ElementType ElementType
+        public virtual ElementType ElementType
         {
             get => this.elementType;
             set => this.RaiseAndSetIfChanged(ref this.elementType, value);
@@ -159,15 +180,6 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         {
             get => this.isExpanded;
             set => this.RaiseAndSetIfChanged(ref this.isExpanded, value);
-        }
-        
-        /// <summary>
-        /// Gets or sets the shape this <see cref="ElementRowViewModel"/> represents
-        /// </summary>
-        public CatiaShapeViewModel Shape
-        {
-            get => this.shape;
-            set => this.RaiseAndSetIfChanged(ref this.shape, value);
         }
         
         /// <summary>
@@ -207,6 +219,33 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         }
 
         /// <summary>
+        /// Gets or sets the corresponding <see cref="ElementDefinition"/>
+        /// </summary>
+        public ElementDefinition ElementDefinition
+        {
+            get => this.elementDefinition;
+            set => this.RaiseAndSetIfChanged(ref this.elementDefinition, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ActualFiniteState"/>
+        /// </summary>
+        public ActualFiniteState SelectedActualFiniteState
+        {
+            get => this.selectedActualFiniteState;
+            set => this.RaiseAndSetIfChanged(ref this.selectedActualFiniteState, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="Option"/>
+        /// </summary>
+        public Option SelectedOption
+        {
+            get => this.selectedOption;
+            set => this.RaiseAndSetIfChanged(ref this.selectedOption, value);
+        }
+
+        /// <summary>
         /// Gets or sets the child elements of this element.
         /// </summary>
         public ReactiveList<ElementRowViewModel> Children { get; set; } = new ReactiveList<ElementRowViewModel>();
@@ -215,5 +254,36 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// Gets or sets the <see cref="IDstParameterViewModel"/> this element contains
         /// </summary>
         public ReactiveList<IDstParameterViewModel> Parameters { get; set; } = new ReactiveList<IDstParameterViewModel>();
+        
+        /// <summary>
+        /// Gets or sets the shape
+        /// </summary>
+        public CatiaShapeViewModel Shape
+        {
+            get => this.shape;
+            set => this.RaiseAndSetIfChanged(ref this.shape, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the direct parent of this <see cref="ElementRowViewModel"/>
+        /// </summary>
+        public ElementRowViewModel Parent
+        {
+            get => this.parent;
+            set => this.RaiseAndSetIfChanged(ref this.parent, value);
+        }
+
+        /// <summary>
+        /// Initializes a new <see cref="ElementRowViewModel"/>
+        /// </summary>
+        /// <param name="product">The <see cref="Product"/> this view model represents</param>
+        /// <param name="fileName">The file name of the <paramref name="product"/></param>
+        public ElementRowViewModel(Product product, string fileName)
+        {
+            this.Name = product.get_Name();
+            this.PartNumber = product.get_PartNumber();
+            this.Description = product.get_DescriptionRef();
+            this.FileName = fileName;
+        }
     }
 }

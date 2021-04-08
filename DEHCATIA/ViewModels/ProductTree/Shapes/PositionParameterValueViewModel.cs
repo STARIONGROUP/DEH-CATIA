@@ -1,17 +1,17 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="StringParameterViewModel.cs" company="RHEA System S.A.">
+// <copyright file="PositionParameterValueViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
-//    This file is part of DEHCATIA
+//    This file is part of DEHPEcosimPro
 // 
-//    The DEHCATIA is free software; you can redistribute it and/or
+//    The DEHPEcosimPro is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Lesser General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or (at your option) any later version.
 // 
-//    The DEHCATIA is distributed in the hope that it will be useful,
+//    The DEHPEcosimPro is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Lesser General Public License for more details.
@@ -22,21 +22,20 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.ViewModels.ProductTree.Parameters
+namespace DEHCATIA.ViewModels.ProductTree.Shapes
 {
-    using KnowledgewareTypeLib;
+    using DEHCATIA.ViewModels.ProductTree.Parameters;
 
     /// <summary>
-    /// Represents a <see cref="string"/> <see cref="Parameter"/> 
+    /// Represents a Position expressable as X,Y,Z
     /// </summary>
-    public class StringParameterViewModel : DstParameterViewModel<string>
+    public class PositionParameterValueViewModel : ThreePointCoordinatesValueViewModel
     {
         /// <summary>
         /// Initializes a new <see cref="DstParameterViewModel{TValueType}"/>
         /// </summary>
-        /// <param name="parameter">The <see cref="Parameter"/></param>
         /// <param name="value">The value</param>
-        public StringParameterViewModel(Parameter parameter, string value) : base(parameter, value)
+        public PositionParameterValueViewModel((double X, double Y, double Z) value) : base(value)
         {
         }
     }

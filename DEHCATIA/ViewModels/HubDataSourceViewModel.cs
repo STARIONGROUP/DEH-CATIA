@@ -24,6 +24,19 @@
 
 namespace DEHCATIA.ViewModels
 {
+    using System;
+    using System.Linq;
+    using System.Reactive;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
+
+    using Autofac;
+
+    using CDP4Dal;
+
+    using DEHCATIA.DstController;
+
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.Services.NavigationService;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
@@ -31,6 +44,12 @@ namespace DEHCATIA.ViewModels
     using DEHPCommon.UserInterfaces.Views;
 
     using DEHCATIA.ViewModels.Interfaces;
+
+    using DEHPCommon;
+    using DEHPCommon.Enumerators;
+    using DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows;
+
+    using ReactiveUI;
 
     /// <summary>
     /// View model that represents a data source panel which holds a tree like browser, a informational header and
@@ -59,6 +78,16 @@ namespace DEHCATIA.ViewModels
         public IHubBrowserHeaderViewModel HubBrowserHeader { get; set; }
 
         /// <summary>
+        /// The <see cref="IDstController"/>
+        /// </summary>
+        private readonly IDstController dstController;
+
+        /// <summary>
+        /// Gets or sets the command to refresh the session
+        /// </summary>
+        public ReactiveCommand<Unit> RefreshCommand { get; set; }
+
+        /// <summary>
         /// Initializes a new <see cref="HubDataSourceViewModel"/>
         /// </summary>
         /// <param name="navigationService">The <see cref="INavigationService"/></param>
@@ -66,16 +95,48 @@ namespace DEHCATIA.ViewModels
         /// <param name="objectBrowser">The <see cref="IObjectBrowserViewModel"/></param>
         /// <param name="publicationBrowser">The <see cref="IPublicationBrowserViewModel"/></param>
         /// <param name="hubBrowserHeader">The <see cref="IHubBrowserHeaderViewModel"/></param>
-        public HubDataSourceViewModel(INavigationService navigationService, IHubController hubController, IObjectBrowserViewModel objectBrowser, IPublicationBrowserViewModel publicationBrowser, IHubBrowserHeaderViewModel hubBrowserHeader) : base(navigationService)
+        /// <param name="dstController">The <see cref="IDstController"/></param>
+        public HubDataSourceViewModel(INavigationService navigationService, IHubController hubController, 
+            IObjectBrowserViewModel objectBrowser, IPublicationBrowserViewModel publicationBrowser, 
+            IHubBrowserHeaderViewModel hubBrowserHeader, IDstController dstController) : base(navigationService)
         {
             this.hubController = hubController;
             this.ObjectBrowser = objectBrowser;
             this.PublicationBrowser = publicationBrowser;
             this.HubBrowserHeader = hubBrowserHeader;
+            this.dstController = dstController;
 
             this.InitializeCommands();
         }
 
+        /// <summary>
+        /// Initializes this view model <see cref="ICommand"/>
+        /// </summary>
+        protected override void InitializeCommands()
+        {
+            base.InitializeCommands();
+            
+            var isConnectedObservable = this.WhenAny(x => x.hubController.OpenIteration,
+                x => x.hubController.IsSessionOpen,
+                (i, o) =>
+                    i.Value != null && o.Value)
+                .ObserveOn(RxApp.MainThreadScheduler);
+
+            isConnectedObservable.Subscribe(this.UpdateConnectButtonText);
+
+            this.RefreshCommand = ReactiveCommand.CreateAsyncTask(isConnectedObservable, async _ =>
+                await this.RefreshCommandExecute(), RxApp.MainThreadScheduler);
+        }
+
+        /// <summary>
+        /// Executes the <see cref="RefreshCommand"/>
+        /// </summary>
+        /// <returns></returns>
+        private async Task RefreshCommandExecute()
+        {
+            await this.hubController.Refresh();
+        }
+        
         /// <summary>
         /// Executes the <see cref="DataSourceViewModel.ConnectCommand"/>
         /// </summary>

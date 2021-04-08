@@ -26,16 +26,22 @@ namespace DEHCATIA.Tests.Services.ComConnector
 {
     using DEHCATIA.Services.ComConnector;
 
+    using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
+
+    using Moq;
+
     using NUnit.Framework;
 
     public class CatiaComServiceTestFixture
     {
         private CatiaComService service;
+        private Mock<IStatusBarControlViewModel> statusBar;
 
         [SetUp]
         public void Setup()
         {
-            this.service = new CatiaComService();
+            this.statusBar = new Mock<IStatusBarControlViewModel>();
+            this.service = new CatiaComService(this.statusBar.Object);
         }
 
         [Test]

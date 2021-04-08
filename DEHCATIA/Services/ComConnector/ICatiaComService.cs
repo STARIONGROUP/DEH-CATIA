@@ -4,14 +4,14 @@
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
-//    This file is part of DEHPEcosimPro
+//    This file is part of DEHCATIA
 // 
-//    The DEHPEcosimPro is free software; you can redistribute it and/or
+//    The DEHCATIA is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Lesser General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or (at your option) any later version.
 // 
-//    The DEHPEcosimPro is distributed in the hope that it will be useful,
+//    The DEHCATIA is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Lesser General Public License for more details.
@@ -24,6 +24,8 @@
 
 namespace DEHCATIA.Services.ComConnector
 {
+    using System.Threading;
+
     using DEHCATIA.ViewModels.ProductTree;
     using DEHCATIA.ViewModels.ProductTree.Rows;
 
@@ -58,11 +60,12 @@ namespace DEHCATIA.Services.ComConnector
         /// Disconnects from a running CATIA client.
         /// </summary>
         void Disconnect();
-        
+
         /// <summary>
         /// Gets the CATIA product or specification tree of a <see cref="CatiaDocumentViewModel"/>.
         /// </summary>
+        /// <param name="cancelToken">The <see cref="CancellationToken"/></param>
         /// <returns>The top <see cref="ElementRowViewModel"/></returns>
-        ElementRowViewModel GetProductTree();
+        ElementRowViewModel GetProductTree(CancellationToken cancelToken);
     }
 }

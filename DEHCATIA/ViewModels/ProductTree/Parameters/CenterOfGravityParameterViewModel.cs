@@ -4,14 +4,14 @@
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
-//    This file is part of DEHPEcosimPro
+//    This file is part of DEHCATIA
 // 
-//    The DEHPEcosimPro is free software; you can redistribute it and/or
+//    The DEHCATIA is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Lesser General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or (at your option) any later version.
 // 
-//    The DEHPEcosimPro is distributed in the hope that it will be useful,
+//    The DEHCATIA is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Lesser General Public License for more details.
@@ -24,35 +24,17 @@
 
 namespace DEHCATIA.ViewModels.ProductTree.Parameters
 {
-    using System.Collections.Generic;
-
-    using ReactiveUI;
-
-    public class CenterOfGravityParameterViewModel : DstParameterViewModel<(double X, double Y, double Z)>
+    /// <summary>
+    /// Represents a Center of Gravity value
+    /// </summary>
+    public class CenterOfGravityParameterViewModel : ThreePointCoordinatesValueViewModel
     {
         /// <summary>
         /// Initializes a new <see cref="DstParameterViewModel{TValueType}"/>
         /// </summary>
         /// <param name="value">The value</param>
-        public CenterOfGravityParameterViewModel((double X, double Y, double Z) value) : base(default, value)
+        public CenterOfGravityParameterViewModel((double X, double Y, double Z) value) : base(value)
         {
-            this.Name = "CenterOfGravity";
-        }
-
-        /// <summary>
-        /// Gets a collection reprentation of the <see cref="DstParameterViewModel{TValueType}.Value"/> for display purpose
-        /// </summary>
-        public ReactiveList<object> AsRow => new ReactiveList<object>(
-            new List<object>()
-            {
-                new {X = $"{this.Value.X} mm", Y = $"{this.Value.Y} mm", Z = $"{this.Value.Z} mm"}
-            });
-
-        /// <summary>Returns a string that represents the current object.</summary>
-        /// <returns>A string that represents the current object.</returns>
-        public override string ToString()
-        {
-            return $"X {this.Value.X} | Y {this.Value.Y} | Z {this.Value.Z}";
         }
     }
 }

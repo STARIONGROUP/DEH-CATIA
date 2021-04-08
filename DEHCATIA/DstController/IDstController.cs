@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="IDstController.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
@@ -24,7 +24,18 @@
 
 namespace DEHCATIA.DstController
 {
+    using System.Collections.Generic;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    using CDP4Common.EngineeringModelData;
+
     using DEHCATIA.ViewModels.ProductTree.Rows;
+
+    using DEHPCommon.Enumerators;
+    using DEHPCommon.MappingEngine;
+
+    using ReactiveUI;
 
     /// <summary>
     /// Interface definition for <see cref="DstController"/>
@@ -37,10 +48,26 @@ namespace DEHCATIA.DstController
         bool IsCatiaConnected { get; set; }
 
         /// <summary>
+        /// Gets or sets the <see cref="MappingDirection"/>
+        /// </summary>
+        MappingDirection MappingDirection { get; set; }
+
+        /// <summary>
+        /// Gets the colection of mapped <see cref="Parameter"/>s And <see cref="ParameterOverride"/>s through their container
+        /// </summary>
+        ReactiveList<(ElementRowViewModel Parent, ElementBase Element)> DstMapResult { get; }
+
+        /// <summary>
+        /// Gets the colection of mapped <see cref="ElementRowViewModel"/>
+        /// </summary>
+        ReactiveList<ElementRowViewModel> HubMapResult { get; }
+
+        /// <summary>
         /// Retrieves the product tree
         /// </summary>
+        /// <param name="cancelToken">The <see cref="CancellationToken"/></param>
         /// <returns>The root <see cref="ElementRowViewModel"/></returns>
-        ElementRowViewModel GetProductTree();
+        ElementRowViewModel GetProductTree(CancellationToken cancelToken);
 
         /// <summary>
         /// Connects to the Catia running instance
@@ -51,5 +78,23 @@ namespace DEHCATIA.DstController
         /// Disconnect from the Catia running instance
         /// </summary>
         void DisconnectFromCatia();
+
+        /// <summary>
+        /// Map the provided collection using the corresponding rule in the assembly and the <see cref="MappingEngine"/>
+        /// </summary>
+        /// <param name="dstElements">The <see cref="List{T}"/> of <see cref="ElementRowViewModel"/> data</param>
+        void Map(List<ElementRowViewModel> dstElements);
+
+        /// <summary>
+        /// Transfers the mapped variables to the Hub data source
+        /// </summary>
+        /// <returns>A <see cref="Task"/></returns>
+        Task TransferMappedThingsToHub();
+
+        /// <summary>
+        /// Updates the <see cref="IValueSet"/> of all <see cref="Parameter"/> and all <see cref="ParameterOverride"/>
+        /// </summary>
+        /// <returns>A <see cref="Task"/></returns>
+        Task UpdateParametersValueSets();
     }
 }

@@ -27,20 +27,41 @@ namespace DEHCATIA.ViewModels
     using System;
     using System.Diagnostics;
     using System.Reactive.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
+
+    using Autofac;
+
+    using CDP4Common.CommonData;
 
     using DEHCATIA.DstController;
+    using DEHCATIA.ViewModels.Dialogs.Interfaces;
     using DEHCATIA.ViewModels.Interfaces;
     using DEHCATIA.ViewModels.ProductTree.Rows;
+    using DEHCATIA.Views.Dialogs;
 
+    using DEHPCommon;
+    using DEHPCommon.Enumerators;
+    using DEHPCommon.HubController.Interfaces;
+    using DEHPCommon.Services.NavigationService;
+    using DEHPCommon.UserInterfaces.ViewModels;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
+
+    using NLog;
 
     using ReactiveUI;
 
     /// <summary>
     /// The view model for the interface responsible of displaying the CATIA product tree.
     /// </summary>
-    public class DstProductTreeViewModel : ReactiveObject, IDstProductTreeViewModel
+    public class DstProductTreeViewModel : ReactiveObject, IDstProductTreeViewModel, IHaveContextMenuViewModel
     {
+        /// <summary>
+        /// The <see cref="NLog"/> logger
+        /// </summary>
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// The <see cref="IDstController"/>.
         /// </summary>
@@ -50,6 +71,16 @@ namespace DEHCATIA.ViewModels
         /// The <see cref="IStatusBarControlViewModel"/>
         /// </summary>
         private readonly IStatusBarControlViewModel statusBar;
+
+        /// <summary>
+        /// The <see cref="INavigationService"/>
+        /// </summary>
+        private readonly INavigationService navigationService;
+
+        /// <summary>
+        /// The <see cref="IHubController"/>
+        /// </summary>
+        private readonly IHubController hubController;
 
         /// <summary>
         /// Backing field for <see cref="IsBusy"/>
@@ -71,6 +102,16 @@ namespace DEHCATIA.ViewModels
         private ElementRowViewModel selectedElement;
 
         /// <summary>
+        /// Backing field for <see cref="RootElement"/>
+        /// </summary>
+        private ElementRowViewModel rootElement;
+
+        /// <summary>
+        /// Backing field for <see cref="RootElement"/>
+        /// </summary>
+        private CancellationTokenSource cancelToken;
+
+        /// <summary>
         /// Gets or sets the selected tree element.
         /// </summary>
         public ElementRowViewModel SelectedElement
@@ -80,46 +121,195 @@ namespace DEHCATIA.ViewModels
         }
 
         /// <summary>
+        /// The root element resulting of getting the product tree
+        /// </summary>
+        public ElementRowViewModel RootElement
+        {
+            get => this.rootElement;
+            set => this.RaiseAndSetIfChanged(ref this.rootElement, value);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="CancellationTokenSource"/> that cancels the task which retrieves the product tree
+        /// </summary>
+        public CancellationTokenSource CancelToken
+        {
+            get => this.cancelToken;
+            set => this.RaiseAndSetIfChanged(ref this.cancelToken, value);
+        }
+
+        /// <summary>
         /// Gets the reactive list of root elements of the <see cref="ProductTree"/>.
         /// </summary>
         public ReactiveList<ElementRowViewModel> RootElements { get; } = new ReactiveList<ElementRowViewModel>();
+
+        /// <summary>
+        /// Gets the Context Menu for this browser
+        /// </summary>
+        public ReactiveList<ContextMenuItemViewModel> ContextMenu { get; } = new ReactiveList<ContextMenuItemViewModel>();
+
+        /// <summary>
+        /// Gets the command that allows to map
+        /// </summary>
+        public ReactiveCommand<object> MapCommand { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DstProductTreeViewModel"/> class.
         /// </summary>
         /// <param name="dstController">The <see cref="IDstController"/></param>
         /// <param name="statusBar">The <see cref="IStatusBarControlViewModel"/></param>
-        public DstProductTreeViewModel(IDstController dstController, IStatusBarControlViewModel statusBar)
+        /// <param name="navigationService">The <see cref="INavigationService"/></param>
+        /// <param name="hubController">The <see cref="IHubController"/></param>
+        public DstProductTreeViewModel(IDstController dstController, IStatusBarControlViewModel statusBar,
+            INavigationService navigationService, IHubController hubController)
         {
             this.dstController = dstController;
             this.statusBar = statusBar;
+            this.navigationService = navigationService;
+            this.hubController = hubController;
+            this.InitializeCommands();
+
+            this.WhenAnyValue(x => x.RootElement)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x =>
+                {
+                    if (x is null)
+                    {
+                        this.RootElements.Clear();
+                    }
+                    else
+                    {
+                        this.RootElements.Add(x);
+                    }
+
+                    this.rootElement = null;
+                });
 
             this.WhenAnyValue(vm => vm.dstController.IsCatiaConnected)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.UpdateProductTree());
+                .Subscribe(_ => this.RunUpdateProductTree());
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="ICommand"/> of this view model
+        /// </summary>
+        public void InitializeCommands()
+        {
+            var canMap = this.WhenAny(
+                vm => vm.hubController.OpenIteration,
+                vm => vm.dstController.MappingDirection,
+                (iteration, mappingDirection) =>
+                    iteration.Value != null && mappingDirection.Value is MappingDirection.FromDstToHub)
+                .ObserveOn(RxApp.MainThreadScheduler);
+
+            this.MapCommand = ReactiveCommand.Create(canMap);
+            this.MapCommand.Subscribe(_ => this.MapCommandExecute());
+            this.MapCommand.ThrownExceptions.Subscribe(e => this.logger.Error(e));
+        }
+        
+        /// <summary>
+        /// Executes the <see cref="MapCommand"/>
+        /// </summary>
+        private void MapCommandExecute()
+        {
+            try
+            {
+                this.logger.Debug("Map command execute starting");
+                var viewModel = AppContainer.Container.Resolve<IDstMappingConfigurationDialogViewModel>();
+                var timer = new Stopwatch();
+                timer.Start();
+
+                this.logger.Debug("Start assigning SelectedThings to the dialog Variables");
+
+                viewModel.Elements.Add(this.SelectedElement ?? this.RootElement);
+                this.logger.Debug("End assigning SelectedThings to the dialog Variables");
+
+                timer.Stop();
+                this.statusBar.Append($"Mapping configuration loaded in {timer.ElapsedMilliseconds} ms");
+
+                this.logger.Debug("Calling NavigationService to open the DstMappingConfigurationDialog");
+                this.navigationService.ShowDialog<DstMappingConfigurationDialog, IDstMappingConfigurationDialogViewModel>(viewModel);
+                this.statusBar.Append($"Mapping in progress");
+                this.logger.Debug("Map command execute end");
+            }
+            catch (Exception e)
+            {
+                this.logger.Error(e);
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+        
+        /// <summary>
+        /// Runs the task that will update the product tree
+        /// </summary>
+        private void RunUpdateProductTree()
+        {
+            this.RootElements.Clear();
+
+            if (this.dstController.IsCatiaConnected)
+            {
+                this.CancelToken = new CancellationTokenSource();
+
+                Task.Run(this.UpdateProductTree, this.CancelToken.Token)
+                    .ContinueWith(async t =>
+                    {
+                        if (t.IsFaulted)
+                        {
+                            this.logger.Error(t.Exception);
+                            this.statusBar.Append($"Obtaining the product tree from Catia failed: {t.Exception?.Message}");
+                        }
+                        else if (t.IsCanceled)
+                        {
+                            this.statusBar.Append($"Obtaining the product tree from Catia has been cancelled");
+                        }
+                        else if (t.IsCompleted)
+                        {
+                            this.RootElement = await t;
+                        }
+
+                        this.IsBusy = false;
+                        this.CancelToken.Dispose();
+                        this.CancelToken = null;
+                    });
+            }
         }
 
         /// <summary>
         /// Updates the <see cref="ProductTree"/> after a CATIA connection update.
         /// </summary>
-        private void UpdateProductTree()
+        private ElementRowViewModel UpdateProductTree()
         {
-            this.RootElements.Clear();
+            this.rootElement = null;
             this.IsBusy = true;
 
-            if (this.dstController.IsCatiaConnected)
+            this.statusBar.Append("Processing the Catia product tree in progress");
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            var element = this.dstController.GetProductTree(this.CancelToken.Token);
+
+            stopwatch.Stop();
+            this.statusBar.Append($"Processing the Catia product tree was done in {stopwatch.Elapsed:g}");
+            
+            return element;
+        }
+
+        /// <summary>
+        /// Populate the context menu for this browser
+        /// </summary>
+        public void PopulateContextMenu()
+        {
+            this.ContextMenu.Clear();
+
+            var itemText = "Map";
+
+            if (this.SelectedElement != null)
             {
-                this.statusBar.Append("Processing the Catia product tree in progress");
-                var stopwatch = new Stopwatch();
-                stopwatch.Start();
-
-                this.RootElements.Add(this.dstController.GetProductTree());
-
-                stopwatch.Stop();
-                this.statusBar.Append($"Processing the Catia product tree was done in {stopwatch.Elapsed:g}");
+                itemText = $"{itemText} {this.SelectedElement.Name}";
             }
 
-            this.IsBusy = false;
+            this.ContextMenu.Add(new ContextMenuItemViewModel(itemText, "", this.MapCommand,
+                MenuItemKind.Export, ClassKind.NotThing));
         }
     }
 }

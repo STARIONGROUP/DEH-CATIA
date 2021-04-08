@@ -1,17 +1,17 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ShapeKind.cs" company="RHEA System S.A.">
+// <copyright file="IParameterTypeService.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
-//    This file is part of DEHCATIA
+//    This file is part of DEHPEcosimPro
 // 
-//    The DEHCATIA is free software; you can redistribute it and/or
+//    The DEHPEcosimPro is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Lesser General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or (at your option) any later version.
 // 
-//    The DEHCATIA is distributed in the hope that it will be useful,
+//    The DEHPEcosimPro is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Lesser General Public License for more details.
@@ -22,76 +22,48 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.Enumerations
+namespace DEHCATIA.Services.ParameterTypeService
 {
+    using CDP4Common.SiteDirectoryData;
+
     /// <summary>
-    /// Reprents a kind of shape
+    /// Interface definition for <see cref="ParameterTypeService"/>
     /// </summary>
-    public enum ShapeKind
+    public interface IParameterTypeService
     {
         /// <summary>
-        /// States that shape kind is set to None
+        /// The Moment of Inertia <see cref="ParameterType"/>
         /// </summary>
-        None = -1,
+        ParameterType MomentOfInertia { get; }
 
         /// <summary>
-        /// Shape kind is a Box
+        /// The Center of Gravity <see cref="ParameterType"/>
         /// </summary>
-        Box,
+        ParameterType CenterOfGravity { get; }
 
         /// <summary>
-        /// Shape kind is a Cylinder
+        /// The Volume <see cref="ParameterType"/>
         /// </summary>
-        Cylinder,
+        ParameterType Volume { get; }
 
         /// <summary>
-        /// Shape kind is a Cone
+        /// The Mass <see cref="ParameterType"/>
         /// </summary>
-        Cone,
+        ParameterType Mass { get; }
 
         /// <summary>
-        /// Shape kind is a Sphere
+        /// The Mass <see cref="ParameterType"/>
         /// </summary>
-        Sphere,
+        ParameterType Orientation { get; }
 
         /// <summary>
-        /// Shape kind is a Paraboloid
+        /// The Mass <see cref="ParameterType"/>
         /// </summary>
-        Paraboloid,
+        ParameterType Position { get; }
 
         /// <summary>
-        /// Shape kind is a Triangular Prism
+        /// Refreshes the defined <see cref="ParameterType"/>
         /// </summary>
-        TriPrism,
-
-        /// <summary>
-        /// Shape kind is a Quadrilateral Prism
-        /// </summary>
-        QuadPrism,
-
-        /// <summary>
-        /// Shape kind is a Capped Cylinder
-        /// </summary>
-        CappedCylinder,
-
-        /// <summary>
-        /// Shape kind is a Capped Cone
-        /// </summary>
-        CappedCone,
-
-        /// <summary>
-        /// Shape kind is a Poly Prism
-        /// </summary>
-        PolyPrism,
-
-        /// <summary>
-        /// Shape kind is an Ellipsoid
-        /// </summary>
-        Ellipsoid,
-
-        /// <summary>
-        /// Shape kind is an Ogive
-        /// </summary>
-        Ogive
+        void RefreshParameterType();
     }
 }
