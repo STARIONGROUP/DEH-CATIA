@@ -4,14 +4,14 @@
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
-//    This file is part of DEHPEcosimPro
+//    This file is part of DEHCATIA
 // 
-//    The DEHPEcosimPro is free software; you can redistribute it and/or
+//    The DEHCATIA is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Lesser General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or (at your option) any later version.
 // 
-//    The DEHPEcosimPro is distributed in the hope that it will be useful,
+//    The DEHCATIA is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Lesser General Public License for more details.
@@ -87,6 +87,17 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
         {
             get => this.catiaSymbol;
             set => this.RaiseAndSetIfChanged(ref this.catiaSymbol, value);
+        }
+        
+        /// <summary>
+        /// Initializes a new <see cref="DoubleWithUnitValueViewModel"/>
+        /// </summary>
+        /// <param name="value">The value</param>
+        /// <param name="unit">The unit</param>
+        public DoubleWithUnitValueViewModel(double value, string unit = "-")
+        {
+            this.Value = value;
+            this.UnitString = unit;
         }
 
         /// <summary>

@@ -24,16 +24,25 @@
 
 namespace DEHCATIA.Tests.ViewModels
 {
+    using System.Reactive.Concurrency;
+    using System.Threading;
+
     using DEHCATIA.DstController;
     using DEHCATIA.ViewModels;
     using DEHCATIA.ViewModels.ProductTree.Rows;
 
     using DEHPCommon.Enumerators;
+    using DEHPCommon.HubController.Interfaces;
+    using DEHPCommon.Services.NavigationService;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using Moq;
 
     using NUnit.Framework;
+
+    using ProductStructureTypeLib;
+
+    using ReactiveUI;
 
     [TestFixture]
     public class DstProductTreeViewModelTestFixture
@@ -41,14 +50,25 @@ namespace DEHCATIA.Tests.ViewModels
         private DstProductTreeViewModel viewModel;
         private Mock<IDstController> dstController;
         private Mock<IStatusBarControlViewModel> statusBar;
+        private Mock<Product> product0;
+        private Mock<Product> product1;
+        private Mock<Product> product2;
+        private Mock<INavigationService> navigationService;
+        private Mock<IHubController> hubController;
 
         [SetUp]
         public void Setup()
         {
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.dstController = new Mock<IDstController>();
             this.statusBar = new Mock<IStatusBarControlViewModel>();
+            this.navigationService = new Mock<INavigationService>();
+            this.hubController = new Mock<IHubController>();
 
-            this.viewModel = new DstProductTreeViewModel(this.dstController.Object, this.statusBar.Object);
+            this.viewModel = new DstProductTreeViewModel(this.dstController.Object, this.statusBar.Object, this.navigationService.Object, this.hubController.Object);
+            this.product0 = new Mock<Product>();
+            this.product1 = new Mock<Product>();
+            this.product2 = new Mock<Product>();
         }
 
         [Test]
@@ -62,11 +82,11 @@ namespace DEHCATIA.Tests.ViewModels
         [Test]
         public void VerifyUpdateProductTree()
         {
-            this.dstController.Setup(x => x.GetProductTree()).Returns(new ElementRowViewModel());
+            this.dstController.Setup(x => x.GetProductTree(It.IsAny<CancellationToken>())).Returns(new ElementRowViewModel(this.product0.Object, string.Empty));
             this.dstController.Setup(x => x.IsCatiaConnected).Returns(true);
-            this.viewModel = new DstProductTreeViewModel(this.dstController.Object, this.statusBar.Object);
-            this.statusBar.Verify(x => x.Append(It.IsAny<string>(), StatusBarMessageSeverity.Info), Times.Exactly(2));
-            Assert.IsNotEmpty(this.viewModel.RootElements);
+            this.viewModel = new DstProductTreeViewModel(this.dstController.Object, this.statusBar.Object, this.navigationService.Object, this.hubController.Object);
+            this.statusBar.Verify(x => x.Append(It.IsAny<string>(), It.IsAny<StatusBarMessageSeverity>()), Times.Exactly(2));
+            Assert.AreEqual(1, this.viewModel.RootElements.Count);
         }
     }
 }

@@ -4,14 +4,14 @@
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
-//    This file is part of DEHPEcosimPro
+//    This file is part of DEHCATIA
 // 
-//    The DEHPEcosimPro is free software; you can redistribute it and/or
+//    The DEHCATIA is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Lesser General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or (at your option) any later version.
 // 
-//    The DEHPEcosimPro is distributed in the hope that it will be useful,
+//    The DEHCATIA is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Lesser General Public License for more details.
@@ -34,7 +34,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
     public class DoubleWithUnitParameterViewModel : DstParameterViewModel<DoubleWithUnitValueViewModel>
     {
         /// <summary>
-        /// Initializes a new <see cref="DstParameterViewModelViewModel{TValueType}"/>
+        /// Initializes a new <see cref="DoubleWithUnitParameterViewModel"/>
         /// </summary>
         /// <param name="parameter">The <see cref="parameter"></see>
         public DoubleWithUnitParameterViewModel(Parameter parameter) : base(parameter, default)
@@ -43,7 +43,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
         }
 
         /// <summary>
-        /// Initializes a new <see cref="DstParameterViewModelViewModel{TValueType}"/>
+        /// Initializes a new <see cref="DoubleWithUnitParameterViewModel"/>
         /// </summary>
         /// <param name="value">The <see cref="DoubleWithUnitValueViewModel"/> value</param>
         public DoubleWithUnitParameterViewModel(DoubleWithUnitValueViewModel value) : base(default, value)

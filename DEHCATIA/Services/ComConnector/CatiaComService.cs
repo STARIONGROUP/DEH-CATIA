@@ -4,14 +4,14 @@
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
-//    This file is part of DEHPEcosimPro
+//    This file is part of DEHCATIA
 // 
-//    The DEHPEcosimPro is free software; you can redistribute it and/or
+//    The DEHCATIA is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Lesser General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or (at your option) any later version.
 // 
-//    The DEHPEcosimPro is distributed in the hope that it will be useful,
+//    The DEHCATIA is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Lesser General Public License for more details.
@@ -27,17 +27,23 @@ namespace DEHCATIA.Services.ComConnector
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Runtime.InteropServices;
     using System.Threading;
 
     using DEHCATIA.Enumerations;
+    using DEHCATIA.Extensions;
     using DEHCATIA.ViewModels.ProductTree;
     using DEHCATIA.ViewModels.ProductTree.Parameters;
     using DEHCATIA.ViewModels.ProductTree.Rows;
+    using DEHCATIA.ViewModels.ProductTree.Shapes;
 
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
+
+    using DevExpress.Xpf.NavBar;
 
     using INFITF;
 
@@ -46,6 +52,8 @@ namespace DEHCATIA.Services.ComConnector
     using MECMOD;
 
     using NLog;
+
+    using PARTITF;
 
     using ProductStructureTypeLib;
 
@@ -61,6 +69,11 @@ namespace DEHCATIA.Services.ComConnector
     public class CatiaComService : ReactiveObject, ICatiaComService
     {
         /// <summary>
+        /// The <see cref="IStatusBarControlViewModel"/>
+        /// </summary>
+        private readonly IStatusBarControlViewModel statusBar;
+
+        /// <summary>
         /// Gets the logger for the <see cref="DstController"/>.
         /// </summary>
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
@@ -71,9 +84,9 @@ namespace DEHCATIA.Services.ComConnector
         private bool isCatiaConnected;
 
         /// <summary>
-        /// The cache of read <see cref="PartDocument"/>
+        /// The cache of read and parsed <see cref="PartDocument"/> as <see cref="DefinitionRowViewModel"/>
         /// </summary>
-        private readonly Dictionary<string, PartDocument> partCache = new Dictionary<string, PartDocument>();
+        private readonly Dictionary<string, DefinitionRowViewModel> catDefinitionCache = new Dictionary<string, DefinitionRowViewModel>();
 
         /// <summary>
         /// Gets or sets whether there's a connection to a running CATIA client.
@@ -97,8 +110,11 @@ namespace DEHCATIA.Services.ComConnector
         /// <summary>
         /// Initializes a nez <see cref="CatiaComService"/>
         /// </summary>
-        public CatiaComService()
+        /// <param name="statusBar">The <see cref="IStatusBarControlViewModel"/></param>
+        public CatiaComService(IStatusBarControlViewModel statusBar)
         {
+            this.statusBar = statusBar;
+
             this.WhenAnyValue(x => x.IsCatiaConnected)
                 .Subscribe(_ => this.SetActiveDocument());
         }
@@ -116,23 +132,24 @@ namespace DEHCATIA.Services.ComConnector
         /// </summary>
         public void Disconnect()
         {
-            this.partCache.Clear();
-            this.CatiaApp = null;
             this.IsCatiaConnected = false;
+            this.catDefinitionCache.Clear();
+            this.CatiaApp = null;
         }
 
         /// <summary>
         /// Gets the CATIA product or specification tree of a <see cref="CatiaDocumentViewModel"/>.
         /// </summary>
+        /// <param name="cancelToken">The <see cref="CancellationToken"/></param>
         /// <returns>The top <see cref="ElementRowViewModel"/></returns>
-        public ElementRowViewModel GetProductTree()
+        public ElementRowViewModel GetProductTree(CancellationToken cancelToken)
         {
             if (!this.IsCatiaConnected || this.ActiveDocument == null)
             {
                 return null;
             }
 
-            if (this.ActiveDocument.ElementType != ElementType.CatProduct || this.ActiveDocument.Document is not ProductDocument)
+            if (this.ActiveDocument.ElementType != ElementType.CatProduct || !(this.ActiveDocument.Document is ProductDocument))
             {
                 this.logger.Error("Cannot open a product tree of a non .CATProduct file.");
                 return null;
@@ -144,11 +161,15 @@ namespace DEHCATIA.Services.ComConnector
             
             topElement.ElementType = ElementType.CatProduct;
             
-            foreach (Product prod in productDoc.Product.Products)
+            foreach (Product product in productDoc.Product.Products)
             {
-                if (this.GetTreeElementFromProduct(prod, this.ActiveDocument.Name) is { } newElement)
+                cancelToken.ThrowIfCancellationRequested();                
+                this.statusBar.Append($"Retrieving product: {product.get_Name()} out of {productDoc.Product.Products.Count} products");
+
+                if (this.GetTreeElementFromProduct(product, this.ActiveDocument.Name, cancelToken) is { } newElement)
                 {
                     topElement.Children.Add(newElement);
+                    newElement.Parent = topElement;
                 }
             }
 
@@ -231,15 +252,21 @@ namespace DEHCATIA.Services.ComConnector
         /// Receives the document type from the CATIA filename as it is stored
         /// </summary>
         /// <param name="fileName">The CATIA full file name</param>
+        /// <param name="parentFileName">The file name of the parent the <paramref name="fileName"/></param>
         /// <returns>The document type</returns>
-        private ElementType GetDocumentTypeFromFileName(string fileName)
+        private ElementType GetDocumentTypeFromFileName(string fileName, string parentFileName = null)
         {
             var dotIndex = fileName.LastIndexOf('.');
             var documentType = dotIndex < 0 ? "" : fileName.Substring(dotIndex + 1);
 
-            return Enum.TryParse(documentType, true, out ElementType elementType)
-                ? elementType
-                : ElementType.Invalid;
+            var elementType = Enum.TryParse(documentType, true, out ElementType type) ? type : ElementType.Invalid;
+
+            if (!string.IsNullOrWhiteSpace(parentFileName) && elementType is ElementType.CatProduct)
+            {
+                elementType = fileName.Equals(parentFileName) ? ElementType.Component : ElementType.CatProduct;
+            }
+
+            return elementType;
         }
 
         /// <summary>
@@ -247,8 +274,9 @@ namespace DEHCATIA.Services.ComConnector
         /// </summary>
         /// <param name="product">The COM product.</param>
         /// <param name="parentFileName">The parent file name of the product.</param>
+        /// <param name="cancelToken">The <see cref="CancellationToken"/></param>
         /// <returns>The element on a <see cref="ElementRowViewModel"/> form, or null if the <see cref="Product"/> couldn't be resolved.</returns>
-        private ElementRowViewModel GetTreeElementFromProduct(Product product, string parentFileName)
+        private ElementRowViewModel GetTreeElementFromProduct(Product product, string parentFileName, CancellationToken cancelToken)
         {
             if (product == null)
             {
@@ -272,34 +300,19 @@ namespace DEHCATIA.Services.ComConnector
                 return null;
             }
 
-            var treeElement = this.InitializeElement(product, fileName);
-
-            switch (this.GetDocumentTypeFromFileName(fileName))
-            {
-                case ElementType.CatProduct:
-                    treeElement.ElementType = fileName.Equals(parentFileName) ? ElementType.Component : ElementType.CatProduct;
-                    break;
-
-                case ElementType.CatPart:
-                    treeElement.ElementType = ElementType.CatPart;
-
-                    if (product.ReferenceProduct is { } referenceProduct)
-                    {
-                        var element = this.InitializeElement(referenceProduct, fileName);
-                        element.ElementType = ElementType.CatDefinition;
-                        this.ReadFilePart(fileName, element);
-                        treeElement.Children.Add(element);
-                    }
-
-                    break;
-            }
-
+            var treeElement = this.InitializeElement(product, fileName, parentFileName);
+            
             foreach (Product componentOrPart in product.Products)
             {
-                var newTreeElement = this.GetTreeElementFromProduct(componentOrPart, fileName);
+                cancelToken.ThrowIfCancellationRequested();
+
+                this.statusBar.Append($"Retrieving product: {componentOrPart.get_Name()} out of {product.Products.Count} products");
+
+                var newTreeElement = this.GetTreeElementFromProduct(componentOrPart, fileName, cancelToken);
 
                 if (newTreeElement != null)
                 {
+                    newTreeElement.Parent = treeElement;
                     treeElement.Children.Add(newTreeElement);
                 }
             }
@@ -308,24 +321,88 @@ namespace DEHCATIA.Services.ComConnector
         }
 
         /// <summary>
+        /// Gets the cat definition <see cref="ElementRowViewModel"/>
+        /// </summary>
+        /// <param name="fileName">The file name of the part</param>
+        /// <param name="referenceProduct">The product of the Cat part file</param>
+        private DefinitionRowViewModel GetCatDefinition(string fileName, Product referenceProduct)
+        {
+            if (this.catDefinitionCache.TryGetValue(fileName, out var existingRow))
+            {
+                return existingRow;
+            }
+
+            var element = new DefinitionRowViewModel(referenceProduct, fileName);
+            this.GetElementProperties(referenceProduct, element);
+            this.ReadFilePart(fileName, element);
+            this.catDefinitionCache.Add(fileName, element);
+            return element;
+        }
+
+        /// <summary>
         /// Initializes a new <see cref="ElementRowViewModel"/>
         /// </summary>
         /// <param name="product">The <see cref="Product"/></param>
         /// <param name="fileName">The file name</param>
-        /// <returns></returns>
-        private ElementRowViewModel InitializeElement(Product product, string fileName)
+        /// <param name="parentFileName">The file name of the parent the <paramref name="fileName"/></param>
+        /// <returns>An <see cref="ElementRowViewModel"/></returns>
+        private ElementRowViewModel InitializeElement(Product product, string fileName, string parentFileName = null)
         {
-            var element = new ElementRowViewModel
+            var element = this.GetDocumentTypeFromFileName(fileName, parentFileName) switch
             {
-                Name = product.get_Name(),
-                PartNumber = product.get_PartNumber(),
-                Description = product.get_DescriptionRef(),
-                FileName = fileName,
+                ElementType.CatPart => new UsageRowViewModel(product, fileName),
+                _ => new ElementRowViewModel(product, fileName)
+            };
+
+            if (element.ElementType is ElementType.CatPart && product.ReferenceProduct is { } referenceProduct)
+            {
+                var definition = this.GetCatDefinition(fileName, referenceProduct);
+                element.Children.Add(definition);
+            }
+            
+            this.GetElementProperties(product, element);
+
+            return element;
+        }
+
+        /// <summary>
+        /// Gets the properties of the <paramref name="element"/> out of <paramref name="product"/>
+        /// </summary>
+        /// <param name="product">The <see cref="Product"/></param>
+        /// <param name="element">The <see cref="ElementRowViewModel"/></param>
+        private void GetElementProperties(Product product, ElementRowViewModel element)
+        {
+            var name = string.Empty;
+
+            try
+            {
+                name = product.GetDefaultShapeName();
+            }
+            catch (COMException exception)
+            {
+                this.logger.Info(exception);
+            }
+
+            element.Shape = new CatiaShapeViewModel()
+            {
+                Name = name,
+                PositionOrientation = this.GetPositionAndOrientation(product)
             };
 
             this.AddInertiaParameters(product.Analyze, element);
-            
-            return element;
+        }
+
+        /// <summary>
+        /// Gets the position and orientation
+        /// </summary>
+        private CatiaShapePositionOrientationViewModel GetPositionAndOrientation(Product product)
+        {
+            var axisComponentsArray = new dynamic[12];
+
+            product.Position.GetComponents(axisComponentsArray);
+
+            return new CatiaShapePositionOrientationViewModel(axisComponentsArray.Take(9).Cast<double>().ToArray(), 
+                axisComponentsArray.Skip(9).Cast<double>().ToArray());
         }
 
         /// <summary>
@@ -369,47 +446,36 @@ namespace DEHCATIA.Services.ComConnector
         /// Reads a <see cref="PartDocument"/>
         /// </summary>
         /// <param name="fileName">The path of the part file</param>
-        /// <param name="element">The <see cref="ElementRowViewModel"/></param>
-        private void ReadFilePart(string fileName, ElementRowViewModel element)
+        /// <param name="element">The <see cref="DefinitionRowViewModel"/></param>
+        private void ReadFilePart(string fileName, DefinitionRowViewModel element)
         {
-            var document = this.partCache.TryGetValue(fileName, out var cacheDocument) 
-                ? cacheDocument 
-                : this.OpenPartDocument(fileName);
+            var document = this.OpenPartDocument(fileName);
             
             this.ParsePartDocument(document, element);
 
             document.Close();
-
-            if (!this.partCache.TryGetValue(fileName, out _))
-            {
-                this.partCache.Add(fileName, document);
-            }
         }
 
         /// <summary>
         /// Gets the Part from CATIA with its parameters.
         /// </summary>
         /// <param name="partDocument">The <see cref="PartDocument"/></param>
-        /// <param name="element">The <see cref="ElementRowViewModel"/></param>
-        private void ParsePartDocument(PartDocument partDocument, ElementRowViewModel element)
+        /// <param name="element">The <see cref="DefinitionRowViewModel"/></param>
+        private void ParsePartDocument(PartDocument partDocument, DefinitionRowViewModel element)
         {
             if (null == partDocument)
             {
                 return;
             }
+            
+            var mainBody = partDocument.Part.MainBody;
 
             element.Parameters.AddRange(this.ParseParameters(partDocument.Part.Parameters));
-        }
+            var shape = element.Parameters.GetShape(ShapeKind.Box);
+            shape.Name = mainBody.get_Name();
+            shape.PositionOrientation = this.GetPositionAndOrientation(partDocument.Product);
 
-        /// <summary>
-        /// Takes an Assembly or Part document provided by CATIA in order to
-        /// read the 'Analyze' object and calls the according function with it.
-        /// </summary>
-        /// <param name="partDocument">The CATIA <see cref="PartDocument"/> referring to the geometric top element</param>
-        /// <param name="element">The <see cref="ElementRowViewModel"/></param>
-        private void AddInertiaParameters(PartDocument partDocument, ElementRowViewModel element)
-        {
-            this.AddInertiaParameters(partDocument.Product.Analyze, element);
+            element.Shape = shape;
         }
 
         /// <summary>
@@ -435,11 +501,9 @@ namespace DEHCATIA.Services.ComConnector
         {
             try
             {
-                return new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel()
+                return new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(analyze.Mass, "kg")
                 {
-                    Value = analyze.Mass,
-                    CatiaSymbol = "kg",
-                    UnitString = "kg"
+                    CatiaSymbol = "kg"
                 })
                 {
                     Name = "mass_with_margin"
@@ -461,13 +525,13 @@ namespace DEHCATIA.Services.ComConnector
         {
             try
             {
-                return new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel()
+                return new DoubleWithUnitParameterViewModel(
+                    
+                    // Volume comes back as milimeters3, so conversion to meter3 is neccessary
+                    new DoubleWithUnitValueViewModel(analyze.Volume / 1000000000, "m3")
                     {
-                        // Volume comes back as milimeters3, so conversion to meter3 is neccessary
-                        Value = analyze.Volume / 1000000000,
-                        CatiaSymbol = "m3",
-                        UnitString = "m³"
-                })
+                        CatiaSymbol = "m3"
+                    })
                 {
                     Name = "Vol"
                 };
@@ -494,6 +558,7 @@ namespace DEHCATIA.Services.ComConnector
                 try
                 {
                     analyze.GetInertia(array);
+                    values = array.Cast<double>().Select(x => x * 0.000001).ToArray();
                 }
                 catch (COMException)
                 {
@@ -517,7 +582,7 @@ namespace DEHCATIA.Services.ComConnector
                 return null;
             }
 
-            return new MomentOfInertiaParameterViewModel(new MomentOfInertiaViewModel(values));
+            return new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel(values));
         }
 
         /// <summary>
@@ -583,12 +648,7 @@ namespace DEHCATIA.Services.ComConnector
         /// <param name="fileName">The filename to be opened.</param>
         /// <returns>The document which contains filename respectively PartNumber.</returns>
         private Document OpenDocument(string fileName)
-        {   
-            if (!File.Exists(fileName))
-            {
-                this.logger.Error($"File does not exist '{fileName}'");
-            }
-
+        {
             if ((this.CatiaApp.Documents.Cast<Document>()
                 .FirstOrDefault(x => x.get_Name() == fileName) is { } openDocument))
             {

@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DstDataSourceViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2021 RHEA System S.A.
 //
@@ -30,7 +30,9 @@ namespace DEHCATIA.ViewModels
     using DEHCATIA.DstController;
     using DEHCATIA.ViewModels.Interfaces;
 
+    using DEHPCommon.Enumerators;
     using DEHPCommon.Services.NavigationService;
+    using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using ReactiveUI;
 
@@ -43,6 +45,11 @@ namespace DEHCATIA.ViewModels
         /// The <see cref="IDstController"/> instance.
         /// </summary>
         private readonly IDstController dstController;
+
+        /// <summary>
+        /// The <see cref="IStatusBarControlViewModel"/>
+        /// </summary>
+        private readonly IStatusBarControlViewModel statusBar;
 
         /// <summary>
         /// Backing field for <see cref="ConnectionStatus"/>.
@@ -75,9 +82,13 @@ namespace DEHCATIA.ViewModels
         /// <param name="dstController">The <see cref="IDstController"/> instance.</param>
         /// <param name="dstBrowserHeaderViewModel">The <see cref="IDstBrowserHeaderViewModel"/> instance.</param>
         /// <param name="dstProductTreeViewModel">The <see cref="IDstProductTreeViewModel"/> instance.</param>
-        public DstDataSourceViewModel(INavigationService navigationService, IDstController dstController, IDstBrowserHeaderViewModel dstBrowserHeaderViewModel, IDstProductTreeViewModel dstProductTreeViewModel) : base(navigationService)
+        /// <param name="statusBar">The <see cref="IStatusBarControlViewModel"/></param>
+        public DstDataSourceViewModel(INavigationService navigationService, IDstController dstController, 
+            IDstBrowserHeaderViewModel dstBrowserHeaderViewModel, IDstProductTreeViewModel dstProductTreeViewModel,
+            IStatusBarControlViewModel statusBar) : base(navigationService)
         {
             this.dstController = dstController;
+            this.statusBar = statusBar;
             this.DstBrowserHeaderViewModel = dstBrowserHeaderViewModel;
             this.DstProductTreeViewModel = dstProductTreeViewModel;
 
@@ -95,7 +106,13 @@ namespace DEHCATIA.ViewModels
         /// </summary>
         protected override void InitializeCommands()
         {
-            this.ConnectCommand = ReactiveCommand.Create();
+            var canConnect = this.WhenAny(x => x.DstProductTreeViewModel.CancelToken,
+                x => x.dstController.IsCatiaConnected,
+                (x, c) => 
+                    x.Value is null || !(x.Value != null && !c.Value))
+                .ObserveOn(RxApp.MainThreadScheduler);
+
+            this.ConnectCommand = ReactiveCommand.Create(canConnect);
             this.ConnectCommand.Subscribe(_ => this.ConnectCommandExecute());
         }
 
@@ -106,6 +123,12 @@ namespace DEHCATIA.ViewModels
         {
             if (this.dstController.IsCatiaConnected)
             {
+                if (this.DstProductTreeViewModel.CancelToken is {} cancelToken)
+                {
+                    this.statusBar.Append("Obtaining CATIA Product Tree is being canceled, please wait", StatusBarMessageSeverity.Warning);
+                    cancelToken.Cancel(true);
+                }
+
                 this.dstController.DisconnectFromCatia();
                 this.ConnectionStatus = "Connection is not established";
             }

@@ -10,10 +10,15 @@
         xmlns:behaviors="clr-namespace:DEHPCommon.UserInterfaces.Behaviors;assembly=DEHPCommon"
         xmlns:objectBrowser="clr-namespace:DEHPCommon.UserInterfaces.Views.ObjectBrowser;assembly=DEHPCommon"
         xmlns:publicationBrowser="clr-namespace:DEHPCommon.UserInterfaces.Views.PublicationBrowser;assembly=DEHPCommon"
+        xmlns:rows="clr-namespace:DEHCATIA.Views.Rows"
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
         Title="DEH CATIA Adapter" WindowState="Maximized" 
         MinWidth="800" MinHeight="600" mc:Ignorable="d">
     <Window.Resources>
         <ResourceDictionary>
+            <DataTemplate x:Key="MappedThingRowDataTemplate">
+                <rows:MappingRow />
+            </DataTemplate>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -58,7 +63,7 @@
                                     <RowDefinition Height="Auto"></RowDefinition>
                                     <RowDefinition></RowDefinition>
                                 </Grid.RowDefinitions>
-                                <Grid>
+                                <Grid Margin="10">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition></ColumnDefinition>
                                         <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -66,9 +71,19 @@
                                     </Grid.ColumnDefinitions>
 
                                     <Path Stretch="Fill" Fill="DarkGray" Data="M 0,110 110,110 110,90 120,120 110,150 110,130 0,130 Z" HorizontalAlignment="Left" MaxHeight="30" RenderTransformOrigin=".5,.5"/>
-                                    <Button Grid.Column="1" Height="40" HorizontalAlignment="Center" Content="Change Transfer Direction" Command="{Binding ChangeMappingDirection}"/>
+                                    <Button ToolTip="Change mapping direction" Grid.Column="1" Height="40" HorizontalAlignment="Center" Content="Change Transfer Direction" Command="{Binding ChangeMappingDirection}"/>
                                     <Path Grid.Column="2" Stretch="Fill" Fill="DarkGray" Data="M 0,110 110,110 110,90 120,120 110,150 110,130 0,130 Z" HorizontalAlignment="Left" MaxHeight="30" RenderTransformOrigin=".5,.5"/>
                                 </Grid>
+
+                                <TabControl Name="HubEngineeringModelPreview" Grid.Row="1" 
+                                            SelectedIndex="{Binding MappingDirection}">
+                                    <TabItem Header="Hub Engineering Model">
+                                        <objectBrowser:ObjectBrowser DataContext="{Binding HubNetChangePreviewViewModel}" ></objectBrowser:ObjectBrowser>
+                                    </TabItem>
+                                    <TabItem Header="Catia Product Tree">
+                                        <views:DstNetChangePreview DataContext="{Binding DstNetChangePreviewViewModel}" ></views:DstNetChangePreview>
+                                    </TabItem>
+                                </TabControl>
                             </Grid>
                         </dxdo:LayoutPanel>
                         <dxdo:LayoutPanel AllowHide="False" Name="HubPanel" AllowDock="False" MinWidth="200" VerticalAlignment="Stretch" dxdo:AutoHideGroup.AutoHideType="Left" AllowClose="False" AllowDrag="False" AllowFloat="False" AllowMove="False" Caption="Hub Data Source">
@@ -77,7 +92,18 @@
                                     <RowDefinition Height="Auto"></RowDefinition>
                                     <RowDefinition></RowDefinition>
                                 </Grid.RowDefinitions>
-                                <Button Width="150" Height="40" HorizontalAlignment="Center" Content="{Binding HubDataSourceViewModel.ConnectButtonText}" Command="{Binding HubDataSourceViewModel.ConnectCommand}"/>
+
+                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                    <Button Margin="0,0,10,0" Width="150" Height="40" HorizontalAlignment="Right" 
+                                            Content="{Binding HubDataSourceViewModel.ConnectButtonText}" Command="{Binding HubDataSourceViewModel.ConnectCommand}"
+                                            ToolTip="Connect or disconnect from a Hub data source"/>
+
+                                    <Button Width="40" Height="40" HorizontalAlignment="Left"
+                                            Command="{Binding HubDataSourceViewModel.RefreshCommand}"
+                                            ToolTip="Refresh the session">
+                                        <Image Source="{dx:DXImage 'Images/Actions/Refresh2_32x32.png'}"></Image>
+                                    </Button>
+                                </StackPanel>
                                 <Grid Grid.Row="1" Background="AliceBlue">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
@@ -86,25 +112,13 @@
                                     </Grid.RowDefinitions>
                                     <common:HubBrowserHeader DataContext="{Binding HubDataSourceViewModel.HubBrowserHeader}" Grid.Row="1" />
                                     <TabControl Grid.Row="2">
-                                        <TabItem>
-                                            <TabItem.Header>
-                                                <TextBlock Text="Engineering Model" />
-                                            </TabItem.Header>
-                                            <objectBrowser:ObjectBrowser>
-                                                <objectBrowser:ObjectBrowser.DataContext>
-                                                    <Binding Path="HubDataSourceViewModel.ObjectBrowser"></Binding>
-                                                </objectBrowser:ObjectBrowser.DataContext>
-                                            </objectBrowser:ObjectBrowser>
+                                        <TabItem Header="Engineering Model">
+                                            <objectBrowser:ObjectBrowser 
+                                                DataContext="{Binding HubDataSourceViewModel.ObjectBrowser}"/>
                                         </TabItem>
-                                        <TabItem>
-                                            <TabItem.Header>
-                                                <TextBlock Text="Publications" />
-                                            </TabItem.Header>
-                                            <publicationBrowser:PublicationBrowser>
-                                                <publicationBrowser:PublicationBrowser.DataContext>
-                                                    <Binding Path="HubDataSourceViewModel.PublicationBrowser"></Binding>
-                                                </publicationBrowser:PublicationBrowser.DataContext>
-                                            </publicationBrowser:PublicationBrowser>
+                                        <TabItem Header="Publications">
+                                            <publicationBrowser:PublicationBrowser 
+                                                DataContext="{Binding HubDataSourceViewModel.PublicationBrowser}"/>
                                         </TabItem>
                                     </TabControl>
                                 </Grid>
@@ -119,8 +133,9 @@
                                     <ColumnDefinition Width="1*" />
                                 </Grid.ColumnDefinitions>
 
-                                <ListView x:Name="Mapping" Grid.Column="0" HorizontalContentAlignment="Stretch" />
-                                <Button Grid.Column="1" Margin="10" Background="Transparent" BorderBrush="Transparent">
+                                <ListView x:Name="Mapping" ItemsSource="{Binding MappingViewModel.MappingRows}" Grid.Column="0" HorizontalContentAlignment="Stretch" 
+                                          ItemTemplate="{StaticResource MappedThingRowDataTemplate}" />
+                                <Button ToolTip="Open the history of transfer dialog" Command="{Binding OpenExchangeHistory}" Grid.Column="1" Margin="10" Background="Transparent" BorderBrush="Transparent">
                                     <TextBlock FontSize="18" Text="🕑 Transfer History" TextWrapping="Wrap" TextAlignment="Center"/>
                                 </Button>
                             </Grid>
@@ -128,22 +143,8 @@
                     </dxdo:LayoutGroup>
                 </dxdo:LayoutGroup>
             </dxdo:DockLayoutManager>
-            <Grid Grid.Row="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="4*" />
-                    <RowDefinition Height="6*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="8*" />
-                </Grid.ColumnDefinitions>
-                <Grid Grid.Row="0" Grid.ColumnSpan="2" Margin="10,10,10,5" HorizontalAlignment="Stretch">
-                    <ProgressBar Background="AliceBlue" Foreground="DarkGray" Maximum="100" Minimum="0" Value="37" />
-                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" Text="37%" />
-                </Grid>
-                <Button Grid.Row="1" Grid.Column="0" Height="40" Margin="10,5,5,10" Content="Cancel"/>
-                <Button Grid.Row="1" Grid.Column="1" Height="40" Margin="5,5,10,10" Content="Transfer"/>
-            </Grid>
+
+            <common:TransferControl Grid.Row="1" DataContext="{Binding TransferControlViewModel}"></common:TransferControl>
 
             <common:StatusBarControl DataContext="{Binding StatusBarControlViewModel}" Grid.Row="2" />
         </Grid>

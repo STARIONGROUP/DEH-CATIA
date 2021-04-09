@@ -15,6 +15,9 @@
              d:DesignHeight="600" d:DesignWidth="400" mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/DEHPCommon;component/UserInterfaces/Views/ContextMenu/ContextMenuStyle.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
             <Style x:Key="ThingIcon" TargetType="{x:Type Image}">
                 <Setter Property="Width" Value="28" />
                 <Setter Property="Height" Value="16" />
@@ -124,7 +127,7 @@
                             <dxg:TableView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AllowColumnMoving="True" AllowEditing="False" 
                                            AllowGrouping="True" AutoWidth="true" IsDetailButtonVisibleBinding="{x:Null}" 
                                            ShowFilterPanelMode="Never" ShowGroupPanel="False" 
-                                           VerticalScrollbarVisibility="Auto"
+                                           VerticalScrollbarVisibility="Auto" ShowEmptyText="True"
                                            IndicatorWidth="30">
                             </dxg:TableView>
                         </dxg:GridControl.View>
@@ -145,7 +148,7 @@
                             <dxg:TableView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AllowColumnMoving="True" AllowEditing="False" 
                                            AllowGrouping="True" AutoWidth="true" IsDetailButtonVisibleBinding="{x:Null}" 
                                            ShowFilterPanelMode="Never" ShowGroupPanel="False" 
-                                           VerticalScrollbarVisibility="Auto"
+                                           VerticalScrollbarVisibility="Auto" ShowEmptyText="True"
                                            IndicatorWidth="30">
                                 <dxg:TableView.RowIndicatorContentTemplate>
                                     <DataTemplate>

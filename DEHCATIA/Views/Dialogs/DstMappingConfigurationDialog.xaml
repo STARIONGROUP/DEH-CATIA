@@ -1,0 +1,306 @@
+﻿<dx:DXDialogWindow x:Class="DEHCATIA.Views.Dialogs.DstMappingConfigurationDialog"
+                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:behaviors="clr-namespace:DEHPCommon.UserInterfaces.Behaviors;assembly=DEHPCommon"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                   xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                   xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+                   xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+                   xmlns:rows="clr-namespace:DEHCATIA.ViewModels.ProductTree.Rows"
+                   xmlns:converters1="clr-namespace:DEHCATIA.Converters"
+                   Title="Mapping Configuration Dialog" MinWidth="800"
+                   MinHeight="600" mc:Ignorable="d" Topmost="True">
+    <Window.Resources>
+        <ResourceDictionary>
+            <Style x:Key="ThingIcon" TargetType="{x:Type Image}">
+                <Setter Property="Width" Value="28" />
+                <Setter Property="Height" Value="16" />
+                <Setter Property="Margin" Value="1" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+            </Style>
+            <converters1:ElementTypeToIconConverter x:Key="ElementTypeToIconConverter" />
+            <HierarchicalDataTemplate DataType="{x:Type rows:ElementRowViewModel}" ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged}">
+                <dx:MeasurePixelSnapper>
+                    <StackPanel Orientation="Horizontal">
+                        <dx:PixelSnapper>
+                            <Image Style="{StaticResource ThingIcon}" Source="{Binding Row.ElementType, Converter={StaticResource ElementTypeToIconConverter}}"/>
+                        </dx:PixelSnapper>
+                        <ContentPresenter x:Name="defaultRowPresenter" Content="{Binding}" ContentTemplate="{Binding View.DefaultDataRowTemplate}"/>
+                    </StackPanel>
+                </dx:MeasurePixelSnapper>
+            </HierarchicalDataTemplate>
+        </ResourceDictionary>
+    </Window.Resources>
+    <dxmvvm:Interaction.Behaviors>
+        <behaviors:CloseWindowBehavior />
+    </dxmvvm:Interaction.Behaviors>
+    <dx:LoadingDecorator BorderEffect="Default" BorderEffectColor="Blue" IsSplashScreenShown="{Binding IsBusy}" OwnerLock="LoadingContent">
+
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="300" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <GroupBox Grid.Row="0" x:Name="MainContainer" Header="Select the top element" Margin="10" Padding="10">
+                <dxg:TreeListControl ItemsSource="{Binding Elements}"
+                                 SelectedItem="{Binding SelectedThing}" SelectionMode="None">
+                    <dxmvvm:Interaction.Behaviors>
+                        <behaviors:ContextMenuBehavior/>
+                    </dxmvvm:Interaction.Behaviors>
+                    <dxg:TreeListControl.View>
+                        <dxg:TreeListView Name="View"
+                                      AllowEditing="False"
+                                      AutoWidth="False"
+                                      ExpandCollapseNodesOnNavigation="True"
+                                      ExpandStateFieldName="IsExpanded"
+                                      FixedLineWidth="0"
+                                      HorizontalScrollbarVisibility="Auto"
+                                      NavigationStyle="Row"
+                                      ShowHorizontalLines="False"
+                                      ShowIndicator="False"
+                                      ShowNodeImages="False"
+                                      ShowVerticalLines="False"
+                                      TreeDerivationMode="HierarchicalDataTemplate"
+                                      TreeLineStyle="Solid"
+                                      VerticalScrollbarVisibility="Auto">
+                            <dxg:TreeListView.FocusedRow>
+                                <dynamic:ExpandoObject />
+                            </dxg:TreeListView.FocusedRow>
+                            <dxg:TreeListView.ContextMenu>
+                                <ContextMenu />
+                            </dxg:TreeListView.ContextMenu>
+                            <dxg:TreeListView.RowStyle>
+                                <Style TargetType="{x:Type dxg:RowControl}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Row.IsHighlighted}" Value="True">
+                                            <Setter Property="Background" Value="Yellow"/>
+                                            <Setter Property="FontWeight" Value="Bold" />
+                                            <Setter Property="Foreground" Value="Blue" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                    <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+                                </Style>
+                            </dxg:TreeListView.RowStyle>
+                        </dxg:TreeListView>
+                    </dxg:TreeListControl.View>
+                    <dxg:TreeListControl.Columns>
+                        <dxg:TreeListColumn FieldName="Name" Fixed="Left"/>
+                        <dxg:TreeListColumn FieldName="PartNumber" Header="Part Number"/>
+                        <dxg:TreeListColumn FieldName="ElementType" Header="Element Type"/>
+                    </dxg:TreeListControl.Columns>
+                </dxg:TreeListControl>
+            </GroupBox>
+            <GroupBox Grid.Row="1" Header="Values" Margin="10" Padding="10">
+                <Grid Height="250">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="5*" />
+                        <ColumnDefinition Width="5*" />
+                        <ColumnDefinition Width="4*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid Margin="10" MaxHeight="400">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Label Margin="2" Grid.Row="0" Grid.Column="0" Content="Name:"></Label>
+                        <Label Margin="2" Grid.Row="1" Grid.Column="2" Content="Volume:"></Label>
+                        <Label Margin="2" Grid.Row="1" Grid.Column="0" Content="Mass:"></Label>
+                        <Label Margin="2" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Content="Center of gravity:"></Label>
+                        <Label Margin="2" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Content="Moment of Inertia:"></Label>
+                        <Label Margin="2" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="1" Content="{Binding SelectedThing.Name}"></Label>
+                        <Label Margin="2" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="3" Content="{Binding SelectedThing.Volume}"></Label>
+                        <Label Margin="2" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1" Content="{Binding SelectedThing.Mass}"></Label>
+                        <dxg:GridControl Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3"
+                                     ToolTip="Center of Gravity" MaxHeight="50" 
+                                     HorizontalAlignment="Left" VerticalAlignment="Stretch" 
+                                     AllowUpdateTwoWayBoundPropertiesOnSynchronization="False" AutoGenerateColumns="None"
+                                     EnableSmartColumnsGeneration="False"
+                                     ItemsSource="{Binding SelectedThing.CenterOfGravity.AsRow}"
+                                     SelectionMode="Row">
+                            <dxg:GridControl.View>
+                                <dxg:TableView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AllowColumnMoving="True" AllowEditing="False" 
+                                           AllowGrouping="True" AutoWidth="true" IsDetailButtonVisibleBinding="{x:Null}" 
+                                           ShowFilterPanelMode="Never" ShowGroupPanel="False" 
+                                           VerticalScrollbarVisibility="Auto" ShowEmptyText="True"
+                                           IndicatorWidth="30">
+                                </dxg:TableView>
+                            </dxg:GridControl.View>
+                            <dxg:GridControl.Columns>
+                                <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="X" />
+                                <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="Y" />
+                                <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="Z" />
+                            </dxg:GridControl.Columns>
+                        </dxg:GridControl>
+                        <dxg:GridControl Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3"
+                                     ToolTip="Mass Moment of Inertia" MaxHeight="210" 
+                                     HorizontalAlignment="Left" VerticalAlignment="Stretch" 
+                                     AllowUpdateTwoWayBoundPropertiesOnSynchronization="False" AutoGenerateColumns="None"
+                                     EnableSmartColumnsGeneration="False"
+                                     ItemsSource="{Binding SelectedThing.MomentOfInertia.Value.AsRows}"
+                                     SelectionMode="Row">
+                            <dxg:GridControl.View>
+                                <dxg:TableView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AllowColumnMoving="True" AllowEditing="False" 
+                                           AllowGrouping="True" AutoWidth="true" IsDetailButtonVisibleBinding="{x:Null}" 
+                                           ShowFilterPanelMode="Never" ShowGroupPanel="False" 
+                                           VerticalScrollbarVisibility="Auto" ShowEmptyText="True"
+                                           IndicatorWidth="30">
+                                    <dxg:TableView.RowIndicatorContentTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="Black" Background="#F8F8F8" BorderThickness=".2">
+                                                <TextBlock HorizontalAlignment="Center"  Text="{Binding Row.Name}" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </dxg:TableView.RowIndicatorContentTemplate>
+                                </dxg:TableView>
+                            </dxg:GridControl.View>
+                            <dxg:GridControl.Columns>
+                                <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="X" />
+                                <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="Y" />
+                                <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="Z" />
+                            </dxg:GridControl.Columns>
+                        </dxg:GridControl>
+                    </Grid>
+                    <Grid Grid.Column="1" Margin="10" MaxHeight="400">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Label Margin="2" Grid.Row="0" Grid.Column="0" Content="Shape Name:"></Label>
+                        <Label Margin="2" Grid.Row="1" Grid.Column="2" Content=""></Label>
+                        <Label Margin="2" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Content="Position:"></Label>
+                        <Label Margin="2" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Content="Orientation:"></Label>
+                        <Label Margin="2" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="1" Content="{Binding SelectedThing.Shape.Name}"></Label>
+                        <dxg:GridControl Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3"
+                                     ToolTip="Center of Gravity" MaxHeight="50" 
+                                     HorizontalAlignment="Left" VerticalAlignment="Stretch" 
+                                     AllowUpdateTwoWayBoundPropertiesOnSynchronization="False" AutoGenerateColumns="None"
+                                     EnableSmartColumnsGeneration="False"
+                                     ItemsSource="{Binding SelectedThing.Shape.PositionOrientation.Position.AsRow}"
+                                     SelectionMode="Row">
+                            <dxg:GridControl.View>
+                                <dxg:TableView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AllowColumnMoving="True" AllowEditing="False" 
+                                           AllowGrouping="True" AutoWidth="true" IsDetailButtonVisibleBinding="{x:Null}" 
+                                           ShowFilterPanelMode="Never" ShowGroupPanel="False" 
+                                           VerticalScrollbarVisibility="Auto" ShowEmptyText="True"
+                                           IndicatorWidth="30">
+                                </dxg:TableView>
+                            </dxg:GridControl.View>
+                            <dxg:GridControl.Columns>
+                                <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="X" />
+                                <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="Y" />
+                                <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="Z" />
+                            </dxg:GridControl.Columns>
+                        </dxg:GridControl>
+                        <dxg:GridControl Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3"
+                                     ToolTip="Mass Moment of Inertia" MaxHeight="210" 
+                                     HorizontalAlignment="Left" VerticalAlignment="Stretch" 
+                                     AllowUpdateTwoWayBoundPropertiesOnSynchronization="False" AutoGenerateColumns="None"
+                                     EnableSmartColumnsGeneration="False"
+                                     ItemsSource="{Binding SelectedThing.Shape.PositionOrientation.Orientation.AsRow}"
+                                     SelectionMode="Row">
+                            <dxg:GridControl.View>
+                                <dxg:TableView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AllowColumnMoving="True" AllowEditing="False" 
+                                           AllowGrouping="True" AutoWidth="true" IsDetailButtonVisibleBinding="{x:Null}" 
+                                           ShowFilterPanelMode="Never" ShowGroupPanel="False" 
+                                           VerticalScrollbarVisibility="Auto" ShowEmptyText="True"
+                                           IndicatorWidth="30">
+                                </dxg:TableView>
+                            </dxg:GridControl.View>
+                            <dxg:GridControl.Columns>
+                                <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="θx" />
+                                <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="θx" />
+                                <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowMoving="False" FieldName="θz" />
+                            </dxg:GridControl.Columns>
+                        </dxg:GridControl>
+                    </Grid>
+
+                    <Grid Grid.Column="2" Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="4*" />
+                            <ColumnDefinition Width="6*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Label Grid.Row="1" Grid.Column="0" Content="Element Definition:" />
+                        <dxe:ComboBoxEdit Grid.Row="1" Grid.Column="1" Margin="2" AllowNullInput="True" AutoComplete="True" ClearSelectionOnBackspace="True" 
+                                          DisplayMember="ShortName" ItemsSource="{Binding AvailableElementDefinitions}"
+                                          NullText="Create New Element Definition" NullValueButtonPlacement="EditBox"
+                                          SelectedItem="{Binding SelectedThing.ElementDefinition}"
+                                          ToolTip="Select an ElementDefinition to be mapped with the top element of the selected tree"
+                                          ShowNullTextForEmptyValue="True" ValidateOnTextInput="False" ValueMember="Name" 
+                                          IsEnabled="{Binding AreHubFieldsEditable}">
+                            <dxe:ComboBoxEdit.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0} [{1}]">
+                                                <Binding Path="Name" />
+                                                <Binding Path="ShortName" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </dxe:ComboBoxEdit.ItemTemplate>
+                        </dxe:ComboBoxEdit>
+                        <Label Grid.Row="2" Grid.Column="0" Content="Actual Finite State:" />
+                        <dxe:ComboBoxEdit Grid.Row="2" Grid.Column="1" Margin="2" ApplyItemTemplateToSelectedItem="True" AutoComplete="True" DisplayMember="Name"
+                                          ItemsSource="{Binding AvailableActualFiniteStates}"
+                                          NullText="No State Depent Parameter Selected"
+                                          SelectedItem="{Binding SelectedThing.SelectedActualFiniteState}"
+                                          ToolTip="Select a ActualFiniteState if the destination contains any state dependant parameters,&#x0a;these parameters with the corresponding state valuesets will be updated"
+                                          ShowNullTextForEmptyValue="True" ValidateOnTextInput="False" ValueMember="Name" 
+                                          IsEnabled="{Binding AreHubFieldsEditable}"/>
+                        <Label Grid.Row="3" Grid.Column="0" Content="Option:" />
+                        <dxe:ComboBoxEdit Grid.Row="3" Grid.Column="1" Margin="2" AutoComplete="True" DisplayMember="ShortName"
+                                          ItemsSource="{Binding AvailableOptions}" SelectedIndex="0" NullText="Select an option"
+                                          SelectedItem="{Binding SelectedThing.SelectedOption}" NullValueButtonPlacement="EditBox"
+                                          ShowNullTextForEmptyValue="True" ValidateOnTextInput="False" 
+                                          ValueMember="Name" AllowNullInput="True" IsEnabled="{Binding AreHubFieldsEditable}"
+                                          ToolTip="Select an Option, if the destination contains any option dependant parameters,&#x0a;these parameters with the corresponding option valuesets will be updated"/>
+                    </Grid>
+                </Grid>
+            </GroupBox>
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Button ToolTip="Map the selected product tree to &#x0a;the defined ElemnentDefinition" Grid.Column="2" Width="117" Height="Auto" MinWidth="100" Margin="5" HorizontalAlignment="Right" Command="{Binding ContinueCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="0,0,10,0" VerticalAlignment="Center" Text="Continue" />
+                        <Image Width="24" Height="24" Source="{dx:DXImage Image=Right_32x32.png}" Stretch="Uniform" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Grid>
+    </dx:LoadingDecorator>
+</dx:DXDialogWindow>

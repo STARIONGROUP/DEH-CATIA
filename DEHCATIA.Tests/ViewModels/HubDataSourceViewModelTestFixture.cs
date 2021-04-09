@@ -28,6 +28,8 @@ namespace DEHCATIA.Tests.ViewModels
     using System.Reactive.Concurrency;
     using System.Threading;
 
+    using DEHCATIA.DstController;
+
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.Services.NavigationService;
     using DEHPCommon.Services.ObjectBrowserTreeSelectorService;
@@ -57,6 +59,7 @@ namespace DEHCATIA.Tests.ViewModels
         private Mock<IObjectBrowserTreeSelectorService> treeSelectorService;
 
         private IHubDataSourceViewModel viewModel;
+        private Mock<IDstController> dstController;
 
         [SetUp]
         public void Setup()
@@ -79,8 +82,11 @@ namespace DEHCATIA.Tests.ViewModels
             this.treeSelectorService = new Mock<IObjectBrowserTreeSelectorService>();
 
             this.hubBrowserHeader = new Mock<IHubBrowserHeaderViewModel>();
+            this.dstController = new Mock<IDstController>();
 
-            this.viewModel = new HubDataSourceViewModel(this.navigationService.Object, this.hubController.Object, this.objectBrowser.Object, this.publicationBrowser.Object, this.hubBrowserHeader.Object);
+            this.viewModel = new HubDataSourceViewModel(this.navigationService.Object, this.hubController.Object, 
+                this.objectBrowser.Object, this.publicationBrowser.Object, this.hubBrowserHeader.Object,
+                this.dstController.Object);
         }
 
         [Test]
