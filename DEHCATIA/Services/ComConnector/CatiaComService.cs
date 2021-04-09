@@ -476,12 +476,6 @@ namespace DEHCATIA.Services.ComConnector
             shape.PositionOrientation = this.GetPositionAndOrientation(partDocument.Product);
 
             element.Shape = shape;
-
-            //element.Shape = new CatiaShapeViewModel()
-            //{ 
-            //    Name = mainBody.get_Name(), 
-            //    PositionOrientation = this.GetPositionAndOrientation(partDocument.Product)
-            //};
         }
 
         /// <summary>
