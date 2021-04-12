@@ -24,6 +24,7 @@
 
 namespace DEHCATIA.Extensions
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -86,16 +87,23 @@ namespace DEHCATIA.Extensions
         /// Retrieves all relevant parameter from the <paramref name="parameters"/>
         /// </summary>
         /// <param name="parameters">The collection of <see cref="IDstParameterViewModel"/></param>
-        /// <param name="shapeKind">The <see cref="ShapeKind"/></param>
         /// <returns></returns>
-        public static CatiaShapeViewModel GetShape(this IEnumerable<IDstParameterViewModel> parameters, ShapeKind shapeKind)
+        public static CatiaShapeViewModel GetShape(this IEnumerable<IDstParameterViewModel> parameters)
         {
             var catiaBaseParameters = parameters as IDstParameterViewModel[] ?? parameters.ToArray();
 
             var doubleParameter = catiaBaseParameters.OfType<DoubleWithUnitParameterViewModel>().ToArray();
 
-            return new CatiaShapeViewModel()
+            var shapeKindParameter = catiaBaseParameters.FirstOrDefault(x => x.Name == ShapeKindParameterName);
+
+            if (!Enum.TryParse(shapeKindParameter?.ValueString, true, out ShapeKind shapeKind))
             {
+                return new CatiaShapeViewModel();
+            }
+
+            return new CatiaShapeViewModel(true)
+            {
+                ShapeKind = shapeKind,
                 Length = doubleParameter.FirstOrDefault(x => x.Name == LenghtParameterName)?.Value,
                 Height = doubleParameter.FirstOrDefault(x => x.Name == HeightParameterName)?.Value,
                 Angle = doubleParameter.FirstOrDefault(x => x.Name == AngleParameterName)?.Value,
@@ -104,7 +112,6 @@ namespace DEHCATIA.Extensions
                 WidthOrDiameter = doubleParameter.FirstOrDefault(x => x.Name == WidthDiameterName)?.Value,
                 LengthSupport = doubleParameter.FirstOrDefault(x => x.Name == LengthSupportParameterName)?.Value,
                 ExternalShape = catiaBaseParameters.OfType<StringParameterViewModel>().FirstOrDefault(x => x.Name == ExternalShapeParameterName)?.Value,
-                ShapeKind = shapeKind,
             };
         }
     }

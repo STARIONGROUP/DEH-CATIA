@@ -95,6 +95,11 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         private CatiaShapePositionOrientationViewModel positionOrientation;
 
         /// <summary>
+        /// Backing field for <see cref="isSupported"/>
+        /// </summary>
+        private bool isSupported;
+
+        /// <summary>
         /// Gets or sets the <see cref="Enumerations.ShapeKind"/>
         /// </summary>
         public ShapeKind ShapeKind
@@ -200,6 +205,24 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         {
             get => this.positionOrientation;
             set => this.RaiseAndSetIfChanged(ref this.positionOrientation, value);
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicatin whether the shape is supported by the adapter
+        /// </summary>
+        public bool IsSupported
+        {
+            get => this.isSupported;
+            set => this.RaiseAndSetIfChanged(ref this.isSupported, value);
+        }
+
+        /// <summary>
+        /// Initializes a new <see cref="CatiaShapeViewModel"/>
+        /// </summary>
+        /// <param name="isSupported">A assert whether the represented shape is supported by the adapter</param>
+        public CatiaShapeViewModel(bool isSupported = false)
+        {
+            this.IsSupported = isSupported;
         }
     }
 }

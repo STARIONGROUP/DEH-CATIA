@@ -35,7 +35,6 @@ namespace DEHCATIA.MappingRules
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using DEHCATIA.DstController;
     using DEHCATIA.Enumerations;
     using DEHCATIA.Services.ParameterTypeService;
     using DEHCATIA.ViewModels.ProductTree.Rows;
@@ -43,9 +42,6 @@ namespace DEHCATIA.MappingRules
     using DEHPCommon;
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.MappingRules.Core;
-
-    using DevExpress.Xpf.NavBar;
-    using DevExpress.Xpo.Helpers;
 
     using NLog;
 
@@ -164,8 +160,23 @@ namespace DEHCATIA.MappingRules
             }
 
             this.MapParameters(elementRowViewModel);
+            this.MapShape(elementRowViewModel);
 
             return elementRowViewModel.ElementDefinition;
+        }
+
+        /// <summary>
+        /// Maps the relevant parameter if the shape is comaptible
+        /// </summary>
+        /// <param name="definitionRow">The <see cref="DefinitionRowViewModel"/></param>
+        private void MapShape(DefinitionRowViewModel definitionRow)
+        {
+            if (definitionRow.Shape.IsSupported)
+            {
+                this.MapParameter(this.parameterTypeService.ShapeKind,
+                    ParameterTypeService.OrientationShortName, definitionRow, definitionRow.Shape.ShapeKind);
+                $"etc...";
+            }
         }
 
         /// <summary>

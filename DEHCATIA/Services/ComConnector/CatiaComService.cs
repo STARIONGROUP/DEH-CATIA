@@ -471,7 +471,7 @@ namespace DEHCATIA.Services.ComConnector
             var mainBody = partDocument.Part.MainBody;
 
             element.Parameters.AddRange(this.ParseParameters(partDocument.Part.Parameters));
-            var shape = element.Parameters.GetShape(ShapeKind.Box);
+            var shape = element.Parameters.GetShape();
             shape.Name = mainBody.get_Name();
             shape.PositionOrientation = this.GetPositionAndOrientation(partDocument.Product);
 
