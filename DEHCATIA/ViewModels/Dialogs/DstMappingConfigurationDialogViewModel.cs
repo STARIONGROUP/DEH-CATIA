@@ -239,7 +239,12 @@ namespace DEHCATIA.ViewModels.Dialogs
         /// </summary>
         private void ContinueCommandExecute()
         {
-            this.DstController.Map(this.Elements.ToList());
+            if (!(this.Elements.FirstOrDefault() is { } element))
+            {
+                return;
+            }
+
+            this.DstController.Map(element);
         }
 
         /// <summary>

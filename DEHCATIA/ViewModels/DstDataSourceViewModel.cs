@@ -26,11 +26,18 @@ namespace DEHCATIA.ViewModels
 {
     using System;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
+
+    using Autofac;
 
     using DEHCATIA.DstController;
+    using DEHCATIA.ViewModels.Dialogs.Interfaces;
     using DEHCATIA.ViewModels.Interfaces;
+    using DEHCATIA.Views.Dialogs;
 
+    using DEHPCommon;
     using DEHPCommon.Enumerators;
+    using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.Services.NavigationService;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
@@ -50,6 +57,11 @@ namespace DEHCATIA.ViewModels
         /// The <see cref="IStatusBarControlViewModel"/>
         /// </summary>
         private readonly IStatusBarControlViewModel statusBar;
+
+        /// <summary>
+        /// The <see cref="IHubController"/>
+        /// </summary>
+        private readonly IHubController hubController;
 
         /// <summary>
         /// Backing field for <see cref="ConnectionStatus"/>.
@@ -83,12 +95,14 @@ namespace DEHCATIA.ViewModels
         /// <param name="dstBrowserHeaderViewModel">The <see cref="IDstBrowserHeaderViewModel"/> instance.</param>
         /// <param name="dstProductTreeViewModel">The <see cref="IDstProductTreeViewModel"/> instance.</param>
         /// <param name="statusBar">The <see cref="IStatusBarControlViewModel"/></param>
+        /// <param name="hubController">The <see cref="IHubController"/></param>
         public DstDataSourceViewModel(INavigationService navigationService, IDstController dstController, 
             IDstBrowserHeaderViewModel dstBrowserHeaderViewModel, IDstProductTreeViewModel dstProductTreeViewModel,
-            IStatusBarControlViewModel statusBar) : base(navigationService)
+            IStatusBarControlViewModel statusBar, IHubController hubController) : base(navigationService)
         {
             this.dstController = dstController;
             this.statusBar = statusBar;
+            this.hubController = hubController;
             this.DstBrowserHeaderViewModel = dstBrowserHeaderViewModel;
             this.DstProductTreeViewModel = dstProductTreeViewModel;
 
@@ -96,6 +110,10 @@ namespace DEHCATIA.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.UpdateConnectButtonText);
 
+            this.WhenAnyValue(vm => vm.dstController.IsCatiaConnected)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(this.UpdateConnectButtonText);
+            
             this.InitializeCommands();
 
             this.ConnectionStatus = "Connection is not established";
@@ -108,8 +126,9 @@ namespace DEHCATIA.ViewModels
         {
             var canConnect = this.WhenAny(x => x.DstProductTreeViewModel.CancelToken,
                 x => x.dstController.IsCatiaConnected,
-                (x, c) => 
-                    x.Value is null || !(x.Value != null && !c.Value))
+                x => x.hubController.OpenIteration,
+                (x, c, i) => 
+                    (x.Value is null || !(x.Value != null && !c.Value)) && i.Value != null)
                 .ObserveOn(RxApp.MainThreadScheduler);
 
             this.ConnectCommand = ReactiveCommand.Create(canConnect);
@@ -134,6 +153,16 @@ namespace DEHCATIA.ViewModels
             }
             else
             {
+                var viewModel = AppContainer.Container.Resolve<IDstLoginViewModel>();
+
+                this.NavigationService.ShowDialog<DstLogin, IDstLoginViewModel>(viewModel);
+
+                if (this.dstController.ExternalIdentifierMap is null)
+                {
+                    this.statusBar.Append("Connection to CATIA has been canceled");
+                    return;
+                }
+
                 this.dstController.ConnectToCatia();
                 this.ConnectionStatus = this.dstController.IsCatiaConnected ? "Connection is established" : "CATIA is not available";
             }

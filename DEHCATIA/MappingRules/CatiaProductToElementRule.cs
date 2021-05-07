@@ -44,15 +44,12 @@ namespace DEHCATIA.MappingRules
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.MappingRules.Core;
 
-    using DevExpress.Xpf.NavBar;
-    using DevExpress.Xpo.Helpers;
-
     using NLog;
 
     /// <summary>
     /// Rule definition that transforms a collection of <see cref="ElementRowViewModel"/> to a collection <see cref="ElementDefinition"/>
     /// </summary>
-    public class CatiaProductToElementRule : MappingRule<List<ElementRowViewModel>, List<(ElementRowViewModel Parent, ElementBase Element)>>
+    public class CatiaProductToElementRule : MappingRule<ElementRowViewModel, List<(ElementRowViewModel Parent, ElementBase Element)>>
     {
         /// <summary>
         /// The current class logger
@@ -63,7 +60,7 @@ namespace DEHCATIA.MappingRules
         /// The <see cref="IHubController"/>
         /// </summary>
         private readonly IHubController hubController = AppContainer.Container.Resolve<IHubController>();
-
+        
         /// <summary>
         /// The <see cref="IParameterTypeService"/>
         /// </summary>
@@ -92,13 +89,15 @@ namespace DEHCATIA.MappingRules
         /// <summary>
         /// Transforms <see cref="!:TInput" /> to a <see cref="!:TOutput" />
         /// </summary>
-        public override List<(ElementRowViewModel Parent, ElementBase Element)> Transform(List<ElementRowViewModel> input)
+        public override List<(ElementRowViewModel Parent, ElementBase Element)> Transform(ElementRowViewModel input)
         {
             try
             {
                 this.owner = this.hubController.CurrentDomainOfExpertise;
                 
-                this.Map(input);
+                this.Map(new List<ElementRowViewModel>{input});
+
+                AppContainer.Container.Resolve<IDstController>().SaveTheMapping(input);
 
                 return this.ruleOutput;
             }

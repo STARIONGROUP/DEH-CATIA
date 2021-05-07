@@ -61,12 +61,7 @@ namespace DEHCATIA.ViewModels
         /// The <see cref="NLog"/> logger
         /// </summary>
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
-
-        /// <summary>
-        /// The <see cref="IDstController"/>.
-        /// </summary>
-        private readonly IDstController dstController;
-
+        
         /// <summary>
         /// The <see cref="IStatusBarControlViewModel"/>
         /// </summary>
@@ -81,6 +76,11 @@ namespace DEHCATIA.ViewModels
         /// The <see cref="IHubController"/>
         /// </summary>
         private readonly IHubController hubController;
+
+        /// <summary>
+        /// The <see cref="IDstController"/>.
+        /// </summary>
+        protected IDstController DstController { get; }
 
         /// <summary>
         /// Backing field for <see cref="IsBusy"/>
@@ -163,7 +163,7 @@ namespace DEHCATIA.ViewModels
         public DstProductTreeViewModel(IDstController dstController, IStatusBarControlViewModel statusBar,
             INavigationService navigationService, IHubController hubController)
         {
-            this.dstController = dstController;
+            this.DstController = dstController;
             this.statusBar = statusBar;
             this.navigationService = navigationService;
             this.hubController = hubController;
@@ -181,11 +181,9 @@ namespace DEHCATIA.ViewModels
                     {
                         this.RootElements.Add(x);
                     }
-
-                    this.rootElement = null;
                 });
 
-            this.WhenAnyValue(vm => vm.dstController.IsCatiaConnected)
+            this.WhenAnyValue(vm => vm.DstController.IsCatiaConnected)
                 .Subscribe(_ => this.RunUpdateProductTree());
         }
 
@@ -196,7 +194,7 @@ namespace DEHCATIA.ViewModels
         {
             var canMap = this.WhenAny(
                 vm => vm.hubController.OpenIteration,
-                vm => vm.dstController.MappingDirection,
+                vm => vm.DstController.MappingDirection,
                 (iteration, mappingDirection) =>
                     iteration.Value != null && mappingDirection.Value is MappingDirection.FromDstToHub)
                 .ObserveOn(RxApp.MainThreadScheduler);
@@ -245,58 +243,58 @@ namespace DEHCATIA.ViewModels
         {
             this.RootElements.Clear();
 
-            if (this.dstController.IsCatiaConnected)
+            if (!this.DstController.IsCatiaConnected)
             {
-                this.CancelToken = new CancellationTokenSource();
-
-                Task.Run(this.UpdateProductTree, this.CancelToken.Token)
-                    .ContinueWith(async t =>
-                    {
-                        if (t.IsFaulted)
-                        {
-                            this.logger.Error(t.Exception);
-                            this.statusBar.Append($"Obtaining the product tree from Catia failed: {t.Exception?.Message}");
-                        }
-                        else if (t.IsCanceled)
-                        {
-                            this.statusBar.Append($"Obtaining the product tree from Catia has been cancelled");
-                        }
-                        else if (t.IsCompleted)
-                        {
-                            this.RootElement = await t;
-                        }
-
-                        this.IsBusy = false;
-                        this.CancelToken.Dispose();
-                        this.CancelToken = null;
-                    });
+                return;
             }
+
+            this.CancelToken = new CancellationTokenSource();
+
+            Task.Run(this.UpdateProductTree, this.CancelToken.Token)
+                .ContinueWith(t =>
+                {
+                    if (t.IsFaulted)
+                    {
+                        this.logger.Error(t.Exception);
+                        this.statusBar.Append($"Obtaining the product tree from Catia failed: {t.Exception?.Message}");
+                    }
+                    else if (t.IsCanceled)
+                    {
+                        this.statusBar.Append($"Obtaining the product tree from Catia has been cancelled");
+                    }
+                    else if (t.IsCompleted)
+                    {
+                        this.RootElement = this.DstController.ProductTree;
+                        this.DstController.LoadMapping();
+                    }
+
+                    this.IsBusy = false;
+                    this.CancelToken.Dispose();
+                    this.CancelToken = null;
+                });
         }
 
         /// <summary>
         /// Updates the <see cref="ProductTree"/> after a CATIA connection update.
         /// </summary>
-        private ElementRowViewModel UpdateProductTree()
+        protected virtual void UpdateProductTree()
         {
-            this.rootElement = null;
+            this.RootElement = null;
             this.IsBusy = true;
 
             this.statusBar.Append("Processing the Catia product tree in progress");
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-
-            var element = this.dstController.GetProductTree(this.CancelToken.Token);
+            this.DstController.GetProductTree(this.CancelToken.Token);
 
             stopwatch.Stop();
             this.statusBar.Append($"Processing the Catia product tree was done in {stopwatch.Elapsed:g}");
-            
-            return element;
         }
 
         /// <summary>
         /// Populate the context menu for this browser
         /// </summary>
-        public void PopulateContextMenu()
+        public virtual void PopulateContextMenu()
         {
             this.ContextMenu.Clear();
 

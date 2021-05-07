@@ -91,7 +91,13 @@ namespace DEHCATIA.Tests.ViewModels.Dialogs
             };
 
             this.product0 = new Mock<Product>();
+            this.product0.Setup(x => x.get_DescriptionRef()).Returns(string.Empty);
+            this.product0.Setup(x => x.get_PartNumber()).Returns(string.Empty);
+            this.product0.Setup(x => x.get_Name()).Returns(string.Empty);
             this.product1 = new Mock<Product>();
+            this.product1.Setup(x => x.get_DescriptionRef()).Returns(string.Empty);
+            this.product1.Setup(x => x.get_PartNumber()).Returns(string.Empty);
+            this.product1.Setup(x => x.get_Name()).Returns(string.Empty);
 
             this.rootElement = new ElementRowViewModel(this.product0.Object, string.Empty)
             {
@@ -112,7 +118,7 @@ namespace DEHCATIA.Tests.ViewModels.Dialogs
             this.hubController.Setup(x => x.GetSiteDirectory()).Returns(new SiteDirectory());
 
             this.dstController = new Mock<IDstController>();
-            this.dstController.Setup(x => x.Map(It.IsAny<List<ElementRowViewModel>>()));
+            this.dstController.Setup(x => x.Map(It.IsAny<ElementRowViewModel>()));
         
             this.statusBar = new Mock<IStatusBarControlViewModel>();
 
@@ -151,11 +157,11 @@ namespace DEHCATIA.Tests.ViewModels.Dialogs
 
             this.viewModel.CloseWindowBehavior = this.closeBehavior.Object;
             this.viewModel.ContinueCommand.Execute(null);
-            this.dstController.Setup(x => x.Map(It.IsAny<List<ElementRowViewModel>>())).Throws<InvalidOperationException>();
+            this.dstController.Setup(x => x.Map(It.IsAny<ElementRowViewModel>())).Throws<InvalidOperationException>();
             this.viewModel.ContinueCommand.Execute(null);
 
             this.closeBehavior.Verify(x => x.Close(), Times.Once);
-            this.dstController.Verify(x => x.Map(It.IsAny<List<ElementRowViewModel>>()), Times.Exactly(2));
+            this.dstController.Verify(x => x.Map(It.IsAny<ElementRowViewModel>()), Times.Exactly(2));
         }
     }
 }
