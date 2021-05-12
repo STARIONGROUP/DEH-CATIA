@@ -92,6 +92,21 @@ namespace DEHCATIA.Enumerations
         /// <summary>
         /// Shape kind is an Ogive
         /// </summary>
-        Ogive
+        Ogive,
+        
+        /// <summary>
+        /// Shape kind is a Tetrahedron
+        /// </summary>
+        Tetrahedron,
+
+        /// <summary>
+        /// Shape kind is a Wedge
+        /// </summary>
+        Wedge,
+
+        /// <summary>
+        /// Shape kind is a Capsule
+        /// </summary>
+        Capsule
     }
 }

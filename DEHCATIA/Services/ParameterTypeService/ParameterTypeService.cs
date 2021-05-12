@@ -80,6 +80,46 @@ namespace DEHCATIA.Services.ParameterTypeService
         public const string PositionShortName = "position";
 
         /// <summary>
+        /// The Shape kind <see cref="ParameterType"/> short name
+        /// </summary>
+        public const string ShapeKindShortName = "kind";
+
+        /// <summary>
+        /// The Shape length <see cref="ParameterType"/> short name
+        /// </summary>
+        public const string ShapeLengthShortName = "length";
+
+        /// <summary>
+        /// The Shape width or diameter <see cref="ParameterType"/> short name
+        /// </summary>
+        public const string ShapeWidthOrDiameterShortName = "wid_diameter";
+
+        /// <summary>
+        /// The Shape height <see cref="ParameterType"/> short name
+        /// </summary>
+        public const string ShapeHeightShortName = "height";
+
+        /// <summary>
+        /// The Shape support length <see cref="ParameterType"/> short name
+        /// </summary>
+        public const string ShapeSupportLengthShortName = "len_supp";
+
+        /// <summary>
+        /// The Shape angle <see cref="ParameterType"/> short name
+        /// </summary>
+        public const string ShapeAngleShortName = "ang";
+
+        /// <summary>
+        /// The Shape support angle <see cref="ParameterType"/> short name
+        /// </summary>
+        public const string ShapeSupportAngleShortName = "ang_supp";
+
+        /// <summary>
+        /// The Shape thickness <see cref="ParameterType"/> short name
+        /// </summary>
+        public const string ShapeThicknessShortName = "thickn";
+
+        /// <summary>
         /// The NLog <see cref="Logger"/>
         /// </summary>
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
@@ -153,7 +193,87 @@ namespace DEHCATIA.Services.ParameterTypeService
         /// The Mass <see cref="ParameterType"/>
         /// </summary>
         public ParameterType Position => this.position ??= this.FetchParameterType(PositionShortName);
-        
+
+        /// <summary>
+        /// Backing field for <see cref="ShapeKind"/>
+        /// </summary>
+        private ParameterType shapeKind;
+
+        /// <summary>
+        /// The Shape kind <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeKind => this.shapeKind ??= this.FetchParameterType(ShapeKindShortName);
+
+        /// <summary>
+        /// Backing field for <see cref="ShapeLength"/>
+        /// </summary>
+        private ParameterType shapeLength;
+
+        /// <summary>
+        /// The Shape length <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeLength => this.shapeLength ??= this.FetchParameterType(ShapeLengthShortName);
+
+        /// <summary>
+        /// Backing field for <see cref="ShapeKind"/>
+        /// </summary>
+        private ParameterType shapeWidthOrDiameter;
+
+        /// <summary>
+        /// The Shape width or diameter <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeWidthOrDiameter => this.shapeWidthOrDiameter ??= this.FetchParameterType(ShapeWidthOrDiameterShortName);
+
+        /// <summary>
+        /// Backing field for <see cref="ShapeHeight"/>
+        /// </summary>
+        private ParameterType shapeHeight;
+
+        /// <summary>
+        /// The Shape height <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeHeight => this.shapeHeight ??= this.FetchParameterType(ShapeHeightShortName);
+
+        /// <summary>
+        /// Backing field for <see cref="ShapeSupportLength"/>
+        /// </summary>
+        private ParameterType shapeSupportLength;
+
+        /// <summary>
+        /// The Shape support length <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeSupportLength => this.shapeSupportLength ??= this.FetchParameterType(ShapeSupportLengthShortName);
+
+        /// <summary>
+        /// Backing field for <see cref="ShapeAngle"/>
+        /// </summary>
+        private ParameterType shapeAngle;
+
+        /// <summary>
+        /// The Shape angle <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeAngle => this.shapeAngle ??= this.FetchParameterType(ShapeAngleShortName);
+
+        /// <summary>
+        /// Backing field for <see cref="ShapeSupportAngle"/>
+        /// </summary>
+        private ParameterType shapeSupportAngle;
+
+        /// <summary>
+        /// The Shape support angle <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeSupportAngle => this.shapeSupportAngle ??= this.FetchParameterType(ShapeSupportAngleShortName);
+
+        /// <summary>
+        /// Backing field for <see cref="ShapeThickness"/>
+        /// </summary>
+        private ParameterType shapeThickness;
+
+        /// <summary>
+        /// The Shape thickness <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeThickness => this.shapeThickness ??= this.FetchParameterType(ShapeThicknessShortName);
+
         /// <summary>
         /// Initializes a new <see cref="ParameterTypeService"/>
         /// </summary>
@@ -167,7 +287,7 @@ namespace DEHCATIA.Services.ParameterTypeService
                 .Subscribe(s => this.RefreshParameterType());
 
             this.WhenAny(x => x.hubController.OpenIteration,
-                    x => x.Value is {})
+                    x => x.Value is { })
                 .Subscribe(_ => this.RefreshParameterType());
         }
 
@@ -193,6 +313,14 @@ namespace DEHCATIA.Services.ParameterTypeService
             this.momentOfInertia = null;
             this.orientation = null;
             this.position = null;
+            this.shapeKind = null;
+            this.shapeLength = null;
+            this.shapeWidthOrDiameter = null;
+            this.shapeHeight = null;
+            this.shapeSupportLength = null;
+            this.shapeAngle = null;
+            this.shapeSupportAngle = null;
+            this.shapeThickness = null;
         }
 
         /// <summary>
@@ -202,8 +330,8 @@ namespace DEHCATIA.Services.ParameterTypeService
         /// <returns>A <see cref="ParameterType"/></returns>
         private ParameterType FetchParameterType(string parameterTypeShortName)
         {
-            if(this.parameterTypes?.FirstOrDefault(x =>
-                x.ShortName == parameterTypeShortName) is { } parameterType)
+            if (this.parameterTypes?.FirstOrDefault(x =>
+                 x.ShortName == parameterTypeShortName) is { } parameterType)
             {
                 return parameterType;
             }
