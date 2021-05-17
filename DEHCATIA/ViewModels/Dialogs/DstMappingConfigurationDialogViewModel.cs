@@ -180,7 +180,10 @@ namespace DEHCATIA.ViewModels.Dialogs
 
                 if (element is UsageRowViewModel usageRow && usageRow.ElementUsage is {} && element.ElementDefinition is {} elementDefinition)
                 {
-                    usageRow.ElementUsage = elementDefinition.ContainedElement.FirstOrDefault(x => x.Iid == usageRow.ElementUsage.Iid);
+                    usageRow.ElementUsage = 
+                        this.AvailableElementDefinitions.SelectMany(d => d.ContainedElement)
+                            .Where(u => u.ElementDefinition.Iid == elementDefinition.Iid)
+                            .FirstOrDefault(x => x.Iid == usageRow.ElementUsage.Iid);
                 }
 
                 this.RefreshMappedThings(element.Children);
@@ -294,7 +297,7 @@ namespace DEHCATIA.ViewModels.Dialogs
                 elementUsages = elementUsages.Where(x => !x.ExcludeOption.Contains(option));
             }
 
-            this.AvailableElementUsages.AddRange(elementUsages); //.Select(x => x.Clone(true))
+            this.AvailableElementUsages.AddRange(elementUsages);
         }
 
         /// <summary>

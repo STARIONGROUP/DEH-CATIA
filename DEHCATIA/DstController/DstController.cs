@@ -375,7 +375,6 @@ namespace DEHCATIA.DstController
         /// <param name="cancelToken">The <see cref="CancellationToken"/></param>
         public void GetProductTree(CancellationToken cancelToken)
         {
-            //this.ProductTree = null;
             this.ProductTree = this.catiaComService.GetProductTree(cancelToken);
         }
 
@@ -648,7 +647,7 @@ namespace DEHCATIA.DstController
             var externalId = $"{this.fromDstToHubIndicator}{element.Name}";
 
             this.ExternalIdentifierMap.Correspondence.RemoveAll(x => x.ExternalId.Equals(externalId, StringComparison.InvariantCultureIgnoreCase));
-            
+
             this.ExternalIdentifierMap.Correspondence.Add(
                 new IdCorrespondence()
                 {

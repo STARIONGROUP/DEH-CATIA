@@ -60,6 +60,11 @@ namespace DEHCATIA.MappingRules
         /// The <see cref="IHubController"/>
         /// </summary>
         private readonly IHubController hubController = AppContainer.Container.Resolve<IHubController>();
+
+        /// <summary>
+        /// The <see cref="IDstController"/>
+        /// </summary>
+        private IDstController dstController;
         
         /// <summary>
         /// The <see cref="IParameterTypeService"/>
@@ -94,7 +99,8 @@ namespace DEHCATIA.MappingRules
             try
             {
                 this.owner = this.hubController.CurrentDomainOfExpertise;
-                
+                this.dstController = AppContainer.Container.Resolve<IDstController>();
+
                 this.Map(new List<ElementRowViewModel>{input});
 
                 return this.ruleOutput;
@@ -125,6 +131,7 @@ namespace DEHCATIA.MappingRules
                     usageRow.ElementDefinition = this.MapDefinitionRowViewModel(definitionRow);
                     this.MapElementUsage(usageRow);
                     this.MapParameters(usageRow);
+                    this.dstController.SaveElementMapping(usageRow);
                     this.ruleOutput.Add((usageRow.Parent, usageRow.ElementUsage));
                 }
                 else
@@ -174,7 +181,7 @@ namespace DEHCATIA.MappingRules
         {
             this.MapElementDefinition(elementRowViewModel);
             this.ruleOutput.Add((elementRowViewModel.Parent, elementRowViewModel.ElementDefinition));
-            AppContainer.Container.Resolve<IDstController>().SaveElementMapping(elementRowViewModel);
+            this.dstController.SaveElementMapping(elementRowViewModel);
         }
 
         /// <summary>
