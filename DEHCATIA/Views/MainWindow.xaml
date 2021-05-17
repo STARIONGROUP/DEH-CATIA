@@ -41,7 +41,12 @@
                                     <RowDefinition Height="Auto"></RowDefinition>
                                     <RowDefinition></RowDefinition>
                                 </Grid.RowDefinitions>
-                                <Button Width="150" Height="40" HorizontalAlignment="Center" Content="{Binding DstSourceViewModel.ConnectButtonText}" Command="{Binding DstSourceViewModel.ConnectCommand}"/>
+                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                    <Button Width="150" Height="40" HorizontalAlignment="Center" Content="{Binding DstSourceViewModel.ConnectButtonText}" Command="{Binding DstSourceViewModel.ConnectCommand}"/>
+                                    <Button Width="40" Height="40" Margin="10,0,10,0" Padding="8" HorizontalAlignment="Left" Command="{Binding DstSourceViewModel.RefreshCommand}" ToolTip="Refresh the connection with Catia and the product tree">
+                                        <Image Source="{dx:DXImage 'Images/Actions/Refresh2_32x32.png'}" />
+                                    </Button>
+                                </StackPanel>
                                 <Grid Grid.Row="1">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />

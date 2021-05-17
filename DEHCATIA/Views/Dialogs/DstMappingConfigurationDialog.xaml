@@ -245,6 +245,7 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
@@ -252,10 +253,9 @@
                         <dxe:ComboBoxEdit Grid.Row="1" Grid.Column="1" Margin="2" AllowNullInput="True" AutoComplete="True" ClearSelectionOnBackspace="True" 
                                           DisplayMember="ShortName" ItemsSource="{Binding AvailableElementDefinitions}"
                                           NullText="Create New Element Definition" NullValueButtonPlacement="EditBox"
-                                          SelectedItem="{Binding SelectedThing.ElementDefinition}"
+                                          SelectedItem="{Binding SelectedThing.ElementDefinition, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                           ToolTip="Select an ElementDefinition to be mapped with the top element of the selected tree"
-                                          ShowNullTextForEmptyValue="True" ValidateOnTextInput="False" ValueMember="Name" 
-                                          IsEnabled="{Binding AreHubFieldsEditable}">
+                                          ShowNullTextForEmptyValue="True" ValidateOnTextInput="False" ValueMember="Name">
                             <dxe:ComboBoxEdit.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock>
@@ -269,20 +269,39 @@
                                 </DataTemplate>
                             </dxe:ComboBoxEdit.ItemTemplate>
                         </dxe:ComboBoxEdit>
-                        <Label Grid.Row="2" Grid.Column="0" Content="Actual Finite State:" />
-                        <dxe:ComboBoxEdit Grid.Row="2" Grid.Column="1" Margin="2" ApplyItemTemplateToSelectedItem="True" AutoComplete="True" DisplayMember="Name"
+                        <Label Grid.Row="2" Grid.Column="0" Content="Element Usage:" />
+                        <dxe:ComboBoxEdit Grid.Row="2" Grid.Column="1" Margin="2" AllowNullInput="True" AutoComplete="True" ClearSelectionOnBackspace="True" 
+                                          DisplayMember="ShortName" ItemsSource="{Binding AvailableElementUsages}"
+                                          NullText="Create New Element Usage" NullValueButtonPlacement="EditBox" IsEnabled="{Binding CanSetAnElementUsage}"
+                                          SelectedItem="{Binding SelectedThing.ElementUsage, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                          ToolTip="Select an ElementUsage to be mapped with the current element of the selected tree"
+                                          ShowNullTextForEmptyValue="True" ValidateOnTextInput="False" ValueMember="Name">
+                            <dxe:ComboBoxEdit.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0} [{1}]">
+                                                <Binding Path="Name" />
+                                                <Binding Path="ShortName" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </dxe:ComboBoxEdit.ItemTemplate>
+                        </dxe:ComboBoxEdit>
+                        <Label Grid.Row="3" Grid.Column="0" Content="Actual Finite State:" />
+                        <dxe:ComboBoxEdit Grid.Row="3" Grid.Column="1" Margin="2" ApplyItemTemplateToSelectedItem="True" AutoComplete="True" DisplayMember="Name"
                                           ItemsSource="{Binding AvailableActualFiniteStates}"
-                                          NullText="No State Depent Parameter Selected"
-                                          SelectedItem="{Binding SelectedThing.SelectedActualFiniteState}"
+                                          NullText="No ActualFiniteState Selected"
+                                          SelectedItem="{Binding SelectedThing.SelectedActualFiniteState, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                           ToolTip="Select a ActualFiniteState if the destination contains any state dependant parameters,&#x0a;these parameters with the corresponding state valuesets will be updated"
-                                          ShowNullTextForEmptyValue="True" ValidateOnTextInput="False" ValueMember="Name" 
-                                          IsEnabled="{Binding AreHubFieldsEditable}"/>
-                        <Label Grid.Row="3" Grid.Column="0" Content="Option:" />
-                        <dxe:ComboBoxEdit Grid.Row="3" Grid.Column="1" Margin="2" AutoComplete="True" DisplayMember="ShortName"
+                                          ShowNullTextForEmptyValue="True" ValidateOnTextInput="False" ValueMember="Name"/>
+                        <Label Grid.Row="4" Grid.Column="0" Content="Option:" />
+                        <dxe:ComboBoxEdit Grid.Row="4" Grid.Column="1" Margin="2" AutoComplete="True" DisplayMember="ShortName"
                                           ItemsSource="{Binding AvailableOptions}" SelectedIndex="0" NullText="Select an option"
-                                          SelectedItem="{Binding SelectedThing.SelectedOption}" NullValueButtonPlacement="EditBox"
-                                          ShowNullTextForEmptyValue="True" ValidateOnTextInput="False" 
-                                          ValueMember="Name" AllowNullInput="True" IsEnabled="{Binding AreHubFieldsEditable}"
+                                          SelectedItem="{Binding SelectedThing.SelectedOption, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                          NullValueButtonPlacement="EditBox" ShowNullTextForEmptyValue="True" ValidateOnTextInput="False" 
+                                          ValueMember="Name" AllowNullInput="True"
                                           ToolTip="Select an Option, if the destination contains any option dependant parameters,&#x0a;these parameters with the corresponding option valuesets will be updated"/>
                     </Grid>
                 </Grid>

@@ -47,7 +47,6 @@ namespace DEHCATIA.Tests.ViewModels.NetChangePreview
     using DEHCATIA.Events;
     using DEHCATIA.ViewModels.NetChangePreview;
     using DEHCATIA.ViewModels.ProductTree.Rows;
-    using DEHCATIA.ViewModels.Rows;
 
     using Moq;
 

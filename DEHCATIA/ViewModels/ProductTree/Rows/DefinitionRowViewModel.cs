@@ -27,7 +27,6 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
     using CDP4Common.EngineeringModelData;
 
     using DEHCATIA.Enumerations;
-    using DEHCATIA.ViewModels.ProductTree.Shapes;
 
     using ProductStructureTypeLib;
 

@@ -265,7 +265,11 @@ namespace DEHCATIA.ViewModels
                     else if (t.IsCompleted)
                     {
                         this.RootElement = this.DstController.ProductTree;
-                        this.DstController.LoadMapping();
+
+                        if (this.DstController.ProductTree != null)
+                        {
+                            this.DstController.LoadMapping();
+                        }
                     }
 
                     this.IsBusy = false;

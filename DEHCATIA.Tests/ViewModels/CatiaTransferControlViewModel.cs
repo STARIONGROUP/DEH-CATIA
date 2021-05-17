@@ -127,8 +127,8 @@ namespace DEHCATIA.Tests.ViewModels
             Assert.IsNotEmpty(this.dstController.Object.HubMapResult);
             Assert.IsNotEmpty(this.dstController.Object.DstMapResult);
             Assert.DoesNotThrow(() => this.viewModel.CancelCommand.ExecuteAsyncTask(null));
-            Assert.IsEmpty(this.dstController.Object.HubMapResult);
-            Assert.IsEmpty(this.dstController.Object.DstMapResult);
+            Assert.IsNotEmpty(this.dstController.Object.HubMapResult);
+            Assert.IsNotEmpty(this.dstController.Object.DstMapResult);
         }
     }
 }

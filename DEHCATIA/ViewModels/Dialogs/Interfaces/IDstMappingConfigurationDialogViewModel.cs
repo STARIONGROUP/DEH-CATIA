@@ -48,12 +48,7 @@ namespace DEHCATIA.ViewModels.Dialogs.Interfaces
         /// Gets or sets a value indicating whether <see cref="MappingConfigurationDialogViewModel.ContinueCommand"/> can execute
         /// </summary>
         bool CanContinue { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the hub fields are available
-        /// </summary>
-        bool AreHubFieldsEditable { get; set; }
-
+        
         /// <summary>
         /// Gets the collection of the available <see cref="ElementDefinition"/>s from the connected Hub Model
         /// </summary>

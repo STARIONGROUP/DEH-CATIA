@@ -402,7 +402,7 @@ namespace DEHCATIA.ViewModels.NetChangePreview
             var existing = this.GetOldElement(element);
 
             if (existing == null)
-            {
+            {   
                 this.ThingsAtPreviousState.Add(element.Clone(true));
             }
         }

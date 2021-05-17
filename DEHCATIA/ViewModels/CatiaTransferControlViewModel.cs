@@ -146,8 +146,6 @@ namespace DEHCATIA.ViewModels
         /// <returns>A <see cref="Task"/></returns>
         private async Task CancelTransfer()
         {
-            this.dstController.DstMapResult.Clear();
-            this.dstController.HubMapResult.Clear();
             this.exchangeHistoryService.ClearPending();
             await Task.Delay(1);
             CDPMessageBus.Current.SendMessage(new UpdateDstElementTreeEvent(true));
@@ -168,7 +166,6 @@ namespace DEHCATIA.ViewModels
             this.IsIndeterminate = true;
             this.statusBar.Append($"Transfers in progress");
             await this.dstController.TransferMappedThingsToHub();
-            //this.dstController.TransferMappedThingsToDst();
             await this.exchangeHistoryService.Write();
             timer.Stop();
             this.statusBar.Append($"Transfers completed in {timer.ElapsedMilliseconds} ms");

@@ -148,7 +148,7 @@ namespace DEHCATIA.Tests.ViewModels.Dialogs
         [Test]
         public void VerifyContinueCommand()
         {
-            Assert.IsFalse(this.viewModel.ContinueCommand.CanExecute(null));
+            Assert.IsTrue(this.viewModel.ContinueCommand.CanExecute(null));
             this.viewModel.SelectedThing = this.viewModel.TopElement;
             this.viewModel.TopElement.ElementDefinition = this.viewModel.AvailableElementDefinitions.FirstOrDefault();
             this.viewModel.TopElement.SelectedOption = this.viewModel.AvailableOptions.FirstOrDefault();

@@ -315,16 +315,16 @@ namespace DEHCATIA.Tests.DstController
                 x =>
                     x.ShowDxDialog<CreateLogEntryDialog, CreateLogEntryDialogViewModel>(
                         It.IsAny<CreateLogEntryDialogViewModel>())
-                , Times.Exactly(1));
+                , Times.Exactly(4));
 
             this.hubController.Verify(
-                x => x.Write(It.IsAny<ThingTransaction>()), Times.Exactly(2));
+                x => x.Write(It.IsAny<ThingTransaction>()), Times.Exactly(4));
 
             this.hubController.Verify(
-                x => x.Refresh(), Times.Exactly(1));
+                x => x.Refresh(), Times.Exactly(2));
 
             this.exchangeHistory.Verify(x =>
-                x.Append(It.IsAny<Thing>(), It.IsAny<ChangeKind>()), Times.Exactly(4));
+                x.Append(It.IsAny<Thing>(), It.IsAny<ChangeKind>()), Times.Exactly(8));
         }
 
         [Test]
@@ -444,7 +444,7 @@ namespace DEHCATIA.Tests.DstController
 
             this.statusBar.Verify(
                 x => x.Append(It.IsAny<string>(), It.IsAny<StatusBarMessageSeverity>()),
-                Times.Exactly(17));
+                Times.Exactly(19));
         }
 
         [Test]
@@ -452,13 +452,13 @@ namespace DEHCATIA.Tests.DstController
         {
             this.elementRow.ElementDefinition = this.element;
             this.controller.ExternalIdentifierMap = new ExternalIdentifierMap();
-            Assert.DoesNotThrow(() => this.controller.SaveTheMapping(this.elementRow));
+            Assert.DoesNotThrow(() => this.controller.SaveElementMapping(this.elementRow));
             Assert.AreEqual(1, this.controller.ExternalIdentifierMap.Correspondence.Count);
             this.elementRow.SelectedOption = this.option;
-            Assert.DoesNotThrow(() => this.controller.SaveTheMapping(this.elementRow));
+            Assert.DoesNotThrow(() => this.controller.SaveElementMapping(this.elementRow));
             Assert.AreEqual(2, this.controller.ExternalIdentifierMap.Correspondence.Count);
             this.elementRow.SelectedActualFiniteState = this.state;
-            Assert.DoesNotThrow(() => this.controller.SaveTheMapping(this.elementRow));
+            Assert.DoesNotThrow(() => this.controller.SaveElementMapping(this.elementRow));
             Assert.AreEqual(3, this.controller.ExternalIdentifierMap.Correspondence.Count);
         }
     }

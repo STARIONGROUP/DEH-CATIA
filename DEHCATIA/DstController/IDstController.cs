@@ -44,6 +44,11 @@ namespace DEHCATIA.DstController
     public interface IDstController
     {
         /// <summary>
+        /// Gets or sets the ready to map <see cref="ElementRowViewModel"/> resulting of the automapping done by the <see cref="LoadMapping"/>
+        /// </summary>
+        ElementRowViewModel ReadyToMapTopElement { get; set; }
+
+        /// <summary>
         /// Gets or sets value the catia ProductTree
         /// </summary>
         ElementRowViewModel ProductTree { get; set; }
@@ -77,6 +82,11 @@ namespace DEHCATIA.DstController
         /// Gets this running tool name
         /// </summary>
         string ThisToolName { get; }
+
+        /// <summary>
+        /// Disconnect and reconnect to the Catia product tree
+        /// </summary>
+        void Reconnect();
 
         /// <summary>
         /// Loads the mapping configuration and generates the map result respectively
@@ -127,7 +137,7 @@ namespace DEHCATIA.DstController
         /// <summary>
         /// Saves the mapping to the <see cref="IDstController.ExternalIdentifierMap"/>
         /// </summary>
-        /// <param name="topElement">The <see cref="ElementRowViewModel"/> that holds the mapping information</param>
-        void SaveTheMapping(ElementRowViewModel topElement);
+        /// <param name="element">The <see cref="ElementRowViewModel"/> that holds the mapping information</param>
+        void SaveElementMapping(ElementRowViewModel element);
     }
 }
