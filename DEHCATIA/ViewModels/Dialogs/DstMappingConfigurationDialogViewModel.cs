@@ -80,17 +80,17 @@ namespace DEHCATIA.ViewModels.Dialogs
         }
 
         /// <summary>
-        /// Backing field for <see cref="AreHubFieldsEditable"/>
+        /// Backing field for <see cref="CanSetAnElementUsage"/>
         /// </summary>
-        private bool areHubFieldsEditable;
+        private bool canSetAnElementUsage;
 
         /// <summary>
-        /// Gets or sets a value indicating whether the hub fields are available
+        /// Gets or sets a value indicating whether the current row has an <see cref="ElementUsage"/> representation
         /// </summary>
-        public bool AreHubFieldsEditable
+        public bool CanSetAnElementUsage
         {
-            get => this.areHubFieldsEditable;
-            set => this.RaiseAndSetIfChanged(ref this.areHubFieldsEditable, value);
+            get => this.canSetAnElementUsage;
+            set => this.RaiseAndSetIfChanged(ref this.canSetAnElementUsage, value);
         }
 
         /// <summary>
@@ -111,6 +111,11 @@ namespace DEHCATIA.ViewModels.Dialogs
         /// Gets the collection of the available <see cref="ElementDefinition"/>s from the connected Hub Model
         /// </summary>
         public ReactiveList<ElementDefinition> AvailableElementDefinitions { get; } = new ReactiveList<ElementDefinition>();
+
+        /// <summary>
+        /// Gets the collection of the available <see cref="ElementDefinition"/>s from the connected Hub Model
+        /// </summary>
+        public ReactiveList<ElementUsage> AvailableElementUsages { get; } = new ReactiveList<ElementUsage>();
 
         /// <summary>
         /// Gets the collection of the available <see cref="ActualFiniteState"/>s depending on the selected <see cref="Parameter"/>
@@ -151,8 +156,8 @@ namespace DEHCATIA.ViewModels.Dialogs
                     this.UpdateHubFields(() =>
                     {
                         this.InitializesCommandsAndObservableSubscriptions();
-                        this.RefreshMappedThings();
                         this.UpdateProperties();
+                        this.RefreshMappedThings();
                         this.CheckCanExecute();
                     });
                 });
@@ -170,34 +175,21 @@ namespace DEHCATIA.ViewModels.Dialogs
             {
                 if (element.ElementDefinition is {})
                 {
-                    element.ElementDefinition = this.GetElementBaseFromTheCache<ElementDefinition>(element.ElementDefinition.Iid);
+                    element.ElementDefinition = this.AvailableElementDefinitions.FirstOrDefault(x => x.Iid == element.ElementDefinition.Iid);
                 }
 
-                if (element is UsageRowViewModel usageRow && usageRow.ElementUsage is {})
+                if (element is UsageRowViewModel usageRow && usageRow.ElementUsage is {} && element.ElementDefinition is {} elementDefinition)
                 {
-                    usageRow.ElementUsage = this.GetElementBaseFromTheCache<ElementUsage>(usageRow.ElementUsage.Iid);
+                    usageRow.ElementUsage = 
+                        this.AvailableElementDefinitions.SelectMany(d => d.ContainedElement)
+                            .Where(u => u.ElementDefinition.Iid == elementDefinition.Iid)
+                            .FirstOrDefault(x => x.Iid == usageRow.ElementUsage.Iid);
                 }
 
                 this.RefreshMappedThings(element.Children);
             }
         }
-
-        /// <summary>
-        /// Tries to gets the version of the referenced thing from the cache otherwise and replace the <paramref name="iid"/> otherwise set it to null
-        /// </summary>
-        /// <typeparam name="TElement">The type of <see cref="ElementBase"/></typeparam>
-        /// <param name="iid">The iid of the <typeparamref name="TElement"/> to refresh</param>
-        /// <returns>A <see cref="TElement"/></returns>
-        private TElement GetElementBaseFromTheCache<TElement>(Guid iid) where TElement : ElementBase
-        {
-            if (this.HubController.GetThingById(iid, this.HubController.OpenIteration, out TElement element))
-            {
-                return (TElement)element.Clone(true);
-            }
-
-            return null;
-        }
-
+        
         /// <summary>
         /// Initializes this view model <see cref="ICommand"/> and <see cref="Observable"/>
         /// </summary>
@@ -230,8 +222,14 @@ namespace DEHCATIA.ViewModels.Dialogs
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateHubFields(this.CheckCanExecute));
 
+            this.WhenAnyValue(x => x.SelectedThing.ElementDefinition)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateHubFields(this.UpdateAvailableElementUsages));
+
             this.WhenAnyValue(x => x.SelectedThing)
-                .Subscribe(x => this.AreHubFieldsEditable = x == this.Elements.FirstOrDefault());
+                .Subscribe(_ => 
+                    this.CanSetAnElementUsage = 
+                        this.SelectedThing != null && this.SelectedThing != this.TopElement && !(this.SelectedThing is DefinitionRowViewModel));
         }
 
         /// <summary>
@@ -239,7 +237,12 @@ namespace DEHCATIA.ViewModels.Dialogs
         /// </summary>
         private void ContinueCommandExecute()
         {
-            this.DstController.Map(this.Elements.ToList());
+            if (!(this.Elements.FirstOrDefault() is { } element))
+            {
+                return;
+            }
+
+            this.DstController.Map(element);
         }
 
         /// <summary>
@@ -273,7 +276,30 @@ namespace DEHCATIA.ViewModels.Dialogs
             
             this.IsBusy = false;
         }
-        
+
+        /// <summary>
+        /// Updates the <see cref="AvailableElementUsages"/>
+        /// </summary>
+        private void UpdateAvailableElementUsages()
+        {
+            this.AvailableElementUsages.Clear();
+
+            if (!(this.SelectedThing?.ElementDefinition is { } elementDefinition) || elementDefinition.Iid == Guid.Empty)
+            {
+                return;
+            }
+
+            var elementUsages = this.AvailableElementDefinitions.SelectMany(d => d.ContainedElement)
+                .Where(u => u.ElementDefinition.Iid == elementDefinition.Iid);
+
+            if (this.SelectedThing.SelectedOption is { } option)
+            {
+                elementUsages = elementUsages.Where(x => !x.ExcludeOption.Contains(option));
+            }
+
+            this.AvailableElementUsages.AddRange(elementUsages);
+        }
+
         /// <summary>
         /// Updates the <see cref="AvailableActualFiniteStates"/>
         /// </summary>

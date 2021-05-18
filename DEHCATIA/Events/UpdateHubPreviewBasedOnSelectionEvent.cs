@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DefinitionRowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="UpdateHubPreviewBasedOnSelectionEvent.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -22,33 +22,28 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.ViewModels.ProductTree.Rows
+namespace DEHCATIA.Events
 {
-    using CDP4Common.EngineeringModelData;
+    using System.Collections.Generic;
 
-    using DEHCATIA.Enumerations;
+    using DEHCATIA.ViewModels.Interfaces;
+    using DEHCATIA.ViewModels.ProductTree.Rows;
 
-    using ProductStructureTypeLib;
-
-    using ReactiveUI;
+    using DEHPCommon.Events;
 
     /// <summary>
-    /// The <see cref="DefinitionRowViewModel"/> is a specific <see cref="ElementRowViewModel"/>
-    /// mappable to a <see cref="ElementDefinition"/> and representing a catia element of type <see cref="ElementType.CatDefinition"/>
+    /// Event for the <see cref="CDP4Dal.CDPMessageBus"/> that allows listener to be notified
+    /// The <see cref="UpdateHubPreviewBasedOnSelectionEvent"/> is for filtering the hub impact view based on a selection
     /// </summary>
-    public class DefinitionRowViewModel : ElementRowViewModel
+    public class UpdateHubPreviewBasedOnSelectionEvent : UpdatePreviewBasedOnSelectionBaseEvent<ElementRowViewModel, IHubNetChangePreviewViewModel>
     {
         /// <summary>
-        /// Gets or sets the type.
+        /// Initializes a new <see cref="T:DEHPCommon.Events.UpdatePreviewBasedOnSelectionBaseEvent`2" />
         /// </summary>
-        public override ElementType ElementType => ElementType.CatDefinition;
-
-        /// <summary>
-        /// Initializes a new <see cref="DefinitionRowViewModel"/>
-        /// </summary>
-        /// <param name="product">The <see cref="Product"/> this view model represents</param>
-        /// <param name="fileName">The file name of the <paramref name="product"/></param>
-        public DefinitionRowViewModel(Product product, string fileName) : base(product, fileName)
+        /// <param name="things">The collection of <see cref="ElementRowViewModel" /> selection</param>
+        /// <param name="target">The target <see cref="T:System.Type" /></param>
+        /// <param name="reset">a value indicating whether the listener should reset its tree</param>
+        public UpdateHubPreviewBasedOnSelectionEvent(IEnumerable<ElementRowViewModel> things, IHubNetChangePreviewViewModel target, bool reset) : base(things, target, reset)
         {
         }
     }

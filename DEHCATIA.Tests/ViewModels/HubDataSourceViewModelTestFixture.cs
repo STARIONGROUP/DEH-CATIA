@@ -60,6 +60,7 @@ namespace DEHCATIA.Tests.ViewModels
 
         private IHubDataSourceViewModel viewModel;
         private Mock<IDstController> dstController;
+        private Mock<IHubSessionControlViewModel> sessionControl;
 
         [SetUp]
         public void Setup()
@@ -76,6 +77,7 @@ namespace DEHCATIA.Tests.ViewModels
             this.objectBrowser.Setup(x => x.CanMap).Returns(new Mock<IObservable<bool>>().Object);
             this.objectBrowser.Setup(x => x.MapCommand).Returns(ReactiveCommand.Create());
             this.objectBrowser.Setup(x => x.Things).Returns(new ReactiveList<BrowserViewModelBase>());
+            this.objectBrowser.Setup(x => x.SelectedThings).Returns(new ReactiveList<object>());
 
             this.publicationBrowser = new Mock<IPublicationBrowserViewModel>();
 
@@ -83,10 +85,11 @@ namespace DEHCATIA.Tests.ViewModels
 
             this.hubBrowserHeader = new Mock<IHubBrowserHeaderViewModel>();
             this.dstController = new Mock<IDstController>();
+            this.sessionControl = new Mock<IHubSessionControlViewModel>();
 
             this.viewModel = new HubDataSourceViewModel(this.navigationService.Object, this.hubController.Object, 
                 this.objectBrowser.Object, this.publicationBrowser.Object, this.hubBrowserHeader.Object,
-                this.dstController.Object);
+                this.dstController.Object, this.sessionControl.Object);
         }
 
         [Test]

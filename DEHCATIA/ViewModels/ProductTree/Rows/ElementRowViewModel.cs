@@ -24,11 +24,19 @@
 
 namespace DEHCATIA.ViewModels.ProductTree.Rows
 {
+    using System;
+    using System.Reactive.Linq;
+
     using CDP4Common.EngineeringModelData;
 
+    using CDP4Dal;
+
     using DEHCATIA.Enumerations;
+    using DEHCATIA.Events;
     using DEHCATIA.ViewModels.ProductTree.Parameters;
     using DEHCATIA.ViewModels.ProductTree.Shapes;
+
+    using DEHPCommon.Events;
 
     using ProductStructureTypeLib;
 
@@ -72,7 +80,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// <summary>
         /// Backing field for <see cref="IsHighlighted"/>
         /// </summary>
-        private string isHighlighted;
+        private bool isHighlighted;
 
         /// <summary>
         /// Backing field for <see cref="Shape"/>
@@ -118,7 +126,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// Backing field for <see cref="Parent"/>
         /// </summary>
         private ElementRowViewModel parent;
-
+        
         /// <summary>
         /// Gets or sets the element name.
         /// </summary>
@@ -165,9 +173,9 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         }
 
         /// <summary>
-        /// Gets or sets a value whether the row is highlighted
+        /// Gets or sets a value indicating whether the row is highlighted
         /// </summary>
-        public string IsHighlighted
+        public bool IsHighlighted
         {
             get => this.isHighlighted;
             set => this.RaiseAndSetIfChanged(ref this.isHighlighted, value);
@@ -284,6 +292,11 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
             this.PartNumber = product.get_PartNumber();
             this.Description = product.get_DescriptionRef();
             this.FileName = fileName;
+
+            CDPMessageBus.Current.Listen<DstHighlightEvent>()
+                .Where(x => (string) x.TargetThingId == this.Name)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x => this.IsHighlighted = x.ShouldHighlight);
         }
     }
 }

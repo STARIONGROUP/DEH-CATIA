@@ -24,8 +24,12 @@
 
 namespace DEHCATIA.ViewModels.Interfaces
 {
+    using System.Windows.Input;
+
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
     using DEHPCommon.UserInterfaces.ViewModels.NetChangePreview.Interfaces;
+
+    using ReactiveUI;
 
     /// <summary>
     /// Interface definitions of methods and properties of the application Main window
@@ -33,9 +37,14 @@ namespace DEHCATIA.ViewModels.Interfaces
     public interface IMainWindowViewModel : ISwitchLayoutPanelOrderViewModel
     {
         /// <summary>
+        /// Gets the <see cref="ITransferControlViewModel"/>
+        /// </summary>
+        ITransferControlViewModel TransferControlViewModel { get; }
+
+        /// <summary>
         /// Gets the view model that represents the net change preview panel
         /// </summary>
-        INetChangePreviewViewModel NetChangePreviewViewModel { get; }
+        IHubNetChangePreviewViewModel HubNetChangePreviewViewModel { get; }
 
         /// <summary>
         /// Gets the view model that represents the 10-25 data source
@@ -43,7 +52,7 @@ namespace DEHCATIA.ViewModels.Interfaces
         IHubDataSourceViewModel HubDataSourceViewModel { get; }
 
         /// <summary>
-        /// Gets the view model the represents the CATIA data source
+        /// Gets the view model that represents the EcosimPro data source
         /// </summary>
         IDstDataSourceViewModel DstSourceViewModel { get; }
 
@@ -51,5 +60,10 @@ namespace DEHCATIA.ViewModels.Interfaces
         /// Gets the view model that represents the status bar
         /// </summary>
         IStatusBarControlViewModel StatusBarControlViewModel { get; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ICommand"/> that will change the mapping direction
+        /// </summary>
+        ReactiveCommand<object> ChangeMappingDirection { get; }
     }
 }

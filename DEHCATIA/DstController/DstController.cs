@@ -27,20 +27,21 @@ namespace DEHCATIA.DstController
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Windows.Media.Animation;
+    using System.Windows;
 
     using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.Types;
 
     using CDP4Dal;
     using CDP4Dal.Operations;
 
     using DEHCATIA.Services.ComConnector;
     using DEHCATIA.ViewModels.ProductTree.Rows;
+    using DEHCATIA.ViewModels.Rows;
 
     using DEHPCommon.Enumerators;
     using DEHPCommon.Events;
@@ -52,8 +53,6 @@ namespace DEHCATIA.DstController
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
     using DEHPCommon.UserInterfaces.Views;
 
-    using DevExpress.Xpf.NavBar;
-
     using NLog;
 
     using ReactiveUI;
@@ -63,6 +62,18 @@ namespace DEHCATIA.DstController
     /// </summary>
     public class DstController : ReactiveObject, IDstController
     {
+        /// <summary>
+        /// The indicator thats states on a <see cref="IdCorrespondence.ExternalId"/> what direction is the mapping saved for
+        /// this indicator is for <see cref="f:MappingDirection.FromDstToHub"/>
+        /// </summary>
+        private readonly string fromDstToHubIndicator = $"{MappingDirection.FromDstToHub}-";
+
+        /// <summary>
+        /// The indicator thats states on a <see cref="IdCorrespondence.ExternalId"/> what direction is the mapping saved for
+        /// this indicator is for <see cref="f:MappingDirection.FromHubToDst"/>
+        /// </summary>
+        private readonly string fromHubToDstIndicator = $"{MappingDirection.FromHubToDst}-";
+
         /// <summary>
         /// Gets the logger for the <see cref="DstController"/>.
         /// </summary>
@@ -109,6 +120,34 @@ namespace DEHCATIA.DstController
         private bool isCatiaConnected;
 
         /// <summary>
+        /// Backing field for <see cref="ProductTree"/>.
+        /// </summary>
+        private ElementRowViewModel productTree;
+
+        /// <summary>
+        /// Backing field for <see cref="ReadyToMapTopElement"/>.
+        /// </summary>
+        private ElementRowViewModel readyToMapTopElement;
+
+        /// <summary>
+        /// Gets or sets the ready to map <see cref="ElementRowViewModel"/> resulting of the automapping done by the <see cref="LoadMapping"/>
+        /// </summary>
+        public ElementRowViewModel ReadyToMapTopElement
+        {
+            get => this.readyToMapTopElement;
+            set => this.RaiseAndSetIfChanged(ref this.readyToMapTopElement, value);
+        }
+
+        /// <summary>
+        /// Gets or sets value the catia ProductTree
+        /// </summary>
+        public ElementRowViewModel ProductTree
+        {
+            get => this.productTree;
+            set => this.RaiseAndSetIfChanged(ref this.productTree, value);
+        }
+
+        /// <summary>
         /// Gets or sets whether there's a connection to a running CATIA client.
         /// </summary>
         public bool IsCatiaConnected
@@ -120,11 +159,16 @@ namespace DEHCATIA.DstController
         /// <summary>
         /// Gets or sets the <see cref="MappingDirection"/>
         /// </summary>
-        public MappingDirection MappingDirection
+        public MappingDirection MappingDirection    
         {
             get => this.mappingDirection;
             set => this.RaiseAndSetIfChanged(ref this.mappingDirection, value);
         }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ExternalIdentifierMap"/>
+        /// </summary>
+        public ExternalIdentifierMap ExternalIdentifierMap { get; set; }
 
         /// <summary>
         /// Gets the colection of mapped <see cref="Parameter"/>s And <see cref="ParameterOverride"/>s through their container
@@ -134,7 +178,12 @@ namespace DEHCATIA.DstController
         /// <summary>
         /// Gets the colection of mapped <see cref="ElementRowViewModel"/>
         /// </summary>
-        public ReactiveList<ElementRowViewModel> HubMapResult { get; private set; } = new ReactiveList<ElementRowViewModel>();
+        public ReactiveList<MappedElementDefinitionRowViewModel> HubMapResult { get; private set; } = new ReactiveList<MappedElementDefinitionRowViewModel>();
+
+        /// <summary>
+        /// Gets this running tool name
+        /// </summary>
+        public string ThisToolName => this.GetType().Assembly.GetName().Name;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DstController"/>.
@@ -158,17 +207,175 @@ namespace DEHCATIA.DstController
 
             this.WhenAnyValue(x => x.catiaComService.IsCatiaConnected)
                 .Subscribe(x => this.IsCatiaConnected = x);
+
+            this.WhenAnyValue(x => x.ReadyToMapTopElement)
+                .Where(x => x != null)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x =>
+                {
+                    this.Map(this.ReadyToMapTopElement);
+                    this.ReadyToMapTopElement = null;
+                });
         }
 
+        /// <summary>
+        /// Disconnect and reconnect to the Catia product tree
+        /// </summary>
+        public void Reconnect()
+        {
+            this.catiaComService.Disconnect();
+            this.catiaComService.Connect();
+        }
+
+        /// <summary>
+        /// Loads the mapping configuration and generates the map result respectively
+        /// </summary>
+        public void LoadMapping()
+        {
+            this.statusBar.Append($"Loading the mapping configuration in progress");
+            
+            if (this.ExternalIdentifierMap is null || this.ExternalIdentifierMap.Iid == Guid.Empty || !this.ExternalIdentifierMap.Correspondence.Any())
+            {
+                this.statusBar.Append($"The mapping configuration doesn't contain any mapping", StatusBarMessageSeverity.Warning);
+                return;
+            }
+            
+            this.MapElementsFromTheExternalIdentifierMap();
+            this.statusBar.Append($"The mapping configuration has been loaded");
+        }
+
+        /// <summary>
+        /// Maps the <see cref="ElementRowViewModel"/>s defined in the <see cref="ExternalIdentifierMap"/> and sets the <see cref="ReadyToMapTopElement"/> property
+        /// </summary>
+        private void MapElementsFromTheExternalIdentifierMap()
+        {
+            foreach (var idCorrespondences in this.ExternalIdentifierMap.Correspondence.GroupBy(x => x.ExternalId))
+            {
+                if (this.FindTheMappedElement(idCorrespondences.Key, this.fromDstToHubIndicator) is { } element)
+                {
+                    this.LoadsCorrespondances(element, idCorrespondences);
+                }
+            }
+            
+            if (!(this.FindTheTopElementMapped() is {} topElement))
+            {
+                this.statusBar.Append($"No applicable mapping has been found in the selected mapping configuration", StatusBarMessageSeverity.Warning);
+                return;
+            }
+
+            this.ReadyToMapTopElement = topElement;
+        }
+
+        /// <summary>
+        /// Finds the top mapped element
+        /// </summary>
+        /// <param name="elements">The collection of <see cref="ElementRowViewModel"/></param>
+        /// <returns>An <see cref="ElementRowViewModel"/></returns>
+        private ElementRowViewModel FindTheTopElementMapped(IEnumerable<ElementRowViewModel> elements = null)
+        {
+            if (elements is null)
+            {
+                return this.ProductTree.ElementDefinition != null 
+                    ? this.ProductTree 
+                    : this.FindTheTopElementMapped(this.ProductTree.Children);
+            }
+
+            foreach (var element in elements)
+            {
+                if (element.ElementDefinition != null)
+                {
+                    return element;
+                }
+
+                if (this.FindTheTopElementMapped(element.Children) is {} topElement)
+                {
+                    return topElement;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Finds the mapped element in the <paramref name="elements"/>
+        /// </summary>
+        /// <param name="elements">The collection of <see cref="ElementRowViewModel"/></param>
+        /// <param name="externalId">The <see cref="IdCorrespondence"/> ExternalId</param>
+        /// <param name="indicator">The string indicating the mapping direction</param>
+        /// <returns>The <see cref="ElementRowViewModel"/> top element</returns>
+        private ElementRowViewModel FindTheMappedElement(string externalId, string indicator, IEnumerable<ElementRowViewModel> elements = null)
+        {
+            if (elements is null)
+            {
+                return this.AreIdentifierTheSame(externalId, indicator, this.ProductTree.Name)
+                    ? this.ProductTree
+                    : this.FindTheMappedElement(externalId, indicator, this.ProductTree.Children);
+            }
+
+            foreach (var element in elements)
+            {
+                if (this.AreIdentifierTheSame(externalId, indicator, element.Name))
+                {
+                    return element;
+                }
+
+                if (this.FindTheMappedElement(externalId, indicator, element.Children) is {} identifiedElement)
+                {
+                    return identifiedElement;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Verify that the <paramref name="externalId"/> matches the <paramref name="indicator"/> and <paramref name="elementName"/>
+        /// </summary>
+        /// <param name="externalId">The <see cref="IdCorrespondence"/> ExternalId</param>
+        /// <param name="indicator">The string indicating the mapping direction</param>
+        /// <param name="elementName">The <see cref="ElementRowViewModel"/> name</param>
+        /// <returns>An assert</returns>
+        private bool AreIdentifierTheSame(string externalId, string indicator, string elementName)
+        {
+            return externalId == $"{indicator}{elementName}";
+        }
+
+        /// <summary>
+        ///  Loads referenced <see cref="Thing"/>s
+        /// </summary>
+        /// <param name="element">The <see cref="ElementRowViewModel"/></param>
+        /// <param name="correspondences">The collection of <see cref="IdCorrespondence"/></param>
+        private void LoadsCorrespondances(ElementRowViewModel element, IEnumerable<IdCorrespondence> correspondences = null)
+        {
+            correspondences ??= this.ExternalIdentifierMap.Correspondence.Where(x => x.ExternalId.StartsWith(this.fromDstToHubIndicator));
+
+            foreach (var idCorrespondence in correspondences)
+            {
+                if (!this.hubController.GetThingById(idCorrespondence.InternalThing, this.hubController.OpenIteration, out Thing thing))
+                {
+                    continue;
+                }
+
+                Action action = thing switch
+                {
+                    ElementDefinition elementDefinition => () => element.ElementDefinition = elementDefinition.Clone(true),
+                    ElementUsage elementUsage when element is UsageRowViewModel usageRow => () => usageRow.ElementUsage = elementUsage.Clone(true),
+                    Option option => () => element.SelectedOption = option.Clone(false),
+                    ActualFiniteState state => () => element.SelectedActualFiniteState = state.Clone(false),
+                    _ => null
+                };
+
+                Application.Current.Dispatcher.Invoke(() => { action?.Invoke(); });
+            }
+        }
+    
         /// <summary>
         /// Retrieves the product tree
         /// </summary>
         /// <param name="cancelToken">The <see cref="CancellationToken"/></param>
-        /// <returns>The root <see cref="ElementRowViewModel"/></returns>
-        public ElementRowViewModel GetProductTree(CancellationToken cancelToken)
+        public void GetProductTree(CancellationToken cancelToken)
         {
-            var productTree = this.catiaComService.GetProductTree(cancelToken);
-            return productTree;
+            this.ProductTree = this.catiaComService.GetProductTree(cancelToken);
         }
 
         /// <summary>
@@ -190,10 +397,10 @@ namespace DEHCATIA.DstController
         /// <summary>
         /// Map the provided collection using the corresponding rule in the assembly and the <see cref="MappingEngine"/>
         /// </summary>
-        /// <param name="dstElements">The <see cref="List{T}"/> of <see cref="ElementRowViewModel"/> data</param>
-        public void Map(List<ElementRowViewModel> dstElements)
+        /// <param name="topElement">The <see cref="List{T}"/> of <see cref="ElementRowViewModel"/> data</param>
+        public void Map(ElementRowViewModel topElement)
         {
-            if (this.mappingEngine.Map(dstElements) is List<(ElementRowViewModel Parent, ElementBase Element)> elements && elements.Any())
+            if (this.mappingEngine.Map(topElement) is List<(ElementRowViewModel Parent, ElementBase Element)> elements && elements.Any())
             {
                 this.DstMapResult.AddRange(elements);
             }
@@ -219,17 +426,18 @@ namespace DEHCATIA.DstController
                 this.RegisterAndCommitElements<ElementDefinition>(iterationClone, transaction);
                 this.RegisterAndCommitElements<ElementUsage>(iterationClone, transaction);
                 transaction.CreateOrUpdate(iterationClone);
-                transaction.CreateOrUpdate(iterationClone);
+                this.PersistExternalIdentifierMap(transaction, iterationClone);
                 await this.hubController.Write(transaction);
                 this.statusBar.Append($"Element(s) have been updated");
-
+                
                 await this.UpdateParametersValueSets();
                 this.statusBar.Append($"Parameter and Parameter Overrides have been updated");
 
                 await this.hubController.Refresh();
+                this.hubController.GetThingById(this.ExternalIdentifierMap.Iid, this.hubController.OpenIteration, out ExternalIdentifierMap map);
+                this.ExternalIdentifierMap = map.Clone(true);
 
-                this.DstMapResult.Clear();
-
+                this.Reconnect();
                 CDPMessageBus.Current.SendMessage(new UpdateObjectBrowserTreeEvent(true));
             }
             catch (Exception e)
@@ -248,7 +456,7 @@ namespace DEHCATIA.DstController
         /// <returns>A <see cref="Task"/></returns>
         private void RegisterAndCommitElements<TElement>(Iteration iterationClone, ThingTransaction transaction) where TElement : ElementBase
         {
-            foreach (var (parent, element) in this.DstMapResult)
+            foreach (var (_, element) in this.DstMapResult)
             {
                 if (!(element is TElement))
                 {
@@ -412,6 +620,103 @@ namespace DEHCATIA.DstController
 
             this.hubController.RegisterNewLogEntryToTransaction(vm.LogEntryContent, transaction);
             return true;
+        }
+        
+        /// <summary>
+        /// Creates and sets the <see cref="ExternalIdentifierMap"/>
+        /// </summary>
+        /// <param name="newName">The model name to use for creating the new <see cref="ExternalIdentifierMap"/></param>
+        /// <returns>A newly created <see cref="ExternalIdentifierMap"/></returns>
+        public ExternalIdentifierMap CreateExternalIdentifierMap(string newName)
+        {
+            return new ExternalIdentifierMap()
+            {
+                Name = newName,
+                ExternalToolName = this.ThisToolName,
+                ExternalModelName = newName,
+                Owner = this.hubController.CurrentDomainOfExpertise
+            };
+        }
+
+        /// <summary>
+        /// Saves the mapping to the <see cref="IDstController.ExternalIdentifierMap"/>
+        /// </summary>
+        /// <param name="element">The <see cref="ElementRowViewModel"/> that holds the mapping information</param>
+        public void SaveElementMapping(ElementRowViewModel element)
+        {
+            var externalId = $"{this.fromDstToHubIndicator}{element.Name}";
+
+            this.ExternalIdentifierMap.Correspondence.RemoveAll(x => x.ExternalId.Equals(externalId, StringComparison.InvariantCultureIgnoreCase));
+
+            this.ExternalIdentifierMap.Correspondence.Add(
+                new IdCorrespondence()
+                {
+                    InternalThing = element.ElementDefinition.Iid,
+                    ExternalId = externalId,
+                });
+
+            if (element.SelectedOption is {} option)
+            {
+                this.ExternalIdentifierMap.Correspondence.Add(
+                    new IdCorrespondence()
+                    {
+                        InternalThing = option.Iid,
+                        ExternalId = externalId,
+                    });
+            }
+
+            if (element is UsageRowViewModel usageRow && usageRow.ElementUsage is {} elementUsage)
+            {
+                this.ExternalIdentifierMap.Correspondence.Add(
+                    new IdCorrespondence()
+                    {
+                        InternalThing = elementUsage.Iid,
+                        ExternalId = externalId,
+                    });
+            }
+
+            if (element.SelectedActualFiniteState is { } state)
+            {
+                this.ExternalIdentifierMap.Correspondence.Add(
+                    new IdCorrespondence()
+                    {
+                        InternalThing = state.Iid,
+                        ExternalId = externalId,
+                    });
+            }
+        }
+
+        /// <summary>
+        /// Updates the configured mapping, registering the <see cref="ExternalIdentifierMap"/> and its <see cref="IdCorrespondence"/>
+        /// to a <see name="IThingTransaction"/>
+        /// </summary>
+        /// <param name="transaction">The <see cref="IThingTransaction"/></param>
+        /// <param name="iterationClone">The <see cref="Iteration"/> clone</param>
+        private void PersistExternalIdentifierMap(IThingTransaction transaction, Iteration iterationClone)
+        {
+            if (this.ExternalIdentifierMap.Iid == Guid.Empty)
+            {
+                this.ExternalIdentifierMap = this.ExternalIdentifierMap.Clone(true);
+                this.ExternalIdentifierMap.Iid = Guid.NewGuid();
+                iterationClone.ExternalIdentifierMap.Add(this.ExternalIdentifierMap);
+            }
+
+            foreach (var correspondence in this.ExternalIdentifierMap.Correspondence)
+            {
+                if (correspondence.Iid == Guid.Empty)
+                {
+                    correspondence.Iid = Guid.NewGuid();
+                    transaction.Create(correspondence);
+                }
+                else
+                {
+                    transaction.CreateOrUpdate(correspondence);
+                }
+            }
+
+            transaction.CreateOrUpdate(this.ExternalIdentifierMap);
+
+            this.statusBar.Append("Mapping configuration processed");
         }
     }
 }

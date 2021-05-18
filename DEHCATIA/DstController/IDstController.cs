@@ -31,6 +31,7 @@ namespace DEHCATIA.DstController
     using CDP4Common.EngineeringModelData;
 
     using DEHCATIA.ViewModels.ProductTree.Rows;
+    using DEHCATIA.ViewModels.Rows;
 
     using DEHPCommon.Enumerators;
     using DEHPCommon.MappingEngine;
@@ -43,6 +44,16 @@ namespace DEHCATIA.DstController
     public interface IDstController
     {
         /// <summary>
+        /// Gets or sets the ready to map <see cref="ElementRowViewModel"/> resulting of the automapping done by the <see cref="LoadMapping"/>
+        /// </summary>
+        ElementRowViewModel ReadyToMapTopElement { get; set; }
+
+        /// <summary>
+        /// Gets or sets value the catia ProductTree
+        /// </summary>
+        ElementRowViewModel ProductTree { get; set; }
+
+        /// <summary>
         /// Gets or sets whether there's a connection to a running CATIA client.
         /// </summary>
         bool IsCatiaConnected { get; set; }
@@ -53,6 +64,11 @@ namespace DEHCATIA.DstController
         MappingDirection MappingDirection { get; set; }
 
         /// <summary>
+        /// Gets or sets the <see cref="ExternalIdentifierMap"/>
+        /// </summary>
+        ExternalIdentifierMap ExternalIdentifierMap { get; set; }
+
+        /// <summary>
         /// Gets the colection of mapped <see cref="Parameter"/>s And <see cref="ParameterOverride"/>s through their container
         /// </summary>
         ReactiveList<(ElementRowViewModel Parent, ElementBase Element)> DstMapResult { get; }
@@ -60,14 +76,28 @@ namespace DEHCATIA.DstController
         /// <summary>
         /// Gets the colection of mapped <see cref="ElementRowViewModel"/>
         /// </summary>
-        ReactiveList<ElementRowViewModel> HubMapResult { get; }
+        ReactiveList<MappedElementDefinitionRowViewModel> HubMapResult { get; }
+
+        /// <summary>
+        /// Gets this running tool name
+        /// </summary>
+        string ThisToolName { get; }
+
+        /// <summary>
+        /// Disconnect and reconnect to the Catia product tree
+        /// </summary>
+        void Reconnect();
+
+        /// <summary>
+        /// Loads the mapping configuration and generates the map result respectively
+        /// </summary>
+        void LoadMapping();
 
         /// <summary>
         /// Retrieves the product tree
         /// </summary>
         /// <param name="cancelToken">The <see cref="CancellationToken"/></param>
-        /// <returns>The root <see cref="ElementRowViewModel"/></returns>
-        ElementRowViewModel GetProductTree(CancellationToken cancelToken);
+        void GetProductTree(CancellationToken cancelToken);
 
         /// <summary>
         /// Connects to the Catia running instance
@@ -82,8 +112,8 @@ namespace DEHCATIA.DstController
         /// <summary>
         /// Map the provided collection using the corresponding rule in the assembly and the <see cref="MappingEngine"/>
         /// </summary>
-        /// <param name="dstElements">The <see cref="List{T}"/> of <see cref="ElementRowViewModel"/> data</param>
-        void Map(List<ElementRowViewModel> dstElements);
+        /// <param name="topElement">The <see cref="List{T}"/> of <see cref="ElementRowViewModel"/> data</param>
+        void Map(ElementRowViewModel topElement);
 
         /// <summary>
         /// Transfers the mapped variables to the Hub data source
@@ -96,5 +126,18 @@ namespace DEHCATIA.DstController
         /// </summary>
         /// <returns>A <see cref="Task"/></returns>
         Task UpdateParametersValueSets();
+
+        /// <summary>
+        /// Creates and sets the <see cref="DstController.ExternalIdentifierMap"/>
+        /// </summary>
+        /// <param name="newName">The model name to use for creating the new <see cref="DstController.ExternalIdentifierMap"/></param>
+        /// <returns>A newly created <see cref="DstController.ExternalIdentifierMap"/></returns>
+        ExternalIdentifierMap CreateExternalIdentifierMap(string newName);
+
+        /// <summary>
+        /// Saves the mapping to the <see cref="IDstController.ExternalIdentifierMap"/>
+        /// </summary>
+        /// <param name="element">The <see cref="ElementRowViewModel"/> that holds the mapping information</param>
+        void SaveElementMapping(ElementRowViewModel element);
     }
 }

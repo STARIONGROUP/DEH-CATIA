@@ -26,9 +26,17 @@ namespace DEHCATIA.Tests.ViewModels
 {
     using System.Reactive.Concurrency;
 
+    using Autofac;
+
+    using CDP4Common.EngineeringModelData;
+
     using DEHCATIA.DstController;
     using DEHCATIA.ViewModels;
+    using DEHCATIA.ViewModels.Dialogs.Interfaces;
     using DEHCATIA.ViewModels.Interfaces;
+
+    using DEHPCommon;
+    using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.Services.NavigationService;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
@@ -48,6 +56,8 @@ namespace DEHCATIA.Tests.ViewModels
 
         private DstDataSourceViewModel viewModel;
         private Mock<IStatusBarControlViewModel> statusBar;
+        private Mock<IHubController> hubController;
+        private Mock<IDstLoginViewModel> loginViewModel;
 
         [SetUp]
         public void Setup()
@@ -60,9 +70,15 @@ namespace DEHCATIA.Tests.ViewModels
             this.dstProductTree = new Mock<IDstProductTreeViewModel>();
             this.dstProductTree = new Mock<IDstProductTreeViewModel>();
             this.statusBar = new Mock<IStatusBarControlViewModel>();
+            this.hubController = new Mock<IHubController>();
+            this.loginViewModel = new Mock<IDstLoginViewModel>();
+
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.RegisterInstance(this.loginViewModel.Object).As<IDstLoginViewModel>();
+            AppContainer.Container = containerBuilder.Build();
 
             this.viewModel = new DstDataSourceViewModel(this.navigationService.Object, this.dstController.Object, this.dstBrowserHeader.Object, 
-                this.dstProductTree.Object, this.statusBar.Object);
+                this.dstProductTree.Object, this.statusBar.Object, this.hubController.Object);
         }
 
         [Test]
@@ -71,6 +87,12 @@ namespace DEHCATIA.Tests.ViewModels
             Assert.IsNotNull(this.viewModel.ConnectCommand);
             Assert.AreEqual("Connect", this.viewModel.ConnectButtonText);
             Assert.AreEqual("Connection is not established", this.viewModel.ConnectionStatus);
+            Assert.IsFalse(this.viewModel.ConnectCommand.CanExecute(null));
+            this.hubController.Setup(x => x.OpenIteration).Returns(new Iteration());
+
+            this.viewModel = new DstDataSourceViewModel(this.navigationService.Object, this.dstController.Object, this.dstBrowserHeader.Object,
+                this.dstProductTree.Object, this.statusBar.Object, this.hubController.Object);
+
             Assert.IsTrue(this.viewModel.ConnectCommand.CanExecute(null));
         }
 
@@ -82,17 +104,26 @@ namespace DEHCATIA.Tests.ViewModels
             this.dstController.Setup(x => x.IsCatiaConnected).Returns(false);
             this.viewModel.ConnectCommand.Execute(null);
 
-            Assert.AreEqual("CATIA is not available", this.viewModel.ConnectionStatus);
+            Assert.AreEqual("Connection is not established", this.viewModel.ConnectionStatus);
 
-            this.dstController.Setup(x => x.ConnectToCatia()).Callback(() => { this.dstController.Setup(c => c.IsCatiaConnected).Returns(true); });
+            this.dstController.Setup(x => x.ConnectToCatia())
+                .Callback(() => this.dstController.Setup(c => c.IsCatiaConnected).Returns(true));
+
+            this.dstController.Setup(x => x.ExternalIdentifierMap).Returns(new ExternalIdentifierMap());
             this.viewModel.ConnectCommand.Execute(null);
+            Assert.AreEqual("Connection is established", this.viewModel.ConnectionStatus);
 
+            this.dstController.Setup(x => x.IsCatiaConnected).Returns(false);
+            this.viewModel.ConnectCommand.Execute(null);
             Assert.AreEqual("Connection is established", this.viewModel.ConnectionStatus);
 
             this.dstController.Verify(x => x.ConnectToCatia(), Times.Exactly(2));
 
             this.dstController.Setup(x => x.IsCatiaConnected).Returns(true);
-            this.dstController.Setup(x => x.DisconnectFromCatia()).Callback(() => { this.dstController.Setup(c => c.IsCatiaConnected).Returns(false); });
+           
+            this.dstController.Setup(x => x.DisconnectFromCatia())
+                .Callback(() => this.dstController.Setup(c => c.IsCatiaConnected).Returns(false));
+
             this.viewModel.ConnectCommand.Execute(null);
 
             Assert.AreEqual("Connection is not established", this.viewModel.ConnectionStatus);

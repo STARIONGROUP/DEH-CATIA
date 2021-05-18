@@ -49,6 +49,8 @@ namespace DEHCATIA.Tests.ViewModels
         private Mock<INavigationService> navigationService;
         private Mock<ITransferControlViewModel> transferControl;
         private Mock<IDstController> dstController;
+        private Mock<IDstNetChangePreviewViewModel> dstNetChangePreview;
+        private Mock<IHubNetChangePreviewViewModel> hubNetChangePreview;
 
         [SetUp]
         public void Setup()
@@ -59,9 +61,12 @@ namespace DEHCATIA.Tests.ViewModels
             this.navigationService = new Mock<INavigationService>();
             this.transferControl = new Mock<ITransferControlViewModel>();
             this.dstController = new Mock<IDstController>();
+            this.dstNetChangePreview = new Mock<IDstNetChangePreviewViewModel>();
+            this.hubNetChangePreview = new Mock<IHubNetChangePreviewViewModel>();
 
             this.viewModel = new MainWindowViewModel(this.hubDataSourceViewModel.Object, this.dstSourceViewModel.Object,
-                this.statusBarViewModel.Object, this.navigationService.Object, this.transferControl.Object, this.dstController.Object);
+                this.statusBarViewModel.Object, this.navigationService.Object, this.transferControl.Object, this.dstController.Object,
+                this.hubNetChangePreview.Object, this.dstNetChangePreview.Object);
         }
 
         [Test]
