@@ -36,6 +36,7 @@ namespace DEHCATIA.ViewModels
     using CDP4Dal;
 
     using DEHCATIA.DstController;
+    using DEHCATIA.Events;
 
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.Services.NavigationService;
@@ -83,10 +84,10 @@ namespace DEHCATIA.ViewModels
         private readonly IDstController dstController;
 
         /// <summary>
-        /// Gets or sets the command to refresh the session
+        /// Gets the <see cref="IHubSessionControlViewModel"/>
         /// </summary>
-        public ReactiveCommand<Unit> RefreshCommand { get; set; }
-
+        public IHubSessionControlViewModel SessionControl { get; }
+        
         /// <summary>
         /// Initializes a new <see cref="HubDataSourceViewModel"/>
         /// </summary>
@@ -96,15 +97,18 @@ namespace DEHCATIA.ViewModels
         /// <param name="publicationBrowser">The <see cref="IPublicationBrowserViewModel"/></param>
         /// <param name="hubBrowserHeader">The <see cref="IHubBrowserHeaderViewModel"/></param>
         /// <param name="dstController">The <see cref="IDstController"/></param>
+        /// <param name="sessionControl">The <see cref="IHubSessionControlViewModel"/></param>
         public HubDataSourceViewModel(INavigationService navigationService, IHubController hubController, 
             IObjectBrowserViewModel objectBrowser, IPublicationBrowserViewModel publicationBrowser, 
-            IHubBrowserHeaderViewModel hubBrowserHeader, IDstController dstController) : base(navigationService)
+            IHubBrowserHeaderViewModel hubBrowserHeader, IDstController dstController,
+                IHubSessionControlViewModel sessionControl) : base(navigationService)
         {
             this.hubController = hubController;
             this.ObjectBrowser = objectBrowser;
             this.PublicationBrowser = publicationBrowser;
             this.HubBrowserHeader = hubBrowserHeader;
             this.dstController = dstController;
+            this.SessionControl = sessionControl;
 
             this.InitializeCommands();
         }
@@ -115,28 +119,25 @@ namespace DEHCATIA.ViewModels
         protected override void InitializeCommands()
         {
             base.InitializeCommands();
-            
-            var isConnectedObservable = this.WhenAny(x => x.hubController.OpenIteration,
-                x => x.hubController.IsSessionOpen,
-                (i, o) =>
-                    i.Value != null && o.Value)
-                .ObserveOn(RxApp.MainThreadScheduler);
 
-            isConnectedObservable.Subscribe(this.UpdateConnectButtonText);
+            this.ObjectBrowser.SelectedThings.CountChanged.Subscribe(_ => this.UpdateNetChangePreviewBasedOnSelection());
 
-            this.RefreshCommand = ReactiveCommand.CreateAsyncTask(isConnectedObservable, async _ =>
-                await this.RefreshCommandExecute(), RxApp.MainThreadScheduler);
+            this.WhenAny(x => x.hubController.OpenIteration,
+                    x => x.hubController.IsSessionOpen,
+                    (i, o) =>
+                        i.Value != null && o.Value)
+                .Subscribe(this.UpdateConnectButtonText);
         }
 
         /// <summary>
-        /// Executes the <see cref="RefreshCommand"/>
+        /// Sends an update event to the Dst net change preview based on the current <see cref="IObjectBrowserViewModel.SelectedThings"/>
         /// </summary>
-        /// <returns></returns>
-        private async Task RefreshCommandExecute()
+        private void UpdateNetChangePreviewBasedOnSelection()
         {
-            await this.hubController.Refresh();
+            CDPMessageBus.Current.SendMessage(new UpdateDstPreviewBasedOnSelectionEvent(
+                this.ObjectBrowser.SelectedThings.OfType<ElementDefinitionRowViewModel>(), null, false));
         }
-        
+
         /// <summary>
         /// Executes the <see cref="DataSourceViewModel.ConnectCommand"/>
         /// </summary>

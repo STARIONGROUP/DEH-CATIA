@@ -44,15 +44,12 @@ namespace DEHCATIA.MappingRules
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.MappingRules.Core;
 
-    using DevExpress.Xpf.NavBar;
-    using DevExpress.Xpo.Helpers;
-
     using NLog;
 
     /// <summary>
     /// Rule definition that transforms a collection of <see cref="ElementRowViewModel"/> to a collection <see cref="ElementDefinition"/>
     /// </summary>
-    public class CatiaProductToElementRule : MappingRule<List<ElementRowViewModel>, List<(ElementRowViewModel Parent, ElementBase Element)>>
+    public class CatiaProductToElementRule : MappingRule<ElementRowViewModel, List<(ElementRowViewModel Parent, ElementBase Element)>>
     {
         /// <summary>
         /// The current class logger
@@ -64,6 +61,11 @@ namespace DEHCATIA.MappingRules
         /// </summary>
         private readonly IHubController hubController = AppContainer.Container.Resolve<IHubController>();
 
+        /// <summary>
+        /// The <see cref="IDstController"/>
+        /// </summary>
+        private IDstController dstController;
+        
         /// <summary>
         /// The <see cref="IParameterTypeService"/>
         /// </summary>
@@ -92,13 +94,14 @@ namespace DEHCATIA.MappingRules
         /// <summary>
         /// Transforms <see cref="!:TInput" /> to a <see cref="!:TOutput" />
         /// </summary>
-        public override List<(ElementRowViewModel Parent, ElementBase Element)> Transform(List<ElementRowViewModel> input)
+        public override List<(ElementRowViewModel Parent, ElementBase Element)> Transform(ElementRowViewModel input)
         {
             try
             {
                 this.owner = this.hubController.CurrentDomainOfExpertise;
-                
-                this.Map(input);
+                this.dstController = AppContainer.Container.Resolve<IDstController>();
+
+                this.Map(new List<ElementRowViewModel>{input});
 
                 return this.ruleOutput;
             }
@@ -128,6 +131,7 @@ namespace DEHCATIA.MappingRules
                     usageRow.ElementDefinition = this.MapDefinitionRowViewModel(definitionRow);
                     this.MapElementUsage(usageRow);
                     this.MapParameters(usageRow);
+                    this.dstController.SaveElementMapping(usageRow);
                     this.ruleOutput.Add((usageRow.Parent, usageRow.ElementUsage));
                 }
                 else
@@ -177,6 +181,7 @@ namespace DEHCATIA.MappingRules
         {
             this.MapElementDefinition(elementRowViewModel);
             this.ruleOutput.Add((elementRowViewModel.Parent, elementRowViewModel.ElementDefinition));
+            this.dstController.SaveElementMapping(elementRowViewModel);
         }
 
         /// <summary>
@@ -186,12 +191,13 @@ namespace DEHCATIA.MappingRules
         private void MapElementDefinition(ElementRowViewModel elementRow)
         {
             elementRow.ElementDefinition ??= this.hubController.OpenIteration.Element
-                                                    .FirstOrDefault(x => x.Name == elementRow.Name)?.Clone(true)
+                                                    .FirstOrDefault(x => x.ShortName == elementRow.Name)?.Clone(true)
                                                 ?? new ElementDefinition()
                                                 {
                                                     Name = elementRow.Name,
                                                     ShortName = elementRow.Name,
-                                                    Owner = this.hubController.CurrentDomainOfExpertise
+                                                    Owner = this.hubController.CurrentDomainOfExpertise,
+                                                    Container = this.hubController.OpenIteration
                                                 };
         }
 
@@ -214,10 +220,10 @@ namespace DEHCATIA.MappingRules
         private ElementUsage GetOrCreateElementUsage(ElementDefinition elementDefinition, string name, ElementDefinition parent)
         {
             var container = this.hubController.OpenIteration.Element
-                .FirstOrDefault(x => x.Name == parent?.Name);
+                .FirstOrDefault(x => x.ShortName == parent?.Name);
 
             var elementUsage = container?.ContainedElement
-                .FirstOrDefault(x => x.Name == name)?.Clone(true);
+                .FirstOrDefault(x => x.ShortName == name)?.Clone(true);
 
             if (elementUsage is null)
             {
@@ -407,6 +413,7 @@ namespace DEHCATIA.MappingRules
                     {
                         new ParameterOverrideValueSet(Guid.Empty, this.hubController.Session.Assembler.Cache, new Uri(this.hubController.Session.DataSourceUri))
                         {
+                            ParameterValueSet = (ParameterValueSet)parameterToOverride?.QueryParameterBaseValueSet(this.selectedOption, this.selectedActualFiniteState),
                             Computed = new ValueArray<string>(),
                             Formula = new ValueArray<string>(initializationCollection),
                             Manual = new ValueArray<string>(initializationCollection),

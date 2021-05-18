@@ -73,7 +73,12 @@ namespace DEHCATIA.ViewModels
         /// <summary>
         /// Gets the view model that represents the net change preview panel
         /// </summary>
-        public INetChangePreviewViewModel NetChangePreviewViewModel { get; }
+        public IHubNetChangePreviewViewModel HubNetChangePreviewViewModel { get; }
+
+        /// <summary>
+        /// Gets the view model that represents the net change preview panel
+        /// </summary>
+        public IDstNetChangePreviewViewModel DstNetChangePreviewViewModel { get; }
 
         /// <summary>
         /// Gets the view model that represents the 10-25 data source
@@ -118,9 +123,12 @@ namespace DEHCATIA.ViewModels
         /// <param name="navigationService">The <see cref="INavigationService"/></param>
         /// <param name="transferControlViewModel">The <see cref="ITransferControlViewModel"/></param>
         /// <param name="dstController">The <see cref="IDstController"/></param>
+        /// <param name="hubNetChangePreviewViewModel">The <see cref="IHubNetChangePreviewViewModel"/></param>
+        /// <param name="dstNetChangePreviewViewModel">The <see cref="IDstNetChangePreviewViewModel"/></param>
         public MainWindowViewModel(IHubDataSourceViewModel hubDataSourceViewModel, IDstDataSourceViewModel dstSourceViewModel, 
             IStatusBarControlViewModel statusBarControlViewModel, INavigationService navigationService,
-            ITransferControlViewModel transferControlViewModel, IDstController dstController)
+            ITransferControlViewModel transferControlViewModel, IDstController dstController, 
+            IHubNetChangePreviewViewModel hubNetChangePreviewViewModel, IDstNetChangePreviewViewModel dstNetChangePreviewViewModel)
         {
             this.navigationService = navigationService;
             this.TransferControlViewModel = transferControlViewModel;
@@ -128,6 +136,8 @@ namespace DEHCATIA.ViewModels
             this.HubDataSourceViewModel = hubDataSourceViewModel;
             this.DstSourceViewModel = dstSourceViewModel;
             this.StatusBarControlViewModel = statusBarControlViewModel;
+            this.HubNetChangePreviewViewModel = hubNetChangePreviewViewModel;
+            this.DstNetChangePreviewViewModel = dstNetChangePreviewViewModel;
             this.StatusBarControlViewModel.Append($"Welcome to the DEH Catia adapter!");
             this.InitializeCommands();
         }

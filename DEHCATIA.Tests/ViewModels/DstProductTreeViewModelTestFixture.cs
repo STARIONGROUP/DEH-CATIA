@@ -26,6 +26,7 @@ namespace DEHCATIA.Tests.ViewModels
 {
     using System.Reactive.Concurrency;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using DEHCATIA.DstController;
     using DEHCATIA.ViewModels;
@@ -80,13 +81,18 @@ namespace DEHCATIA.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyUpdateProductTree()
+        public async Task VerifyUpdateProductTree()
         {
-            this.dstController.Setup(x => x.GetProductTree(It.IsAny<CancellationToken>())).Returns(new ElementRowViewModel(this.product0.Object, string.Empty));
+            this.dstController.Setup(x => x.GetProductTree(It.IsAny<CancellationToken>()));
+            this.dstController.Setup(x => x.ProductTree).Returns(new ElementRowViewModel(this.product1.Object, string.Empty));
             this.dstController.Setup(x => x.IsCatiaConnected).Returns(true);
+            this.statusBar.Setup(x => x.Append(It.IsAny<string>(), StatusBarMessageSeverity.Info));
+ 
             this.viewModel = new DstProductTreeViewModel(this.dstController.Object, this.statusBar.Object, this.navigationService.Object, this.hubController.Object);
-            this.statusBar.Verify(x => x.Append(It.IsAny<string>(), It.IsAny<StatusBarMessageSeverity>()), Times.Exactly(2));
-            Assert.AreEqual(1, this.viewModel.RootElements.Count);
+            
+            await Task.Delay(1);
+            this.statusBar.Verify(x => x.Append(It.IsAny<string>(), StatusBarMessageSeverity.Info), Times.Exactly(2));
+            Assert.IsNotNull(this.viewModel.RootElement);
         }
     }
 }

@@ -40,6 +40,7 @@ namespace DEHCATIA.Tests.ViewModels
     using DEHCATIA.DstController;
     using DEHCATIA.ViewModels;
     using DEHCATIA.ViewModels.ProductTree.Rows;
+    using DEHCATIA.ViewModels.Rows;
 
     using Moq;
 
@@ -69,7 +70,7 @@ namespace DEHCATIA.Tests.ViewModels
                 .Returns(new ReactiveList<(ElementRowViewModel, ElementBase)>());
 
             this.dstController.Setup(x => x.HubMapResult)
-                .Returns(new ReactiveList<ElementRowViewModel>());
+                .Returns(new ReactiveList<MappedElementDefinitionRowViewModel>());
 
             this.exchangeHistoryService = new Mock<IExchangeHistoryService>();
 
@@ -115,9 +116,9 @@ namespace DEHCATIA.Tests.ViewModels
                 (null, new ElementDefinition())
             });
 
-            this.dstController.Setup(x => x.HubMapResult).Returns(new ReactiveList<ElementRowViewModel>()
+            this.dstController.Setup(x => x.HubMapResult).Returns(new ReactiveList<MappedElementDefinitionRowViewModel>()
             {
-                new ElementRowViewModel(new Mock<Product>().Object, string.Empty)
+                new MappedElementDefinitionRowViewModel()
             });
 
             Assert.IsFalse(this.viewModel.CancelCommand.CanExecute(null));
@@ -126,8 +127,8 @@ namespace DEHCATIA.Tests.ViewModels
             Assert.IsNotEmpty(this.dstController.Object.HubMapResult);
             Assert.IsNotEmpty(this.dstController.Object.DstMapResult);
             Assert.DoesNotThrow(() => this.viewModel.CancelCommand.ExecuteAsyncTask(null));
-            Assert.IsEmpty(this.dstController.Object.HubMapResult);
-            Assert.IsEmpty(this.dstController.Object.DstMapResult);
+            Assert.IsNotEmpty(this.dstController.Object.HubMapResult);
+            Assert.IsNotEmpty(this.dstController.Object.DstMapResult);
         }
     }
 }

@@ -39,6 +39,7 @@ namespace DEHCATIA
     using DEHCATIA.ViewModels.Dialogs;
     using DEHCATIA.ViewModels.Dialogs.Interfaces;
     using DEHCATIA.ViewModels.Interfaces;
+    using DEHCATIA.ViewModels.NetChangePreview;
     using DEHCATIA.Views;
 
     using DEHPCommon;
@@ -154,6 +155,9 @@ namespace DEHCATIA
             containerBuilder.RegisterType<DstProductTreeViewModel>().As<IDstProductTreeViewModel>().SingleInstance();
             containerBuilder.RegisterType<CatiaTransferControlViewModel>().As<ITransferControlViewModel>().SingleInstance();
             containerBuilder.RegisterType<DstMappingConfigurationDialogViewModel>().As<IDstMappingConfigurationDialogViewModel>();
+            containerBuilder.RegisterType<HubNetChangePreviewViewModel>().As<IHubNetChangePreviewViewModel>().SingleInstance();
+            containerBuilder.RegisterType<DstNetChangePreviewViewModel>().As<IDstNetChangePreviewViewModel>().SingleInstance();
+            containerBuilder.RegisterType<DstLoginViewModel>().As<IDstLoginViewModel>();
         }
     }   
 }

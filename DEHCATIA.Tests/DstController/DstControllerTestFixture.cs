@@ -51,6 +51,8 @@ namespace DEHCATIA.Tests.DstController
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
     using DEHPCommon.UserInterfaces.Views;
 
+    using DevExpress.Mvvm.Native;
+
     using Moq;
 
     using NUnit.Framework;
@@ -75,6 +77,9 @@ namespace DEHCATIA.Tests.DstController
         private Assembler assembler;
         private Mock<Product> product0;
         private Mock<Product> product1;
+        private Option option;
+        private ActualFiniteState state;
+        private ElementRowViewModel elementRow;
 
         [SetUp]
         public void Setup()
@@ -87,7 +92,7 @@ namespace DEHCATIA.Tests.DstController
             this.hubController = new Mock<IHubController>();
             this.navigationService = new Mock<INavigationService>();
 
-            this.element = new ElementDefinition();
+            this.element = new ElementDefinition(Guid.NewGuid(), null, null);
 
             var uri = new Uri("http://t.e");
 
@@ -114,8 +119,19 @@ namespace DEHCATIA.Tests.DstController
             this.hubController.Setup(x => x.OpenIteration).Returns(this.iteration);
 
             this.product0 = new Mock<Product>();
+            this.product0.Setup(x => x.get_DescriptionRef()).Returns(string.Empty);
+            this.product0.Setup(x => x.get_PartNumber()).Returns(string.Empty);
+            this.product0.Setup(x => x.get_Name()).Returns("product0");
             this.product1 = new Mock<Product>();
+            this.product1.Setup(x => x.get_DescriptionRef()).Returns(string.Empty);
+            this.product1.Setup(x => x.get_PartNumber()).Returns(string.Empty);
+            this.product1.Setup(x => x.get_Name()).Returns("product1");
 
+            this.elementRow = new ElementRowViewModel(this.product0.Object, string.Empty);
+
+            this.option = new Option(Guid.NewGuid(), null, null);
+            this.state = new ActualFiniteState(Guid.NewGuid(), null, null);
+            
             this.controller = new DstController(this.comService.Object, this.statusBar.Object, this.mappingEngine.Object,
                 this.exchangeHistory.Object, this.hubController.Object, this.navigationService.Object);
         }
@@ -141,10 +157,14 @@ namespace DEHCATIA.Tests.DstController
         [Test]
         public void VerifyGetProductTree()
         {
+            this.cancellationToken = new CancellationToken();
             Assert.IsFalse(this.controller.IsCatiaConnected);
             this.comService.Setup(x => x.GetProductTree(this.cancellationToken)).Returns(default(ElementRowViewModel));
-            Assert.IsNull(this.controller.GetProductTree(this.cancellationToken));
-            this.comService.Verify(x => x.GetProductTree(this.cancellationToken), Times.Once);
+            Assert.DoesNotThrow(() => this.controller.GetProductTree(this.cancellationToken));
+            this.cancellationToken = new CancellationToken();
+            Assert.DoesNotThrow(() => this.controller.GetProductTree(this.cancellationToken));
+            Assert.IsNull(this.controller.ProductTree);
+            this.comService.Verify(x => x.GetProductTree(this.cancellationToken), Times.Exactly(2));
         }
 
         [Test]
@@ -181,17 +201,17 @@ namespace DEHCATIA.Tests.DstController
                             (usageRowViewModel, new ElementUsage())
                         });
 
-            Assert.DoesNotThrow(() => this.controller.Map(new List<ElementRowViewModel>(){ rootElement }));
+            Assert.DoesNotThrow(() => this.controller.Map(rootElement));
 
             this.mappingEngine.Setup(x => x.Map(It.IsAny<object>()))
                 .Returns(new byte());
 
-            Assert.DoesNotThrow(() => this.controller.Map(new List<ElementRowViewModel>() { rootElement }));
+            Assert.DoesNotThrow(() => this.controller.Map(rootElement));
 
             this.mappingEngine.Setup(x => x.Map(It.IsAny<object>()))
                 .Returns(new List<(ElementRowViewModel, ElementBase)>());
 
-            Assert.DoesNotThrow(() => this.controller.Map(new List<ElementRowViewModel>() { rootElement }));
+            Assert.DoesNotThrow(() => this.controller.Map(rootElement));
                 
             this.mappingEngine.Verify(x => x.Map(It.IsAny<object>()), Times.Exactly(3));
         }
@@ -199,6 +219,8 @@ namespace DEHCATIA.Tests.DstController
         [Test]
         public void VerifyTransferToHub()
         {
+            this.controller.ExternalIdentifierMap = new ExternalIdentifierMap();
+            
             this.navigationService.Setup(
                 x => x.ShowDxDialog<CreateLogEntryDialog, CreateLogEntryDialogViewModel>(
                 It.IsAny<CreateLogEntryDialogViewModel>())).Returns(true);
@@ -260,6 +282,11 @@ namespace DEHCATIA.Tests.DstController
             this.hubController.Setup(x =>
                 x.GetThingById(parameterOverride.Iid, It.IsAny<Iteration>(), out parameterOverride));
 
+            var externalIdentifierMap = new ExternalIdentifierMap();
+
+            this.hubController.Setup(x =>
+                x.GetThingById(It.IsAny<Guid>(), It.IsAny<Iteration>(), out externalIdentifierMap));
+
             Assert.DoesNotThrowAsync(async () => await this.controller.TransferMappedThingsToHub());
 
             this.navigationService.Setup(
@@ -288,16 +315,16 @@ namespace DEHCATIA.Tests.DstController
                 x =>
                     x.ShowDxDialog<CreateLogEntryDialog, CreateLogEntryDialogViewModel>(
                         It.IsAny<CreateLogEntryDialogViewModel>())
-                , Times.Exactly(1));
+                , Times.Exactly(4));
 
             this.hubController.Verify(
-                x => x.Write(It.IsAny<ThingTransaction>()), Times.Exactly(2));
+                x => x.Write(It.IsAny<ThingTransaction>()), Times.Exactly(4));
 
             this.hubController.Verify(
-                x => x.Refresh(), Times.Exactly(1));
+                x => x.Refresh(), Times.Exactly(2));
 
             this.exchangeHistory.Verify(x =>
-                x.Append(It.IsAny<Thing>(), It.IsAny<ChangeKind>()), Times.Exactly(4));
+                x.Append(It.IsAny<Thing>(), It.IsAny<ChangeKind>()), Times.Exactly(8));
         }
 
         [Test]
@@ -349,6 +376,90 @@ namespace DEHCATIA.Tests.DstController
 
             this.hubController.Verify(x =>
                 x.Write(It.IsAny<ThingTransaction>()), Times.Once);
+        }
+
+        [Test]
+        public void VerifyCreateExternalIdentifierMap()
+        {
+            var newExternalIdentifierMap = this.controller.CreateExternalIdentifierMap("Name");
+            this.controller.ExternalIdentifierMap = newExternalIdentifierMap;
+            Assert.AreEqual("Name", this.controller.ExternalIdentifierMap.Name);
+            Assert.AreEqual("Name", this.controller.ExternalIdentifierMap.ExternalModelName);
+        }
+
+        [Test]
+        public void VerifyLoadMapping()
+        {
+            var parent = new ElementRowViewModel(this.product1.Object, string.Empty);
+
+            this.controller.ProductTree = parent;
+
+            Assert.DoesNotThrow(() => this.controller.LoadMapping());
+         
+            this.controller.ExternalIdentifierMap = new ExternalIdentifierMap()
+            {
+                Correspondence =
+                {
+                    new IdCorrespondence()
+                    {
+                        InternalThing = this.element.Iid,
+                        ExternalId = $"{MappingDirection.FromDstToHub}-{this.elementRow.Name}"
+                    },
+                    new IdCorrespondence()
+                    {
+                        InternalThing = this.option.Iid,
+                        ExternalId = $"{MappingDirection.FromDstToHub}-{this.elementRow.Name}"
+                    },
+                    new IdCorrespondence()
+                    {
+                        InternalThing = this.state.Iid,
+                        ExternalId = $"{MappingDirection.FromDstToHub}-{this.elementRow.Name}"
+                    }
+                }
+            };
+
+            Assert.DoesNotThrow(() => this.controller.LoadMapping());
+
+            this.controller.ExternalIdentifierMap.Iid = Guid.NewGuid();
+
+            Assert.DoesNotThrow(() => this.controller.LoadMapping());
+
+            this.hubController.Setup(x => x.GetThingById(this.element.Iid, It.IsAny<Iteration>(), out this.element)).Returns(false);
+            this.hubController.Setup(x => x.GetThingById(this.option.Iid, It.IsAny<Iteration>(), out this.option)).Returns(true);
+            this.hubController.Setup(x => x.GetThingById(this.state.Iid, It.IsAny<Iteration>(), out this.state)).Returns(true);
+
+            Assert.DoesNotThrow(() => this.controller.LoadMapping());
+
+            this.hubController.Setup(x => x.GetThingById(this.element.Iid, It.IsAny<Iteration>(), out this.element)).Returns(true);
+
+            Assert.DoesNotThrow(() => this.controller.LoadMapping());
+
+            this.controller.ProductTree.Children.Add(this.elementRow);
+
+            Assert.DoesNotThrow(() => this.controller.LoadMapping());
+
+            this.controller.ProductTree = this.elementRow;
+
+            Assert.DoesNotThrow(() => this.controller.LoadMapping());
+
+            this.statusBar.Verify(
+                x => x.Append(It.IsAny<string>(), It.IsAny<StatusBarMessageSeverity>()),
+                Times.Exactly(19));
+        }
+
+        [Test]
+        public void VerifySaveTheMapping()
+        {
+            this.elementRow.ElementDefinition = this.element;
+            this.controller.ExternalIdentifierMap = new ExternalIdentifierMap();
+            Assert.DoesNotThrow(() => this.controller.SaveElementMapping(this.elementRow));
+            Assert.AreEqual(1, this.controller.ExternalIdentifierMap.Correspondence.Count);
+            this.elementRow.SelectedOption = this.option;
+            Assert.DoesNotThrow(() => this.controller.SaveElementMapping(this.elementRow));
+            Assert.AreEqual(2, this.controller.ExternalIdentifierMap.Correspondence.Count);
+            this.elementRow.SelectedActualFiniteState = this.state;
+            Assert.DoesNotThrow(() => this.controller.SaveElementMapping(this.elementRow));
+            Assert.AreEqual(3, this.controller.ExternalIdentifierMap.Correspondence.Count);
         }
     }
 }

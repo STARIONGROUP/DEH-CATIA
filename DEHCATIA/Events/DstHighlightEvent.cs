@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DefinitionRowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="DstHighlightEvent.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -22,34 +22,34 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.ViewModels.ProductTree.Rows
+namespace DEHCATIA.Events
 {
-    using CDP4Common.EngineeringModelData;
-
-    using DEHCATIA.Enumerations;
-
-    using ProductStructureTypeLib;
-
-    using ReactiveUI;
+    using CDP4Dal;
 
     /// <summary>
-    /// The <see cref="DefinitionRowViewModel"/> is a specific <see cref="ElementRowViewModel"/>
-    /// mappable to a <see cref="ElementDefinition"/> and representing a catia element of type <see cref="ElementType.CatDefinition"/>
+    /// An event for <see cref="CDPMessageBus"/>
     /// </summary>
-    public class DefinitionRowViewModel : ElementRowViewModel
+    public class DstHighlightEvent
     {
         /// <summary>
-        /// Gets or sets the type.
+        /// A Value indicating whether the higlighting of the target should be canceled
         /// </summary>
-        public override ElementType ElementType => ElementType.CatDefinition;
+        public bool ShouldHighlight { get; }
 
         /// <summary>
-        /// Initializes a new <see cref="DefinitionRowViewModel"/>
+        /// The target thing id
         /// </summary>
-        /// <param name="product">The <see cref="Product"/> this view model represents</param>
-        /// <param name="fileName">The file name of the <paramref name="product"/></param>
-        public DefinitionRowViewModel(Product product, string fileName) : base(product, fileName)
+        public object TargetThingId { get; }
+
+        /// <summary>
+        /// Initializes a new <see cref="DstHighlightEvent"/>
+        /// </summary>
+        /// <param name="targetId">The target thing id</param>
+        /// <param name="shouldHighlight">A Value indicating whether the higlighting of the target should be canceled</param>
+        public DstHighlightEvent(object targetId, bool shouldHighlight = true)
         {
+            this.TargetThingId = targetId;
+            this.ShouldHighlight = shouldHighlight;
         }
     }
 }

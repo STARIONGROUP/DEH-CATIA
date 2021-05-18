@@ -112,7 +112,13 @@ namespace DEHCATIA.Tests.MappingRules
             AppContainer.Container = containerBuilder.Build();
 
             this.product0 = new Mock<Product>();
+            this.product0.Setup(x => x.get_DescriptionRef()).Returns(string.Empty);
+            this.product0.Setup(x => x.get_PartNumber()).Returns(string.Empty);
+            this.product0.Setup(x => x.get_Name()).Returns(string.Empty);
             this.product1 = new Mock<Product>();
+            this.product1.Setup(x => x.get_DescriptionRef()).Returns(string.Empty);
+            this.product1.Setup(x => x.get_PartNumber()).Returns(string.Empty);
+            this.product1.Setup(x => x.get_Name()).Returns(string.Empty);
 
             this.rule = new CatiaProductToElementRule();
         }
@@ -169,7 +175,7 @@ namespace DEHCATIA.Tests.MappingRules
             
             var result = new List<(ElementRowViewModel Parent, ElementBase Element)>();
 
-            Assert.DoesNotThrow(() => result = this.rule.Transform(new List<ElementRowViewModel>(){rootElement}));
+            Assert.DoesNotThrow(() => result = this.rule.Transform(rootElement));
             Assert.IsNotNull(result);
             Assert.AreEqual(3, result.Count);
         }
