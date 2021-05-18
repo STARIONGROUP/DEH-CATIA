@@ -35,7 +35,6 @@ namespace DEHCATIA.MappingRules
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using DEHCATIA.DstController;
     using DEHCATIA.Enumerations;
     using DEHCATIA.Services.ParameterTypeService;
     using DEHCATIA.ViewModels.ProductTree.Rows;
@@ -70,7 +69,7 @@ namespace DEHCATIA.MappingRules
         /// The <see cref="IParameterTypeService"/>
         /// </summary>
         private readonly IParameterTypeService parameterTypeService = AppContainer.Container.Resolve<IParameterTypeService>();
-        
+
         /// <summary>
         /// The collection of <see cref="ElementBase"/> that results of the <see cref="Transform"/>
         /// </summary>
@@ -123,8 +122,8 @@ namespace DEHCATIA.MappingRules
             {
                 this.selectedActualFiniteState ??= elementRowViewModel.SelectedActualFiniteState;
                 this.selectedOption ??= elementRowViewModel.SelectedOption;
-                
-                if (elementRowViewModel.ElementType == ElementType.CatPart 
+
+                if (elementRowViewModel.ElementType == ElementType.CatPart
                     && elementRowViewModel is UsageRowViewModel usageRow
                     && usageRow.Children.FirstOrDefault() is DefinitionRowViewModel definitionRow)
                 {
@@ -139,18 +138,18 @@ namespace DEHCATIA.MappingRules
                     this.MapElementRowViewModel(elementRowViewModel);
                     this.MapParameters(elementRowViewModel);
 
-                    if (elementRowViewModel.Parent is {} parent)
+                    if (elementRowViewModel.Parent is { } parent)
                     {
                         var elementUsage = this.GetOrCreateElementUsage(elementRowViewModel.ElementDefinition, elementRowViewModel.Name, parent.ElementDefinition);
                         this.MapParameters(elementUsage, elementRowViewModel);
                         this.ruleOutput.Add((parent, elementUsage));
                     }
-                    
+
                     this.Map(elementRowViewModel.Children);
                 }
             }
         }
-        
+
         /// <summary>
         /// Maps the <see cref="ElementRowViewModel"/>
         /// </summary>
@@ -168,8 +167,35 @@ namespace DEHCATIA.MappingRules
             }
 
             this.MapParameters(elementRowViewModel);
+            this.MapShape(elementRowViewModel);
 
             return elementRowViewModel.ElementDefinition;
+        }
+
+        /// <summary>
+        /// Maps the relevant parameter if the shape is comaptible
+        /// </summary>
+        /// <param name="definitionRow">The <see cref="DefinitionRowViewModel"/></param>
+        private void MapShape(DefinitionRowViewModel definitionRow)
+        {
+            if (definitionRow.Shape.IsSupported)
+            {
+                this.MapParameter(this.parameterTypeService.ShapeKind, ParameterTypeService.ShapeKindShortName, definitionRow, definitionRow.Shape.ShapeKind.ToString());
+
+                this.MapParameter(this.parameterTypeService.ShapeLength, ParameterTypeService.ShapeLengthShortName, definitionRow, definitionRow.Shape.Length.Value);
+
+                this.MapParameter(this.parameterTypeService.ShapeWidthOrDiameter, ParameterTypeService.ShapeWidthOrDiameterShortName, definitionRow, definitionRow.Shape.WidthOrDiameter.Value);
+
+                this.MapParameter(this.parameterTypeService.ShapeHeight, ParameterTypeService.ShapeHeightShortName, definitionRow, definitionRow.Shape.Height.Value);
+
+                this.MapParameter(this.parameterTypeService.ShapeSupportLength, ParameterTypeService.ShapeSupportLengthShortName, definitionRow, definitionRow.Shape.LengthSupport.Value);
+
+                this.MapParameter(this.parameterTypeService.ShapeAngle, ParameterTypeService.ShapeAngleShortName, definitionRow, definitionRow.Shape.Angle.Value);
+
+                this.MapParameter(this.parameterTypeService.ShapeSupportAngle, ParameterTypeService.ShapeSupportAngleShortName, definitionRow, definitionRow.Shape.AngleSupport.Value);
+
+                this.MapParameter(this.parameterTypeService.ShapeThickness, ParameterTypeService.ShapeThicknessShortName, definitionRow, definitionRow.Shape.Thickness.Value);
+            }
         }
 
         /// <summary>
@@ -381,6 +407,57 @@ namespace DEHCATIA.MappingRules
         /// Maps the provided <paramref name="values"/> to a parameter of type <paramref name="parameterType"/>
         /// </summary>
         /// <param name="parameterTypeShortName">The short name of the <paramref name="parameterType"/></param>
+        /// <param name="definitionRow">The <see cref="DefinitionRowViewModel"/>The <see cref="DefinitionRowViewModel"/></param>
+        /// <param name="parameterType">The current <see cref="ParameterType"/></param>
+        /// <param name="values">array of <see cref="double"/> that contains the actual values to be mapped</param>
+        private void MapParameter(ParameterType parameterType, string parameterTypeShortName, ElementRowViewModel definitionRow, params string[] values)
+        {
+            if (!(parameterType is { } type))
+            {
+                Logger.Info($"The {parameterTypeShortName}  parameter has been skipped for the {definitionRow.Name}");
+                return;
+            }
+
+            Parameter parameter;
+
+            if (definitionRow.ElementDefinition.Parameter
+                .FirstOrDefault(p => p.ParameterType.ShortName == parameterTypeShortName) is { } existingParameter)
+            {
+                parameter = existingParameter.Clone(true);
+            }
+            else
+            {
+                var initializationCollection = this.CreateValueArrayInitializationCollection(values.Length);
+
+                parameter = new Parameter(Guid.Empty, this.hubController.Session.Assembler.Cache, new Uri(this.hubController.Session.DataSourceUri))
+                {
+                    ParameterType = type,
+                    Owner = this.owner,
+                    ValueSet =
+                    {
+                        new ParameterValueSet(Guid.Empty, this.hubController.Session.Assembler.Cache, new Uri(this.hubController.Session.DataSourceUri))
+                        {
+                            Computed = new ValueArray<string>(),
+                            Formula = new ValueArray<string>(initializationCollection),
+                            Manual = new ValueArray<string>(initializationCollection),
+                            Reference = new ValueArray<string>(initializationCollection),
+                            Published = new ValueArray<string>(initializationCollection)
+                        }
+                    }
+                };
+
+                definitionRow.ElementDefinition.Parameter.Add(parameter);
+            }
+
+            this.UpdateValueSet(parameter, values);
+
+            Logger.Info($"The {parameterTypeShortName}  parameter has been updated for the {definitionRow.Name}");
+        }
+
+        /// <summary>
+        /// Maps the provided <paramref name="values"/> to a parameter of type <paramref name="parameterType"/>
+        /// </summary>
+        /// <param name="parameterTypeShortName">The short name of the <paramref name="parameterType"/></param>
         /// <param name="elementUsage">The <see cref="ElementUsage"/></param>
         /// <param name="parameterType">The current <see cref="ParameterType"/></param>
         /// <param name="values">array of <see cref="double"/> that contains the actual values to be mapped</param>
@@ -447,7 +524,7 @@ namespace DEHCATIA.MappingRules
 
             return values;
         }
-        
+
         /// <summary>
         /// Updates the <paramref name="parameter"/> correct valueset with the <paramref name="values"/>
         /// </summary>
@@ -466,9 +543,9 @@ namespace DEHCATIA.MappingRules
         private void UpdateValueSet(ParameterBase parameter, IEnumerable<string> values)
         {
             var valueSet = parameter.QueryParameterBaseValueSet(this.selectedOption, this.selectedActualFiniteState);
-        
-            ((ParameterValueSetBase) valueSet).Computed = new ValueArray<string>(values);
-        
+
+            ((ParameterValueSetBase)valueSet).Computed = new ValueArray<string>(values);
+
             valueSet.ValueSwitch = ParameterSwitchKind.COMPUTED;
         }
     }

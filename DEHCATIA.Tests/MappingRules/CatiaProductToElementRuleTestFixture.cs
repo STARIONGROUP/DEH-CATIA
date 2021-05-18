@@ -26,6 +26,7 @@ namespace DEHCATIA.Tests.MappingRules
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     using Autofac;
 
@@ -35,6 +36,7 @@ namespace DEHCATIA.Tests.MappingRules
     using CDP4Dal;
 
     using DEHCATIA.DstController;
+    using DEHCATIA.Enumerations;
     using DEHCATIA.MappingRules;
     using DEHCATIA.Services.ParameterTypeService;
     using DEHCATIA.ViewModels.ProductTree.Parameters;
@@ -43,6 +45,7 @@ namespace DEHCATIA.Tests.MappingRules
 
     using DEHPCommon;
     using DEHPCommon.HubController.Interfaces;
+    using DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser;
 
     using Moq;
 
@@ -178,6 +181,92 @@ namespace DEHCATIA.Tests.MappingRules
             Assert.DoesNotThrow(() => result = this.rule.Transform(rootElement));
             Assert.IsNotNull(result);
             Assert.AreEqual(3, result.Count);
+        }
+
+        [Test]
+        public void VerifyMapShape()
+        {
+            var rootElement = new ElementRowViewModel(this.product0.Object, string.Empty)
+            {
+                Name = "RootElementRow",
+                CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
+                Volume = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(42)),
+                MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
+                Shape = new CatiaShapeViewModel()
+                {
+                    PositionOrientation = new CatiaShapePositionOrientationViewModel(
+                           new[] { .1, 0, 0, 0, 1, 0, 0, 0, 1 }, new[] { .0, 0, 0 })
+                }
+            };
+
+            var usageRowViewModel = new UsageRowViewModel(this.product1.Object, string.Empty)
+            {
+                Name = "UsageRow",
+                CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
+                Volume = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(42)),
+                MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
+                Shape = new CatiaShapeViewModel()
+                {
+                    PositionOrientation = new CatiaShapePositionOrientationViewModel(
+                        new[] { .1, 0, 0, 0, 1, 0, 0, 0, 1 }, new[] { .0, 0, 0 }),
+                    ShapeKind = ShapeKind.CappedCone,
+                    Length = new DoubleWithUnitValueViewModel(2),
+                    WidthOrDiameter = new DoubleWithUnitValueViewModel(42),
+                    Height = new DoubleWithUnitValueViewModel(2),
+                    LengthSupport = new DoubleWithUnitValueViewModel(2),
+                    Angle = new DoubleWithUnitValueViewModel(6),
+                    AngleSupport = new DoubleWithUnitValueViewModel(453),
+                    Thickness = new DoubleWithUnitValueViewModel(54),
+                    IsSupported = true,
+                },
+                Parent = rootElement
+            };
+
+            var definitionRowViewModel = new DefinitionRowViewModel(this.product1.Object, string.Empty)
+            {
+                Name = "DefinitionRow",
+                CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
+                Volume = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(42)),
+                MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
+                Shape = new CatiaShapeViewModel()
+                {
+                    PositionOrientation = new CatiaShapePositionOrientationViewModel(
+                        new[] { .1, 0, 0, 0, 1, 0, 0, 0, 1 }, new[] { .0, 0, 0 }),
+                    ShapeKind = ShapeKind.Paraboloid,
+                    Length = new DoubleWithUnitValueViewModel(2),
+                    WidthOrDiameter = new DoubleWithUnitValueViewModel(42),
+                    Height = new DoubleWithUnitValueViewModel(2),
+                    LengthSupport =  new DoubleWithUnitValueViewModel(2),
+                    Angle = new DoubleWithUnitValueViewModel(6),
+                    AngleSupport = new DoubleWithUnitValueViewModel(453),
+                    Thickness = new DoubleWithUnitValueViewModel(54),
+                    IsSupported = true,
+                },
+                Parent = usageRowViewModel
+            };
+
+            usageRowViewModel.Children.Add(definitionRowViewModel);
+            rootElement.Children.Add(usageRowViewModel);
+
+            var result = new List<(ElementRowViewModel Parent, ElementBase Element)>();
+
+            Assert.DoesNotThrow(() => result = this.rule.Transform(new List<ElementRowViewModel>() { rootElement }));
+            Assert.IsNotNull(result);
+            Assert.AreEqual(3, result.Count);
+            Assert.AreEqual(1, result
+                .Select(x => x.Element)
+                .OfType<ElementDefinition>()
+                .FirstOrDefault()?
+                .Parameter.Count);
+
+            Assert.AreEqual(1, result
+                .Select(x => x.Element)
+                .OfType<ElementDefinition>()
+                .FirstOrDefault(x => x.ShortName == "DefinitionRow")?
+                .Parameter.Count);
         }
     }
 }

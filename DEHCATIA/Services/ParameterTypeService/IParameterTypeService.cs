@@ -62,6 +62,46 @@ namespace DEHCATIA.Services.ParameterTypeService
         ParameterType Position { get; }
 
         /// <summary>
+        /// The Shape Kind <see cref="ParameterType"/>
+        /// </summary>
+        ParameterType ShapeKind { get; }
+
+        /// <summary>
+        /// The Shape length <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeLength { get; }
+
+        /// <summary>
+        /// The Shape width or diameter <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeWidthOrDiameter { get; }
+
+        /// <summary>
+        /// The Shape height <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeHeight { get; }
+
+        /// <summary>
+        /// The Shape support length <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeSupportLength { get; }
+
+        /// <summary>
+        /// The Shape angle <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeAngle { get; }
+
+        /// <summary>
+        /// The Shape support angle <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeSupportAngle { get; }
+
+        /// <summary>
+        /// The Shape thickness <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeThickness { get; }
+
+        /// <summary>
         /// Refreshes the defined <see cref="ParameterType"/>
         /// </summary>
         void RefreshParameterType();
