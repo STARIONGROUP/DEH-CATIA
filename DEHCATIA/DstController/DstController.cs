@@ -176,6 +176,11 @@ namespace DEHCATIA.DstController
         public ReactiveList<(ElementRowViewModel Parent, ElementBase Element)> DstMapResult { get; private set; } = new ReactiveList<(ElementRowViewModel Parent, ElementBase Element)>();
 
         /// <summary>
+        /// Gets the colection of mapped <see cref="Parameter"/>s And <see cref="ParameterOverride"/>s through their container
+        /// </summary>
+        public ReactiveList<ElementBase> SelectedThingsToTransfer { get; private set; } = new ReactiveList<ElementBase>();
+
+        /// <summary>
         /// Gets the colection of mapped <see cref="ElementRowViewModel"/>
         /// </summary>
         public ReactiveList<MappedElementDefinitionRowViewModel> HubMapResult { get; private set; } = new ReactiveList<MappedElementDefinitionRowViewModel>();
@@ -221,10 +226,26 @@ namespace DEHCATIA.DstController
         /// <summary>
         /// Disconnect and reconnect to the Catia product tree
         /// </summary>
-        public void Reconnect()
+        public void Refresh()
         {
+            this.ResetMappedElement();
             this.catiaComService.Disconnect();
             this.catiaComService.Connect();
+        }
+
+        /// <summary>
+        /// Resets the result of the Mapping and sends the message to reset the related trees
+        /// </summary>
+        /// <param name="shouldResetTheTrees">A value indicating whether <see cref="UpdateTreeBaseEvent"/>s should be sent</param>
+        public void ResetMappedElement(bool shouldResetTheTrees = false)
+        {
+            this.SelectedThingsToTransfer.Clear();
+            this.DstMapResult.Clear();
+
+            if (shouldResetTheTrees)
+            {
+                CDPMessageBus.Current.SendMessage(new UpdateObjectBrowserTreeEvent(true));
+            }
         }
 
         /// <summary>
@@ -241,7 +262,6 @@ namespace DEHCATIA.DstController
             }
             
             this.MapElementsFromTheExternalIdentifierMap();
-            this.statusBar.Append($"The mapping configuration has been loaded");
         }
 
         /// <summary>
@@ -264,6 +284,7 @@ namespace DEHCATIA.DstController
             }
 
             this.ReadyToMapTopElement = topElement;
+            this.statusBar.Append($"The mapping configuration has been loaded");
         }
 
         /// <summary>
@@ -402,6 +423,7 @@ namespace DEHCATIA.DstController
         {
             if (this.mappingEngine.Map(topElement) is List<(ElementRowViewModel Parent, ElementBase Element)> elements && elements.Any())
             {
+                this.DstMapResult.Clear();
                 this.DstMapResult.AddRange(elements);
             }
 
@@ -418,7 +440,7 @@ namespace DEHCATIA.DstController
 
             try
             {
-                if (!(this.DstMapResult.Any() && this.TrySupplyingAndCreatingLogEntry(transaction)))
+                if (!(this.SelectedThingsToTransfer.Any() && this.TrySupplyingAndCreatingLogEntry(transaction)))
                 {
                     return;
                 }
@@ -432,13 +454,15 @@ namespace DEHCATIA.DstController
                 
                 await this.UpdateParametersValueSets();
                 this.statusBar.Append($"Parameter and Parameter Overrides have been updated");
+                
+                this.statusBar.Append($"Reloading in progress...");
 
                 await this.hubController.Refresh();
+                this.ResetMappedElement();
+
                 this.hubController.GetThingById(this.ExternalIdentifierMap.Iid, this.hubController.OpenIteration, out ExternalIdentifierMap map);
                 this.ExternalIdentifierMap = map.Clone(true);
-
-                this.Reconnect();
-                CDPMessageBus.Current.SendMessage(new UpdateObjectBrowserTreeEvent(true));
+                this.LoadMapping();
             }
             catch (Exception e)
             {
@@ -454,9 +478,9 @@ namespace DEHCATIA.DstController
         /// <param name="iterationClone">The <see cref="Iteration"/> clone</param>
         /// <param name="transaction">The <see cref="IThingTransaction"/></param>
         /// <returns>A <see cref="Task"/></returns>
-        private void RegisterAndCommitElements<TElement>(Iteration iterationClone, ThingTransaction transaction) where TElement : ElementBase
+        private void RegisterAndCommitElements<TElement>(Iteration iterationClone, IThingTransaction transaction) where TElement : ElementBase
         {
-            foreach (var (_, element) in this.DstMapResult)
+            foreach (var element in this.SelectedThingsToTransfer)
             {
                 if (!(element is TElement))
                 {
@@ -507,13 +531,11 @@ namespace DEHCATIA.DstController
         {
             var (iterationClone, transaction) = this.GetIterationTransaction();
             
-            this.UpdateParametersValueSets(transaction, this.DstMapResult
-                .Select(x => x.Element)
+            this.UpdateParametersValueSets(transaction, this.SelectedThingsToTransfer
                 .OfType<ElementDefinition>()
                 .SelectMany(x => x.Parameter));
 
-            this.UpdateParametersValueSets(transaction, this.DstMapResult
-                .Select(x => x.Element)
+            this.UpdateParametersValueSets(transaction, this.SelectedThingsToTransfer
                 .OfType<ElementUsage>()
                 .SelectMany(x => x.ParameterOverride));
 
@@ -577,6 +599,7 @@ namespace DEHCATIA.DstController
         {
             clone.Computed = valueSet.Computed;
             clone.ValueSwitch = valueSet.ValueSwitch;
+            this?.exchangeHistory.Append(clone, valueSet);
         }
 
         /// <summary>

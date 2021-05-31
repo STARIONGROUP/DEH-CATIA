@@ -210,6 +210,9 @@ namespace DEHCATIA.Tests.ViewModels.NetChangePreview
             this.hubController.Setup(x => x.Reload()).Returns(Task.CompletedTask);
             
             this.dstController = new Mock<IDstController>();
+
+            this.dstController.Setup(x => x.SelectedThingsToTransfer)
+                .Returns(new ReactiveList<ElementBase>());
             
             this.product0 = new Mock<Product>();
             this.product0.Setup(x => x.get_DescriptionRef()).Returns(string.Empty);
@@ -331,7 +334,7 @@ namespace DEHCATIA.Tests.ViewModels.NetChangePreview
         public void VerifyContextMenu()
         {
             this.viewModel.PopulateContextMenu();
-            Assert.IsEmpty(this.viewModel.ContextMenu);
+            Assert.AreEqual(2, this.viewModel.ContextMenu.Count);
         }
 
         [Test]

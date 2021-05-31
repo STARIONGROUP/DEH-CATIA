@@ -34,6 +34,7 @@ namespace DEHCATIA.DstController
     using DEHCATIA.ViewModels.Rows;
 
     using DEHPCommon.Enumerators;
+    using DEHPCommon.Events;
     using DEHPCommon.MappingEngine;
 
     using ReactiveUI;
@@ -74,6 +75,11 @@ namespace DEHCATIA.DstController
         ReactiveList<(ElementRowViewModel Parent, ElementBase Element)> DstMapResult { get; }
 
         /// <summary>
+        /// Gets the colection of mapped <see cref="Parameter"/>s And <see cref="ParameterOverride"/>s through their container
+        /// </summary>
+        ReactiveList<ElementBase> SelectedThingsToTransfer { get; }
+
+        /// <summary>
         /// Gets the colection of mapped <see cref="ElementRowViewModel"/>
         /// </summary>
         ReactiveList<MappedElementDefinitionRowViewModel> HubMapResult { get; }
@@ -86,7 +92,13 @@ namespace DEHCATIA.DstController
         /// <summary>
         /// Disconnect and reconnect to the Catia product tree
         /// </summary>
-        void Reconnect();
+        void Refresh();
+
+        /// <summary>
+        /// Resets the result of the Mapping and sends the message to reset the related trees
+        /// </summary>
+        /// <param name="shouldResetTheTrees">A value indicating whether <see cref="UpdateTreeBaseEvent"/>s should be sent</param>
+        void ResetMappedElement(bool shouldResetTheTrees = false);
 
         /// <summary>
         /// Loads the mapping configuration and generates the map result respectively

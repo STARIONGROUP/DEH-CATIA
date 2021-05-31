@@ -31,7 +31,6 @@ namespace DEHCATIA.ViewModels.Dialogs
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.UserInterfaces.Behaviors;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
-    using DEHPCommon.UserPreferenceHandler.UserPreferenceService;
 
     using DEHCATIA.DstController;
     using DEHCATIA.ViewModels.Dialogs.Interfaces;

@@ -84,6 +84,11 @@ namespace DEHCATIA.Extensions
         private const string ExternalShapeParameterName = "ext_shape";
 
         /// <summary>
+        /// The <see cref="CatiaShapeViewModel.Area"/> parameter name catia uses
+        /// </summary>
+        private const string AreaParameterName = "area";
+
+        /// <summary>
         /// Retrieves all relevant parameter from the <paramref name="parameters"/>
         /// </summary>
         /// <param name="parameters">The collection of <see cref="IDstParameterViewModel"/></param>
@@ -105,6 +110,7 @@ namespace DEHCATIA.Extensions
             {
                 ShapeKind = shapeKind,
                 Length = doubleParameter.FirstOrDefault(x => x.Name == LenghtParameterName)?.Value,
+                Area = doubleParameter.FirstOrDefault(x => x.Name == AreaParameterName)?.Value,
                 Height = doubleParameter.FirstOrDefault(x => x.Name == HeightParameterName)?.Value,
                 Angle = doubleParameter.FirstOrDefault(x => x.Name == AngleParameterName)?.Value,
                 AngleSupport = doubleParameter.FirstOrDefault(x => x.Name == AngleSupportParameterName)?.Value,

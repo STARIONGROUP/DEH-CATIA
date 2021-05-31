@@ -85,6 +85,11 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         private DoubleWithUnitValueViewModel thickness;
 
         /// <summary>
+        /// Backing field for <see cref="Area"/>
+        /// </summary>
+        private DoubleWithUnitValueViewModel area;
+
+        /// <summary>
         /// Backing field for <see cref="ExternalShape"/>
         /// </summary>
         private string externalShape;
@@ -178,6 +183,15 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         {
             get => this.thickness;
             set => this.RaiseAndSetIfChanged(ref this.thickness, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the area of the shape
+        /// </summary>
+        public DoubleWithUnitValueViewModel Area
+        {
+            get => this.area;
+            set => this.RaiseAndSetIfChanged(ref this.area, value);
         }
 
         /// <summary>

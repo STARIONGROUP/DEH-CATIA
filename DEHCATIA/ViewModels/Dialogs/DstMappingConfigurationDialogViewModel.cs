@@ -35,10 +35,13 @@ namespace DEHCATIA.ViewModels.Dialogs
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Dal;
+
     using DEHCATIA.DstController;
     using DEHCATIA.ViewModels.Dialogs.Interfaces;
     using DEHCATIA.ViewModels.ProductTree.Rows;
 
+    using DEHPCommon.Events;
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 

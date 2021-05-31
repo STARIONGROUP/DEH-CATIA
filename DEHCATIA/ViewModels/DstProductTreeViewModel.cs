@@ -184,6 +184,7 @@ namespace DEHCATIA.ViewModels
                 });
 
             this.WhenAnyValue(vm => vm.DstController.IsCatiaConnected)
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.RunUpdateProductTree());
         }
 
@@ -243,7 +244,7 @@ namespace DEHCATIA.ViewModels
         {
             this.RootElements.Clear();
 
-            if (!this.DstController.IsCatiaConnected)
+            if (!this.DstController.IsCatiaConnected || this.cancelToken != null)
             {
                 return;
             }

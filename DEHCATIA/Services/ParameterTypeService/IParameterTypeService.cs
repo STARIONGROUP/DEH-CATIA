@@ -62,44 +62,49 @@ namespace DEHCATIA.Services.ParameterTypeService
         ParameterType Position { get; }
 
         /// <summary>
-        /// The Shape Kind <see cref="ParameterType"/>
+        /// The Shape kind <see cref="ParameterType"/>
         /// </summary>
         ParameterType ShapeKind { get; }
 
         /// <summary>
         /// The Shape length <see cref="ParameterType"/>
         /// </summary>
-        public ParameterType ShapeLength { get; }
+        ParameterType ShapeLength { get; }
 
         /// <summary>
         /// The Shape width or diameter <see cref="ParameterType"/>
         /// </summary>
-        public ParameterType ShapeWidthOrDiameter { get; }
+        ParameterType ShapeWidthOrDiameter { get; }
 
         /// <summary>
         /// The Shape height <see cref="ParameterType"/>
         /// </summary>
-        public ParameterType ShapeHeight { get; }
+        ParameterType ShapeHeight { get; }
 
         /// <summary>
         /// The Shape support length <see cref="ParameterType"/>
         /// </summary>
-        public ParameterType ShapeSupportLength { get; }
+        ParameterType ShapeSupportLength { get; }
 
         /// <summary>
         /// The Shape angle <see cref="ParameterType"/>
         /// </summary>
-        public ParameterType ShapeAngle { get; }
+        ParameterType ShapeAngle { get; }
 
         /// <summary>
         /// The Shape support angle <see cref="ParameterType"/>
         /// </summary>
-        public ParameterType ShapeSupportAngle { get; }
+        ParameterType ShapeSupportAngle { get; }
 
         /// <summary>
         /// The Shape thickness <see cref="ParameterType"/>
         /// </summary>
-        public ParameterType ShapeThickness { get; }
+        ParameterType ShapeThickness { get; }
+
+        /// <summary>
+        /// The Shape area <see cref="ParameterType"/>
+        /// </summary>
+        ParameterType ShapeArea { get; }
 
         /// <summary>
         /// Refreshes the defined <see cref="ParameterType"/>

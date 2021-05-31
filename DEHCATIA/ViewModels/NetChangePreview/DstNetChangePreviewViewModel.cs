@@ -157,6 +157,7 @@ namespace DEHCATIA.ViewModels.NetChangePreview
         private void Reload()
         {
             CDPMessageBus.Current.SendMessage(new DstHighlightEvent(this.RootElement.Name, false));
+            this.RootElements.Clear();
         }
         
         /// <summary>

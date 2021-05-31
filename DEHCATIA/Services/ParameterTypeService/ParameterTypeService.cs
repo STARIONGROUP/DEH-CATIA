@@ -35,9 +35,7 @@ namespace DEHCATIA.Services.ParameterTypeService
     using CDP4Dal;
     using CDP4Dal.Events;
 
-    using DEHPCommon.Enumerators;
     using DEHPCommon.HubController.Interfaces;
-    using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using NLog;
 
@@ -67,7 +65,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         /// <summary>
         /// The Mass <see cref="ParameterType"/> short name
         /// </summary>
-        public const string MassShortName = "mass";
+        public const string MassShortName = "m";
 
         /// <summary>
         /// The Orientation <see cref="ParameterType"/> short name
@@ -87,7 +85,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         /// <summary>
         /// The Shape length <see cref="ParameterType"/> short name
         /// </summary>
-        public const string ShapeLengthShortName = "length";
+        public const string ShapeLengthShortName = "l";
 
         /// <summary>
         /// The Shape width or diameter <see cref="ParameterType"/> short name
@@ -97,7 +95,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         /// <summary>
         /// The Shape height <see cref="ParameterType"/> short name
         /// </summary>
-        public const string ShapeHeightShortName = "height";
+        public const string ShapeHeightShortName = "h";
 
         /// <summary>
         /// The Shape support length <see cref="ParameterType"/> short name
@@ -118,6 +116,11 @@ namespace DEHCATIA.Services.ParameterTypeService
         /// The Shape thickness <see cref="ParameterType"/> short name
         /// </summary>
         public const string ShapeThicknessShortName = "thickn";
+        
+        /// <summary>
+        /// The Shape thickness <see cref="ParameterType"/> short name
+        /// </summary>
+        public const string ShapeAreaShortName = "area";
 
         /// <summary>
         /// The NLog <see cref="Logger"/>
@@ -275,6 +278,16 @@ namespace DEHCATIA.Services.ParameterTypeService
         public ParameterType ShapeThickness => this.shapeThickness ??= this.FetchParameterType(ShapeThicknessShortName);
 
         /// <summary>
+        /// Backing field for <see cref="ShapeThickness"/>
+        /// </summary>
+        private ParameterType shapeArea;
+
+        /// <summary>
+        /// The Shape area <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeArea => this.shapeArea ??= this.FetchParameterType(ShapeThicknessShortName);
+
+        /// <summary>
         /// Initializes a new <see cref="ParameterTypeService"/>
         /// </summary>
         /// <param name="hubController">The <see cref="IHubController"/></param>
@@ -306,7 +319,15 @@ namespace DEHCATIA.Services.ParameterTypeService
 
             this.parameterTypes = this.hubController.OpenIteration.GetContainerOfType<EngineeringModel>().RequiredRdls
                 .SelectMany(x => x.ParameterType).ToList();
+            
+            this.ResetFields();
+        }
 
+        /// <summary>
+        /// Resets the parameter types fields forcing the service to query the parameter type from the cache
+        /// </summary>
+        private void ResetFields()
+        {
             this.volume = null;
             this.mass = null;
             this.centerOfGravity = null;
@@ -321,6 +342,7 @@ namespace DEHCATIA.Services.ParameterTypeService
             this.shapeAngle = null;
             this.shapeSupportAngle = null;
             this.shapeThickness = null;
+            this.shapeArea = null;
         }
 
         /// <summary>
