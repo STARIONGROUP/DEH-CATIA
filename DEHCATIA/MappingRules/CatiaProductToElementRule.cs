@@ -191,6 +191,10 @@ namespace DEHCATIA.MappingRules
                 this.MapParameter(this.parameterTypeService.ShapeSupportAngle, ParameterTypeService.ShapeSupportAngleShortName, definitionRow, definitionRow.Shape.AngleSupport?.Value);
                 this.MapParameter(this.parameterTypeService.ShapeThickness, ParameterTypeService.ShapeThicknessShortName, definitionRow, definitionRow.Shape.Thickness?.Value);
                 this.MapParameter(this.parameterTypeService.ShapeArea, ParameterTypeService.ShapeAreaShortName, definitionRow, definitionRow.Shape.Area?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeDensity, ParameterTypeService.ShapeDensityShortName, definitionRow, definitionRow.Shape.Density?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeMassMargin, ParameterTypeService.ShapeMassMarginShortName, definitionRow, definitionRow.Shape.MassMargin?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeMassWithMargin, ParameterTypeService.ShapeMassWithMarginShortName, definitionRow, definitionRow.Shape.MassWithMargin?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeSysMassMargin, ParameterTypeService.ShapeSysMassMarginShortName, definitionRow, definitionRow.Shape.SysMassMargin?.Value);
             }
         }
 

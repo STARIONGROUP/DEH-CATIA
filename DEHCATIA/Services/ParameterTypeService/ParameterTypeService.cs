@@ -118,10 +118,30 @@ namespace DEHCATIA.Services.ParameterTypeService
         public const string ShapeThicknessShortName = "thickn";
         
         /// <summary>
-        /// The Shape thickness <see cref="ParameterType"/> short name
+        /// The Shape sys mass margin <see cref="ParameterType"/> short name
+        /// </summary>
+        public const string ShapeSysMassMarginShortName = "sysmassmargin";
+        
+        /// <summary>
+        /// The Shape mass with margin <see cref="ParameterType"/> short name
+        /// </summary>
+        public const string ShapeMassWithMarginShortName = "masswithmargin";
+        
+        /// <summary>
+        /// The Shape mass margin <see cref="ParameterType"/> short name
+        /// </summary>
+        public const string ShapeMassMarginShortName = "massmargin";
+        
+        /// <summary>
+        /// The Shape density <see cref="ParameterType"/> short name
+        /// </summary>
+        public const string ShapeDensityShortName = "density";
+
+        /// <summary>
+        /// The Shape area <see cref="ParameterType"/> short name
         /// </summary>
         public const string ShapeAreaShortName = "area";
-
+        
         /// <summary>
         /// The NLog <see cref="Logger"/>
         /// </summary>
@@ -285,7 +305,47 @@ namespace DEHCATIA.Services.ParameterTypeService
         /// <summary>
         /// The Shape area <see cref="ParameterType"/>
         /// </summary>
-        public ParameterType ShapeArea => this.shapeArea ??= this.FetchParameterType(ShapeThicknessShortName);
+        public ParameterType ShapeArea => this.shapeArea ??= this.FetchParameterType(ShapeAreaShortName);
+
+        /// <summary>
+        /// Backing field for <see cref="ShapeDensity"/>
+        /// </summary>
+        private ParameterType shapeDensity;
+
+        /// <summary>
+        /// The Shape density <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeDensity => this.shapeDensity ??= this.FetchParameterType(ShapeDensityShortName);
+
+        /// <summary>
+        /// Backing field for <see cref="ShapeMassMargin"/>
+        /// </summary>
+        private ParameterType shapeMassMargin;
+
+        /// <summary>
+        /// The Shape mass margin <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeMassMargin => this.shapeMassMargin ??= this.FetchParameterType(ShapeMassMarginShortName);
+
+        /// <summary>
+        /// Backing field for <see cref="shapeMassWithMargin"/>
+        /// </summary>
+        private ParameterType shapeMassWithMargin;
+
+        /// <summary>
+        /// The Shape mass with all margin <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeMassWithMargin => this.shapeMassWithMargin ??= this.FetchParameterType(ShapeMassWithMarginShortName);
+
+        /// <summary>
+        /// Backing field for <see cref="ShapeSysMassMargin"/>
+        /// </summary>
+        private ParameterType shapeSysMassMargin;
+
+        /// <summary>
+        /// The Shape sys mass margin <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ShapeSysMassMargin => this.shapeSysMassMargin ??= this.FetchParameterType(ShapeSysMassMarginShortName);
 
         /// <summary>
         /// Initializes a new <see cref="ParameterTypeService"/>
@@ -343,6 +403,10 @@ namespace DEHCATIA.Services.ParameterTypeService
             this.shapeSupportAngle = null;
             this.shapeThickness = null;
             this.shapeArea = null;
+            this.shapeMassMargin = null;
+            this.shapeSysMassMargin = null;
+            this.shapeMassWithMargin = null;
+            this.shapeDensity = null;
         }
 
         /// <summary>

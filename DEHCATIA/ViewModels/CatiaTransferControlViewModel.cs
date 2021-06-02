@@ -107,11 +107,13 @@ namespace DEHCATIA.ViewModels
             this.exchangeHistoryService = exchangeHistoryService;
 
             CDPMessageBus.Current.Listen<UpdateObjectBrowserTreeEvent>()
-                .Select(x => !x.Reset).ObserveOn(RxApp.MainThreadScheduler)
+                .Select(x => !x.Reset)
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.UpdateCanTransfer);
 
             CDPMessageBus.Current.Listen<UpdateDstElementTreeEvent>()
-                .Select(x => !x.Reset).ObserveOn(RxApp.MainThreadScheduler)
+                .Select(x => !x.Reset)
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.UpdateCanTransfer);
 
             this.dstController.SelectedThingsToTransfer.CountChanged.Subscribe(x =>
@@ -157,7 +159,7 @@ namespace DEHCATIA.ViewModels
         /// Updates the <see cref="CanTransfer"/>
         /// </summary>
         private void UpdateCanTransfer(bool value)
-        {
+            {
             this.CanTransfer = value;
         }
 

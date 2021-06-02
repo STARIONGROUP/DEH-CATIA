@@ -44,37 +44,62 @@ namespace DEHCATIA.Extensions
         private const string ShapeKindParameterName = "kind";
 
         /// <summary>
-        /// The <see cref="CatiaShapeViewModel.ShapeKind"/> parameter name catia uses
+        /// The <see cref="CatiaShapeViewModel.Length"/> parameter name catia uses
         /// </summary>
         private const string LenghtParameterName = "len";
 
         /// <summary>
-        /// The <see cref="CatiaShapeViewModel.ShapeKind"/> parameter name catia uses
+        /// The <see cref="CatiaShapeViewModel.WidthOrDiameter"/>  parameter name catia uses
         /// </summary>
         private const string WidthDiameterName = "wid_diam";
 
         /// <summary>
-        /// The <see cref="CatiaShapeViewModel.ShapeKind"/> parameter name catia uses
+        /// The <see cref="CatiaShapeViewModel.Height"/>  parameter name catia uses
         /// </summary>
         private const string HeightParameterName = "height";
 
         /// <summary>
-        /// The <see cref="CatiaShapeViewModel.ShapeKind"/> parameter name catia uses
+        /// The <see cref="CatiaShapeViewModel.LengthSupport"/>  parameter name catia uses
         /// </summary>
         private const string LengthSupportParameterName = "len_supp";
 
         /// <summary>
-        /// The <see cref="CatiaShapeViewModel.ShapeKind"/> parameter name catia uses
+        /// The <see cref="CatiaShapeViewModel.Mass"/>  parameter name catia uses
+        /// </summary>
+        private const string MassParameterName = "m";
+
+        /// <summary>
+        /// The <see cref="CatiaShapeViewModel.MassMargin"/>  parameter name catia uses
+        /// </summary>
+        private const string MassMarginParameterName = "mass_margin";
+
+        /// <summary>
+        /// The <see cref="CatiaShapeViewModel.SysMassMargin"/>  parameter name catia uses
+        /// </summary>
+        private const string SysMassParameterName = "sys_mass_margin";
+
+        /// <summary>
+        /// The <see cref="CatiaShapeViewModel.MassWithMargin"/>  parameter name catia uses
+        /// </summary>
+        private const string MassWithMarginParameterName = "Mass_with_AllMargin";
+
+        /// <summary>
+        /// The <see cref="CatiaShapeViewModel.Density"/>  parameter name catia uses
+        /// </summary>
+        private const string DensityParameterName = "eff_density";
+
+        /// <summary>
+        /// The <see cref="CatiaShapeViewModel.Angle"/>  parameter name catia uses
         /// </summary>
         private const string AngleParameterName = "ang";
 
         /// <summary>
-        /// The <see cref="CatiaShapeViewModel.ShapeKind"/> parameter name catia uses
+        /// The <see cref="CatiaShapeViewModel.AngleSupport"/>  parameter name catia uses
         /// </summary>
         private const string AngleSupportParameterName = "ang_supp";
 
         /// <summary>
-        /// The <see cref="CatiaShapeViewModel.ShapeKind"/> parameter name catia uses
+        /// The <see cref="CatiaShapeViewModel.Thickness"/>  parameter name catia uses
         /// </summary>
         private const string ThicknessParameterName = "thickn";
 
@@ -87,6 +112,11 @@ namespace DEHCATIA.Extensions
         /// The <see cref="CatiaShapeViewModel.Area"/> parameter name catia uses
         /// </summary>
         private const string AreaParameterName = "area";
+
+        /// <summary>
+        /// The <see cref="CatiaShapeViewModel.Volume"/> parameter name catia uses
+        /// </summary>
+        private const string VolumeParameterName = "eff_volume";
 
         /// <summary>
         /// Retrieves all relevant parameter from the <paramref name="parameters"/>
@@ -117,6 +147,12 @@ namespace DEHCATIA.Extensions
                 Thickness = doubleParameter.FirstOrDefault(x => x.Name == ThicknessParameterName)?.Value,
                 WidthOrDiameter = doubleParameter.FirstOrDefault(x => x.Name == WidthDiameterName)?.Value,
                 LengthSupport = doubleParameter.FirstOrDefault(x => x.Name == LengthSupportParameterName)?.Value,
+                Mass = doubleParameter.FirstOrDefault(x => x.Name == MassParameterName)?.Value,
+                MassMargin = doubleParameter.FirstOrDefault(x => x.Name == MassMarginParameterName)?.Value,
+                SysMassMargin = doubleParameter.FirstOrDefault(x => x.Name == SysMassParameterName)?.Value,
+                MassWithMargin = doubleParameter.FirstOrDefault(x => x.Name == MassWithMarginParameterName)?.Value,
+                Volume = doubleParameter.FirstOrDefault(x => x.Name == VolumeParameterName)?.Value,
+                Density = doubleParameter.FirstOrDefault(x => x.Name ==DensityParameterName)?.Value,
                 ExternalShape = catiaBaseParameters.OfType<StringParameterViewModel>().FirstOrDefault(x => x.Name == ExternalShapeParameterName)?.Value,
             };
         }

@@ -107,6 +107,26 @@ namespace DEHCATIA.Services.ParameterTypeService
         ParameterType ShapeArea { get; }
 
         /// <summary>
+        /// The Shape density <see cref="ParameterType"/>
+        /// </summary>
+        ParameterType ShapeDensity { get; }
+
+        /// <summary>
+        /// The Shape mass margin <see cref="ParameterType"/>
+        /// </summary>
+        ParameterType ShapeMassMargin { get; }
+
+        /// <summary>
+        /// The Shape mass with all margin <see cref="ParameterType"/>
+        /// </summary>
+        ParameterType ShapeMassWithMargin { get; }
+
+        /// <summary>
+        /// The Shape sys mass margin <see cref="ParameterType"/>
+        /// </summary>
+        ParameterType ShapeSysMassMargin { get; }
+
+        /// <summary>
         /// Refreshes the defined <see cref="ParameterType"/>
         /// </summary>
         void RefreshParameterType();

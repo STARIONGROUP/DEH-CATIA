@@ -90,6 +90,11 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         private DoubleWithUnitValueViewModel area;
 
         /// <summary>
+        /// Backing field for <see cref="Mass"/>
+        /// </summary>
+        private DoubleWithUnitValueViewModel mass;
+
+        /// <summary>
         /// Backing field for <see cref="ExternalShape"/>
         /// </summary>
         private string externalShape;
@@ -103,6 +108,31 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// Backing field for <see cref="isSupported"/>
         /// </summary>
         private bool isSupported;
+
+        /// <summary>
+        /// Backing field for <see cref="MassMargin"/>
+        /// </summary>
+        private DoubleWithUnitValueViewModel massMargin;
+
+        /// <summary>
+        /// Backing field for <see cref="MassWithMargin"/>
+        /// </summary>
+        private DoubleWithUnitValueViewModel massWithMargin;
+
+        /// <summary>
+        /// Backing field for <see cref="SysMassMargin"/>
+        /// </summary>
+        private DoubleWithUnitValueViewModel sysMassMargin;
+
+        /// <summary>
+        /// Backing field for <see cref="Density"/>
+        /// </summary>
+        private DoubleWithUnitValueViewModel density;
+
+        /// <summary>
+        /// Backing field for <see cref="Volume"/>
+        /// </summary>
+        private DoubleWithUnitValueViewModel volume;
 
         /// <summary>
         /// Gets or sets the <see cref="Enumerations.ShapeKind"/>
@@ -195,6 +225,15 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         }
 
         /// <summary>
+        /// Gets or sets the mass of the shape
+        /// </summary>
+        public DoubleWithUnitValueViewModel Mass
+        {
+            get => this.mass;
+            set => this.RaiseAndSetIfChanged(ref this.mass, value);
+        }
+
+        /// <summary>
         /// Gets or sets the Name of the external shape reference of the compound shape parameter
         /// </summary>
         public string ExternalShape
@@ -228,6 +267,51 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         {
             get => this.isSupported;
             set => this.RaiseAndSetIfChanged(ref this.isSupported, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the mass margin of the shape
+        /// </summary>
+        public DoubleWithUnitValueViewModel MassMargin
+        {
+            get => this.massMargin;
+            set => this.RaiseAndSetIfChanged(ref this.massMargin, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the sys mass margin of the shape
+        /// </summary>
+        public DoubleWithUnitValueViewModel SysMassMargin
+        {
+            get => this.sysMassMargin;
+            set => this.RaiseAndSetIfChanged(ref this.sysMassMargin, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the mass with margin of the shape
+        /// </summary>
+        public DoubleWithUnitValueViewModel MassWithMargin
+        {
+            get => this.massWithMargin;
+            set => this.RaiseAndSetIfChanged(ref this.massWithMargin, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the volume of the shape
+        /// </summary>
+        public DoubleWithUnitValueViewModel Volume
+        {
+            get => this.volume;
+            set => this.RaiseAndSetIfChanged(ref this.volume, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the density of the shape
+        /// </summary>
+        public DoubleWithUnitValueViewModel Density
+        {
+            get => this.density;
+            set => this.RaiseAndSetIfChanged(ref this.density, value);
         }
 
         /// <summary>

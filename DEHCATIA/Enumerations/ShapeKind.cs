@@ -128,5 +128,15 @@ namespace DEHCATIA.Enumerations
         /// Shape kind is a planar quadrilateral
         /// </summary>
         PlanarQuadrilateral,
+
+        /// <summary>
+        /// Shape kind is a disc segment
+        /// </summary>
+        DiscSegment,
+
+        /// <summary>
+        /// Shape kind is a Paraboloid
+        /// </summary>
+        ParaboloidSegment,
     }
 }
