@@ -35,6 +35,7 @@ namespace DEHCATIA.MappingRules
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
+    using DEHCATIA.DstController;
     using DEHCATIA.Enumerations;
     using DEHCATIA.Services.ParameterTypeService;
     using DEHCATIA.ViewModels.ProductTree.Rows;
@@ -131,6 +132,7 @@ namespace DEHCATIA.MappingRules
                     this.MapElementUsage(usageRow);
                     this.MapParameters(usageRow);
                     this.dstController.SaveElementMapping(usageRow);
+                    this.ruleOutput.Add((usageRow.Parent, usageRow.ElementDefinition));
                     this.ruleOutput.Add((usageRow.Parent, usageRow.ElementUsage));
                 }
                 else
@@ -181,20 +183,18 @@ namespace DEHCATIA.MappingRules
             if (definitionRow.Shape.IsSupported)
             {
                 this.MapParameter(this.parameterTypeService.ShapeKind, ParameterTypeService.ShapeKindShortName, definitionRow, definitionRow.Shape.ShapeKind.ToString());
-
-                this.MapParameter(this.parameterTypeService.ShapeLength, ParameterTypeService.ShapeLengthShortName, definitionRow, definitionRow.Shape.Length.Value);
-
-                this.MapParameter(this.parameterTypeService.ShapeWidthOrDiameter, ParameterTypeService.ShapeWidthOrDiameterShortName, definitionRow, definitionRow.Shape.WidthOrDiameter.Value);
-
-                this.MapParameter(this.parameterTypeService.ShapeHeight, ParameterTypeService.ShapeHeightShortName, definitionRow, definitionRow.Shape.Height.Value);
-
-                this.MapParameter(this.parameterTypeService.ShapeSupportLength, ParameterTypeService.ShapeSupportLengthShortName, definitionRow, definitionRow.Shape.LengthSupport.Value);
-
-                this.MapParameter(this.parameterTypeService.ShapeAngle, ParameterTypeService.ShapeAngleShortName, definitionRow, definitionRow.Shape.Angle.Value);
-
-                this.MapParameter(this.parameterTypeService.ShapeSupportAngle, ParameterTypeService.ShapeSupportAngleShortName, definitionRow, definitionRow.Shape.AngleSupport.Value);
-
-                this.MapParameter(this.parameterTypeService.ShapeThickness, ParameterTypeService.ShapeThicknessShortName, definitionRow, definitionRow.Shape.Thickness.Value);
+                this.MapParameter(this.parameterTypeService.ShapeLength, ParameterTypeService.ShapeLengthShortName, definitionRow, definitionRow.Shape.Length?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeWidthOrDiameter, ParameterTypeService.ShapeWidthOrDiameterShortName, definitionRow, definitionRow.Shape.WidthOrDiameter?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeHeight, ParameterTypeService.ShapeHeightShortName, definitionRow, definitionRow.Shape.Height?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeSupportLength, ParameterTypeService.ShapeSupportLengthShortName, definitionRow, definitionRow.Shape.LengthSupport?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeAngle, ParameterTypeService.ShapeAngleShortName, definitionRow, definitionRow.Shape.Angle?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeSupportAngle, ParameterTypeService.ShapeSupportAngleShortName, definitionRow, definitionRow.Shape.AngleSupport?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeThickness, ParameterTypeService.ShapeThicknessShortName, definitionRow, definitionRow.Shape.Thickness?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeArea, ParameterTypeService.ShapeAreaShortName, definitionRow, definitionRow.Shape.Area?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeDensity, ParameterTypeService.ShapeDensityShortName, definitionRow, definitionRow.Shape.Density?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeMassMargin, ParameterTypeService.ShapeMassMarginShortName, definitionRow, definitionRow.Shape.MassMargin?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeMassWithMargin, ParameterTypeService.ShapeMassWithMarginShortName, definitionRow, definitionRow.Shape.MassWithMargin?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeSysMassMargin, ParameterTypeService.ShapeSysMassMarginShortName, definitionRow, definitionRow.Shape.SysMassMargin?.Value);
             }
         }
 
@@ -246,7 +246,7 @@ namespace DEHCATIA.MappingRules
         private ElementUsage GetOrCreateElementUsage(ElementDefinition elementDefinition, string name, ElementDefinition parent)
         {
             var container = this.hubController.OpenIteration.Element
-                .FirstOrDefault(x => x.ShortName == parent?.Name);
+                .FirstOrDefault(x => x.ShortName == parent?.ShortName);
 
             var elementUsage = container?.ContainedElement
                 .FirstOrDefault(x => x.ShortName == name)?.Clone(true);
@@ -275,22 +275,22 @@ namespace DEHCATIA.MappingRules
         private void MapParameters(ElementUsage elementUsage, ElementRowViewModel elementRowViewModel)
         {
             this.MapParameterOverride(this.parameterTypeService.CenterOfGravity,
-                ParameterTypeService.CenterOfGravityShortName, elementUsage, elementRowViewModel.CenterOfGravity.Values);
+                ParameterTypeService.CenterOfGravityShortName, elementUsage, elementRowViewModel.ElementDefinition, elementRowViewModel.CenterOfGravity.Values);
 
             this.MapParameterOverride(this.parameterTypeService.MomentOfInertia,
-                ParameterTypeService.MomentOfInertiaShortName, elementUsage, elementRowViewModel.MomentOfInertia.Value.Values);
+                ParameterTypeService.MomentOfInertiaShortName, elementUsage, elementRowViewModel.ElementDefinition, elementRowViewModel.MomentOfInertia.Value.Values);
 
             this.MapParameterOverride(this.parameterTypeService.Volume,
-                ParameterTypeService.VolumeShortName, elementUsage, elementRowViewModel.Volume.Value.Value);
+                ParameterTypeService.VolumeShortName, elementUsage, elementRowViewModel.ElementDefinition, elementRowViewModel.Volume.Value.Value);
 
             this.MapParameterOverride(this.parameterTypeService.Mass,
-                ParameterTypeService.MassShortName, elementUsage, elementRowViewModel.Mass.Value.Value);
+                ParameterTypeService.MassShortName, elementUsage, elementRowViewModel.ElementDefinition, elementRowViewModel.Mass.Value.Value);
 
             this.MapParameterOverride(this.parameterTypeService.Orientation,
-                ParameterTypeService.OrientationShortName, elementUsage, elementRowViewModel.Shape.PositionOrientation.Orientation.Values);
+                ParameterTypeService.OrientationShortName, elementUsage, elementRowViewModel.ElementDefinition, elementRowViewModel.Shape.PositionOrientation.Orientation.Values);
 
             this.MapParameterOverride(this.parameterTypeService.Position,
-                ParameterTypeService.PositionShortName, elementUsage, elementRowViewModel.Shape.PositionOrientation.Position.Values);
+                ParameterTypeService.PositionShortName, elementUsage, elementRowViewModel.ElementDefinition, elementRowViewModel.Shape.PositionOrientation.Position.Values);
         }
 
         /// <summary>
@@ -309,22 +309,22 @@ namespace DEHCATIA.MappingRules
         private void MapParameters(UsageRowViewModel usageRow)
         {
             this.MapParameterOverride(this.parameterTypeService.CenterOfGravity,
-                ParameterTypeService.CenterOfGravityShortName, usageRow.ElementUsage, usageRow.CenterOfGravity.Values);
+                ParameterTypeService.CenterOfGravityShortName, usageRow.ElementUsage, usageRow.ElementDefinition, usageRow.CenterOfGravity.Values);
 
             this.MapParameterOverride(this.parameterTypeService.MomentOfInertia,
-                ParameterTypeService.MomentOfInertiaShortName, usageRow.ElementUsage, usageRow.MomentOfInertia.Value.Values);
+                ParameterTypeService.MomentOfInertiaShortName, usageRow.ElementUsage, usageRow.ElementDefinition, usageRow.MomentOfInertia.Value.Values);
 
             this.MapParameterOverride(this.parameterTypeService.Volume,
-                ParameterTypeService.VolumeShortName, usageRow.ElementUsage, usageRow.Volume.Value.Value);
+                ParameterTypeService.VolumeShortName, usageRow.ElementUsage, usageRow.ElementDefinition, usageRow.Volume.Value.Value);
 
             this.MapParameterOverride(this.parameterTypeService.Mass,
-                ParameterTypeService.MassShortName, usageRow.ElementUsage, usageRow.Mass.Value.Value);
+                ParameterTypeService.MassShortName, usageRow.ElementUsage, usageRow.ElementDefinition, usageRow.Mass.Value.Value);
 
             this.MapParameterOverride(this.parameterTypeService.Orientation,
-                ParameterTypeService.OrientationShortName, usageRow.ElementUsage, usageRow.Shape.PositionOrientation.Orientation.Values);
+                ParameterTypeService.OrientationShortName, usageRow.ElementUsage, usageRow.ElementDefinition, usageRow.Shape.PositionOrientation.Orientation.Values);
 
             this.MapParameterOverride(this.parameterTypeService.Position,
-                ParameterTypeService.PositionShortName, usageRow.ElementUsage, usageRow.Shape.PositionOrientation.Position.Values);
+                ParameterTypeService.PositionShortName, usageRow.ElementUsage, usageRow.ElementDefinition, usageRow.Shape.PositionOrientation.Position.Values);
         }
 
         /// <summary>
@@ -340,16 +340,29 @@ namespace DEHCATIA.MappingRules
                 ParameterTypeService.MomentOfInertiaShortName, elementRow, elementRow.MomentOfInertia.Value.Values);
 
             this.MapParameter(this.parameterTypeService.Volume,
-                ParameterTypeService.VolumeShortName, elementRow, elementRow.Volume.Value.Value);
+                ParameterTypeService.VolumeShortName, elementRow, elementRow.Volume.Value?.Value);
 
             this.MapParameter(this.parameterTypeService.Mass,
-                ParameterTypeService.MassShortName, elementRow, elementRow.Mass.Value.Value);
+                ParameterTypeService.MassShortName, elementRow, elementRow.Mass.Value?.Value);
 
             this.MapParameter(this.parameterTypeService.Orientation,
                 ParameterTypeService.OrientationShortName, elementRow, elementRow.Shape.PositionOrientation.Orientation.Values);
 
             this.MapParameter(this.parameterTypeService.Position,
                 ParameterTypeService.PositionShortName, elementRow, elementRow.Shape.PositionOrientation.Position.Values);
+        }
+
+        /// <summary>
+        /// Maps the provided <paramref name="value"/> to a parameter of type <paramref name="parameterType"/>
+        /// </summary>
+        /// <param name="parameterTypeShortName">The short name of the <paramref name="parameterType"/></param>
+        /// <param name="definitionRow">The <see cref="DefinitionRowViewModel"/>The <see cref="DefinitionRowViewModel"/></param>
+        /// <param name="parameterType">The current <see cref="ParameterType"/></param>
+        /// <param name="value">The value <see cref="double"/></param>
+        private void MapParameter(ParameterType parameterType, string parameterTypeShortName, ElementRowViewModel definitionRow, double? value)
+        {
+            this.MapParameter(parameterType, parameterTypeShortName, definitionRow,
+                value.HasValue ? new[] { value.Value } : new double[] { });
         }
 
         /// <summary>
@@ -361,46 +374,17 @@ namespace DEHCATIA.MappingRules
         /// <param name="values">array of <see cref="double"/> that contains the actual values to be mapped</param>
         private void MapParameter(ParameterType parameterType, string parameterTypeShortName, ElementRowViewModel definitionRow, params double[] values)
         {
-            if (!(parameterType is { } type))
+            if (parameterType is null || values.Length < 1)
             {
-                Logger.Info($"The {parameterTypeShortName}  parameter has been skipped for the {definitionRow.Name}");
+                Logger.Info($"The {parameterTypeShortName} parameter has been skipped for the {definitionRow.Name}");
                 return;
             }
 
-            Parameter parameter;
-
-            if (definitionRow.ElementDefinition.Parameter
-                .FirstOrDefault(p => p.ParameterType.ShortName == parameterTypeShortName) is { } existingParameter)
-            {
-                parameter = existingParameter.Clone(true);
-            }
-            else
-            {
-                var initializationCollection = this.CreateValueArrayInitializationCollection(values.Length);
-
-                parameter = new Parameter(Guid.Empty, this.hubController.Session.Assembler.Cache, new Uri(this.hubController.Session.DataSourceUri))
-                {
-                    ParameterType = type,
-                    Owner = this.owner,
-                    ValueSet =
-                    {
-                        new ParameterValueSet(Guid.Empty, this.hubController.Session.Assembler.Cache, new Uri(this.hubController.Session.DataSourceUri))
-                        {
-                            Computed = new ValueArray<string>(),
-                            Formula = new ValueArray<string>(initializationCollection),
-                            Manual = new ValueArray<string>(initializationCollection),
-                            Reference = new ValueArray<string>(initializationCollection),
-                            Published = new ValueArray<string>(initializationCollection)
-                        }
-                    }
-                };
-
-                definitionRow.ElementDefinition.Parameter.Add(parameter);
-            }
-
+            var parameter = this.GetParameter(parameterType, parameterTypeShortName, definitionRow, values.Length);
+            
             this.UpdateValueSet(parameter, values);
 
-            Logger.Info($"The {parameterTypeShortName}  parameter has been updated for the {definitionRow.Name}");
+            Logger.Info($"The {parameterTypeShortName} parameter has been updated for the {definitionRow.Name}");
         }
 
         /// <summary>
@@ -409,15 +393,32 @@ namespace DEHCATIA.MappingRules
         /// <param name="parameterTypeShortName">The short name of the <paramref name="parameterType"/></param>
         /// <param name="definitionRow">The <see cref="DefinitionRowViewModel"/>The <see cref="DefinitionRowViewModel"/></param>
         /// <param name="parameterType">The current <see cref="ParameterType"/></param>
-        /// <param name="values">array of <see cref="double"/> that contains the actual values to be mapped</param>
+        /// <param name="values">array of <see cref="string"/> that contains the actual values to be mapped</param>
         private void MapParameter(ParameterType parameterType, string parameterTypeShortName, ElementRowViewModel definitionRow, params string[] values)
         {
-            if (!(parameterType is { } type))
+            if (parameterType is null || values.Length < 1)
             {
-                Logger.Info($"The {parameterTypeShortName}  parameter has been skipped for the {definitionRow.Name}");
+                Logger.Info($"The {parameterTypeShortName} parameter has been skipped for the {definitionRow.Name}");
                 return;
             }
 
+            var parameter = this.GetParameter(parameterType, parameterTypeShortName, definitionRow, values.Length);
+            
+            this.UpdateValueSet(parameter, values);
+
+            Logger.Info($"The {parameterTypeShortName} parameter has been updated for the {definitionRow.Name}");
+        }
+
+        /// <summary>
+        /// Gets or creates a new Parameter based on the <paramref name="parameterType"/>
+        /// </summary>
+        /// <param name="parameterType">The <see cref="ParameterType"/></param>
+        /// <param name="parameterTypeShortName">The <paramref name="parameterType"/> ShortName</param>
+        /// <param name="definitionRow">The <see cref="ElementRowViewModel"/></param>
+        /// <param name="numberOfValue">The number of values the parameter will hold</param>
+        /// <returns>A <see cref="Parameter"/></returns>
+        private Parameter GetParameter(ParameterType parameterType, string parameterTypeShortName, ElementRowViewModel definitionRow, int numberOfValue)
+        {
             Parameter parameter;
 
             if (definitionRow.ElementDefinition.Parameter
@@ -427,11 +428,11 @@ namespace DEHCATIA.MappingRules
             }
             else
             {
-                var initializationCollection = this.CreateValueArrayInitializationCollection(values.Length);
+                var initializationCollection = this.CreateValueArrayInitializationCollection(numberOfValue);
 
                 parameter = new Parameter(Guid.Empty, this.hubController.Session.Assembler.Cache, new Uri(this.hubController.Session.DataSourceUri))
                 {
-                    ParameterType = type,
+                    ParameterType = parameterType,
                     Owner = this.owner,
                     ValueSet =
                     {
@@ -446,12 +447,15 @@ namespace DEHCATIA.MappingRules
                     }
                 };
 
+                if (parameterType is QuantityKind quantityKind)
+                {
+                    parameter.Scale = quantityKind.DefaultScale;
+                }
+
                 definitionRow.ElementDefinition.Parameter.Add(parameter);
             }
 
-            this.UpdateValueSet(parameter, values);
-
-            Logger.Info($"The {parameterTypeShortName}  parameter has been updated for the {definitionRow.Name}");
+            return parameter;
         }
 
         /// <summary>
@@ -460,12 +464,13 @@ namespace DEHCATIA.MappingRules
         /// <param name="parameterTypeShortName">The short name of the <paramref name="parameterType"/></param>
         /// <param name="elementUsage">The <see cref="ElementUsage"/></param>
         /// <param name="parameterType">The current <see cref="ParameterType"/></param>
+        /// <param name="elementDefinition">The <see cref="ElementDefinition"/></param>
         /// <param name="values">array of <see cref="double"/> that contains the actual values to be mapped</param>
-        private void MapParameterOverride(ParameterType parameterType, string parameterTypeShortName, ElementUsage elementUsage, params double[] values)
+        private void MapParameterOverride(ParameterType parameterType, string parameterTypeShortName, ElementUsage elementUsage, ElementDefinition elementDefinition, params double[] values)
         {
             if (!(parameterType is { }))
             {
-                Logger.Info($"The {parameterTypeShortName}  parameter override has been skipped for the {elementUsage.Name}");
+                Logger.Info($"The {parameterTypeShortName} parameter override has been skipped for the {elementUsage.Name}");
                 return;
             }
 
@@ -480,7 +485,7 @@ namespace DEHCATIA.MappingRules
             {
                 var initializationCollection = this.CreateValueArrayInitializationCollection(values.Length);
 
-                var parameterToOverride = elementUsage.ElementDefinition.Parameter.FirstOrDefault(x => x.ParameterType.ShortName == parameterTypeShortName);
+                var parameterToOverride = elementDefinition.Parameter.FirstOrDefault(x => x.ParameterType.ShortName == parameterTypeShortName);
 
                 parameter = new ParameterOverride(Guid.Empty, this.hubController.Session.Assembler.Cache, new Uri(this.hubController.Session.DataSourceUri))
                 {
@@ -505,7 +510,7 @@ namespace DEHCATIA.MappingRules
 
             this.UpdateValueSet(parameter, values);
 
-            Logger.Info($"The {parameterTypeShortName}  parameter has been updated for the {elementUsage.Name}");
+            Logger.Info($"The {parameterTypeShortName} parameter has been updated for the {elementUsage.Name}");
         }
 
         /// <summary>

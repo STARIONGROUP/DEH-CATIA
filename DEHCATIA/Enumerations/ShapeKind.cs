@@ -107,6 +107,36 @@ namespace DEHCATIA.Enumerations
         /// <summary>
         /// Shape kind is a Capsule
         /// </summary>
-        Capsule
+        Capsule,
+
+        /// <summary>
+        /// Shape kind is a Capsule
+        /// </summary>
+        Triangle,
+
+        /// <summary>
+        /// Shape kind is a Cylinder Segment
+        /// </summary>
+        CylinderSegment,
+        
+        /// <summary>
+        /// Shape kind is a sperical segment
+        /// </summary>
+        SpericalSegment,
+
+        /// <summary>
+        /// Shape kind is a planar quadrilateral
+        /// </summary>
+        PlanarQuadrilateral,
+
+        /// <summary>
+        /// Shape kind is a disc segment
+        /// </summary>
+        DiscSegment,
+
+        /// <summary>
+        /// Shape kind is a Paraboloid
+        /// </summary>
+        ParaboloidSegment,
     }
 }

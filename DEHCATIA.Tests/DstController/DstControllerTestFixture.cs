@@ -274,7 +274,8 @@ namespace DEHCATIA.Tests.DstController
 
             rootElement.Children.Add(usageRowViewModel);
 
-            this.controller.DstMapResult.Add((definitionRowViewModel, new ElementUsage() {ParameterOverride = { parameterOverride}}));
+            this.controller.SelectedThingsToTransfer.Add(new ElementUsage() { ParameterOverride = { parameterOverride } });
+            this.controller.SelectedThingsToTransfer.Add(new ElementDefinition() { Parameter = { parameter } });
 
             this.hubController.Setup(x =>
                 x.GetThingById(It.IsAny<Guid>(), It.IsAny<Iteration>(), out parameter));
@@ -315,16 +316,16 @@ namespace DEHCATIA.Tests.DstController
                 x =>
                     x.ShowDxDialog<CreateLogEntryDialog, CreateLogEntryDialogViewModel>(
                         It.IsAny<CreateLogEntryDialogViewModel>())
-                , Times.Exactly(4));
+                , Times.Exactly(1));
 
             this.hubController.Verify(
-                x => x.Write(It.IsAny<ThingTransaction>()), Times.Exactly(4));
+                x => x.Write(It.IsAny<ThingTransaction>()), Times.Exactly(2));
 
             this.hubController.Verify(
-                x => x.Refresh(), Times.Exactly(2));
+                x => x.Refresh(), Times.Exactly(1));
 
             this.exchangeHistory.Verify(x =>
-                x.Append(It.IsAny<Thing>(), It.IsAny<ChangeKind>()), Times.Exactly(8));
+                x.Append(It.IsAny<Thing>(), It.IsAny<ChangeKind>()), Times.Exactly(4));
         }
 
         [Test]
@@ -444,7 +445,7 @@ namespace DEHCATIA.Tests.DstController
 
             this.statusBar.Verify(
                 x => x.Append(It.IsAny<string>(), It.IsAny<StatusBarMessageSeverity>()),
-                Times.Exactly(19));
+                Times.Exactly(14));
         }
 
         [Test]

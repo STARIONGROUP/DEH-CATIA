@@ -99,6 +99,15 @@ namespace DEHCATIA.Tests.Services.ParameterTypeService
             Assert.IsNull(this.service.Position);
             Assert.IsNull(this.service.Mass);
             Assert.IsNull(this.service.CenterOfGravity);
+            Assert.IsNull(this.service.ShapeKind);
+            Assert.IsNull(this.service.ShapeLength);
+            Assert.IsNull(this.service.ShapeWidthOrDiameter);
+            Assert.IsNull(this.service.ShapeHeight);
+            Assert.IsNull(this.service.ShapeSupportLength);
+            Assert.IsNull(this.service.ShapeAngle);
+            Assert.IsNull(this.service.ShapeSupportAngle);
+            Assert.IsNull(this.service.ShapeArea);
+            Assert.IsNull(this.service.ShapeThickness);
             this.hubController.Verify(x => x.OpenIteration, Times.Exactly(4));
         }
 

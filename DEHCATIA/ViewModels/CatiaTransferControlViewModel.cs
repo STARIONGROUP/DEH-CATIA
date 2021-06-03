@@ -26,10 +26,14 @@ namespace DEHCATIA.ViewModels
 {
     using System;
     using System.Diagnostics;
+    using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
 
+    using CDP4Common.Extensions;
+
     using CDP4Dal;
+    using CDP4Dal.Events;
 
     using DEHCATIA.DstController;
     using DEHCATIA.Events;
@@ -103,15 +107,26 @@ namespace DEHCATIA.ViewModels
             this.exchangeHistoryService = exchangeHistoryService;
 
             CDPMessageBus.Current.Listen<UpdateObjectBrowserTreeEvent>()
-                .Select(x => !x.Reset).ObserveOn(RxApp.MainThreadScheduler)
+                .Select(x => !x.Reset)
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.UpdateCanTransfer);
 
             CDPMessageBus.Current.Listen<UpdateDstElementTreeEvent>()
-                .Select(x => !x.Reset).ObserveOn(RxApp.MainThreadScheduler)
+                .Select(x => !x.Reset)
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.UpdateCanTransfer);
 
-            this.dstController.DstMapResult.CountChanged.Subscribe(x => this.UpdateCanTransfer(x > 0));
-            this.dstController.HubMapResult.CountChanged.Subscribe(x => this.UpdateCanTransfer(x > 0));
+            this.dstController.SelectedThingsToTransfer.CountChanged.Subscribe(x =>
+            {
+                this.UpdateCanTransfer(x > 0);
+                this.UpdateNumberOfThingsToTransfer();
+            });
+
+            this.dstController.HubMapResult.CountChanged.Subscribe(x =>
+            {
+                this.UpdateCanTransfer(x > 0);
+                this.UpdateNumberOfThingsToTransfer();
+            });
 
             this.TransferCommand = ReactiveCommand.CreateAsyncTask(
                 this.WhenAnyValue(x => x.CanTransfer),
@@ -133,10 +148,18 @@ namespace DEHCATIA.ViewModels
         }
 
         /// <summary>
+        /// Updates the <see cref="TransferControlViewModel.NumberOfThing"/>
+        /// </summary>
+        private void UpdateNumberOfThingsToTransfer()
+        {
+            this.NumberOfThing = this.dstController.SelectedThingsToTransfer.DistinctBy(x => x.ShortName).Count() + this.dstController.HubMapResult.Count;
+        }
+
+        /// <summary>
         /// Updates the <see cref="CanTransfer"/>
         /// </summary>
         private void UpdateCanTransfer(bool value)
-        {
+            {
             this.CanTransfer = value;
         }
 
@@ -146,10 +169,13 @@ namespace DEHCATIA.ViewModels
         /// <returns>A <see cref="Task"/></returns>
         private async Task CancelTransfer()
         {
+            this.statusBar.Append($"Cancelling the transfer...");
             this.exchangeHistoryService.ClearPending();
             await Task.Delay(1);
             CDPMessageBus.Current.SendMessage(new UpdateDstElementTreeEvent(true));
-            CDPMessageBus.Current.SendMessage(new UpdateObjectBrowserTreeEvent(true));
+            this.dstController.ResetMappedElement();
+            this.dstController.LoadMapping();
+            this.statusBar.Append($"Mapping has been reloaded");
             this.AreThereAnyTransferInProgress = false;
             this.IsIndeterminate = false;
         }

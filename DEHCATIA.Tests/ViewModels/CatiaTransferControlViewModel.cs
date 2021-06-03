@@ -72,6 +72,9 @@ namespace DEHCATIA.Tests.ViewModels
             this.dstController.Setup(x => x.HubMapResult)
                 .Returns(new ReactiveList<MappedElementDefinitionRowViewModel>());
 
+            this.dstController.Setup(x => x.SelectedThingsToTransfer)
+                .Returns(new ReactiveList<ElementBase>());
+
             this.exchangeHistoryService = new Mock<IExchangeHistoryService>();
 
             this.viewModel = new CatiaTransferControlViewModel(this.dstController.Object, this.statusBar.Object, this.exchangeHistoryService.Object);

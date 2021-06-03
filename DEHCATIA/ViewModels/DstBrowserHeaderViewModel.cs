@@ -163,7 +163,6 @@ namespace DEHCATIA.ViewModels
                 }
                 catch (COMException)
                 {
-
                     this.ActiveDocumentCurrentLayer = "Active document has no layers";
                 }
             }

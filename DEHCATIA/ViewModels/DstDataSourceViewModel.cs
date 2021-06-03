@@ -25,12 +25,15 @@
 namespace DEHCATIA.ViewModels
 {
     using System;
+    using System.Diagnostics;
     using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
     using Autofac;
+
+    using CDP4Dal;
 
     using DEHCATIA.DstController;
     using DEHCATIA.ViewModels.Dialogs.Interfaces;
@@ -39,6 +42,7 @@ namespace DEHCATIA.ViewModels
 
     using DEHPCommon;
     using DEHPCommon.Enumerators;
+    using DEHPCommon.Events;
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.Services.NavigationService;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
@@ -92,7 +96,7 @@ namespace DEHCATIA.ViewModels
         /// <summary>
         /// Gets or sets the command that refreshes the connection and the product tree
         /// </summary>
-        public ReactiveCommand<object> RefreshCommand { get; set; }
+        public ReactiveCommand<Unit> RefreshCommand { get; set; }
 
         /// <summary>
         /// Initializes a new instance of <see cref="DstDataSourceViewModel"/>.
@@ -148,8 +152,24 @@ namespace DEHCATIA.ViewModels
                         x.Value is null  && c.Value && i.Value != null)
                 .ObserveOn(RxApp.MainThreadScheduler);
 
-            this.RefreshCommand = ReactiveCommand.Create(canRefresh);
-            this.RefreshCommand.Subscribe(_ => this.dstController.Reconnect());
+            this.RefreshCommand = ReactiveCommand.CreateAsyncTask(canRefresh, _ => this.RefreshCommandExecute());
+        }
+
+        /// <summary>
+        /// Executes the <see cref="RefreshCommand"/>
+        /// </summary>
+        /// <returns></returns>
+        private async Task RefreshCommandExecute()
+        {
+            this.statusBar.Append($"Refreshing the Catia Product tree in progress");
+            var timer = new Stopwatch();
+            timer.Start();
+
+            await Task.Run(() => this.dstController.Refresh()).ContinueWith(_ =>
+            {
+                timer.Stop();
+                this.statusBar.Append($"Refresh {(_.IsCompleted ? "has complete in" : "has failed after")} {timer.ElapsedMilliseconds} ms");
+            });
         }
 
         /// <summary>
@@ -166,6 +186,7 @@ namespace DEHCATIA.ViewModels
                 }
 
                 this.dstController.DisconnectFromCatia();
+                CDPMessageBus.Current.SendMessage(new UpdateObjectBrowserTreeEvent(true));
                 this.ConnectionStatus = "Connection is not established";
             }
             else

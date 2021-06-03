@@ -45,7 +45,6 @@ namespace DEHCATIA.Tests.MappingRules
 
     using DEHPCommon;
     using DEHPCommon.HubController.Interfaces;
-    using DEHPCommon.UserInterfaces.ViewModels.PublicationBrowser;
 
     using Moq;
 
@@ -180,7 +179,7 @@ namespace DEHCATIA.Tests.MappingRules
 
             Assert.DoesNotThrow(() => result = this.rule.Transform(rootElement));
             Assert.IsNotNull(result);
-            Assert.AreEqual(3, result.Count);
+            Assert.AreEqual(4, result.Count);
         }
 
         [Test]
@@ -253,9 +252,10 @@ namespace DEHCATIA.Tests.MappingRules
 
             var result = new List<(ElementRowViewModel Parent, ElementBase Element)>();
 
-            Assert.DoesNotThrow(() => result = this.rule.Transform(new List<ElementRowViewModel>() { rootElement }));
+            Assert.DoesNotThrow(() => result = this.rule.Transform(rootElement));
             Assert.IsNotNull(result);
-            Assert.AreEqual(3, result.Count);
+            Assert.AreEqual(4, result.Count);
+
             Assert.AreEqual(1, result
                 .Select(x => x.Element)
                 .OfType<ElementDefinition>()
