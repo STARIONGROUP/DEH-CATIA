@@ -132,8 +132,8 @@ namespace DEHCATIA.Tests.MappingRules
             {
                 Name = "RootElementRow",
                 CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
-                Volume = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
-                Mass = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(42)),
+                Volume = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(42)),
                 MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
                 Shape = new CatiaShapeViewModel()
                 {
@@ -146,8 +146,8 @@ namespace DEHCATIA.Tests.MappingRules
             {
                 Name = "UsageRow",
                 CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
-                Volume = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
-                Mass = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(42)),
+                Volume = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(42)),
                 MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
                 Shape = new CatiaShapeViewModel()
                 {
@@ -161,8 +161,8 @@ namespace DEHCATIA.Tests.MappingRules
             {
                 Name = "DefinitionRow",
                 CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
-                Volume = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
-                Mass = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(42)),
+                Volume = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(42)),
                 MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
                 Shape = new CatiaShapeViewModel()
                 {
@@ -189,8 +189,8 @@ namespace DEHCATIA.Tests.MappingRules
             {
                 Name = "RootElementRow",
                 CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
-                Volume = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
-                Mass = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(42)),
+                Volume = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(42)),
                 MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
                 Shape = new CatiaShapeViewModel()
                 {
@@ -203,8 +203,8 @@ namespace DEHCATIA.Tests.MappingRules
             {
                 Name = "UsageRow",
                 CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
-                Volume = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
-                Mass = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(42)),
+                Volume = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(42)),
                 MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
                 Shape = new CatiaShapeViewModel()
                 {
@@ -227,8 +227,8 @@ namespace DEHCATIA.Tests.MappingRules
             {
                 Name = "DefinitionRow",
                 CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
-                Volume = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
-                Mass = new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(42)),
+                Volume = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(42)),
                 MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
                 Shape = new CatiaShapeViewModel()
                 {

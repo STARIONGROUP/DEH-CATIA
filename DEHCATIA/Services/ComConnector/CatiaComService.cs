@@ -423,9 +423,9 @@ namespace DEHCATIA.Services.ComConnector
                     continue;
                 }
 
-                if (parameter is RealParam realParam)
+                if (parameter is RealParam)
                 {
-                    collection.Add(new DoubleWithUnitParameterViewModel(parameter));
+                    collection.Add(new DoubleParameterViewModel(parameter));
                     continue;
                 }
 
@@ -496,12 +496,12 @@ namespace DEHCATIA.Services.ComConnector
         /// Gets the Mass from analyse object
         /// </summary>
         /// <param name="analyze">the object where to receive data from</param>
-        /// <returns>A <see cref="DoubleWithUnitParameterViewModel"/></returns>1
-        private DoubleWithUnitParameterViewModel GetMass(Analyze analyze)
+        /// <returns>A <see cref="DoubleParameterViewModel"/></returns>1
+        private DoubleParameterViewModel GetMass(Analyze analyze)
         {
             try
             {
-                return new DoubleWithUnitParameterViewModel(new DoubleWithUnitValueViewModel(analyze.Mass, "kg")
+                return new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(analyze.Mass, "kg")
                 {
                     CatiaSymbol = "kg"
                 })
@@ -521,11 +521,11 @@ namespace DEHCATIA.Services.ComConnector
         /// </summary>
         /// <param name="analyze">the object where to receive data from</param>
         /// <returns>The parameter Volume</returns>
-        private DoubleWithUnitParameterViewModel GetVolume(Analyze analyze)
+        private DoubleParameterViewModel GetVolume(Analyze analyze)
         {
             try
             {
-                return new DoubleWithUnitParameterViewModel(
+                return new DoubleParameterViewModel(
                     
                     // Volume comes back as milimeters3, so conversion to meter3 is neccessary
                     new DoubleWithUnitValueViewModel(analyze.Volume / 1000000000, "m3")

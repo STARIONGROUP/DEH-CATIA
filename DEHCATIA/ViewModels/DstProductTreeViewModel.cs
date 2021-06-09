@@ -217,10 +217,10 @@ namespace DEHCATIA.ViewModels
                 var timer = new Stopwatch();
                 timer.Start();
 
-                this.logger.Debug("Start assigning SelectedThings to the dialog Variables");
+                this.logger.Debug("Start assigning to the dialog product tree ");
 
                 viewModel.Elements.Add(this.SelectedElement ?? this.RootElement);
-                this.logger.Debug("End assigning SelectedThings to the dialog Variables");
+                this.logger.Debug("End assigning SelectedThings to the dialog product tree");
 
                 timer.Stop();
                 this.statusBar.Append($"Existing mapped elements refreshed in {timer.ElapsedMilliseconds} ms");
@@ -232,7 +232,6 @@ namespace DEHCATIA.ViewModels
             catch (Exception e)
             {
                 this.logger.Error(e);
-                Console.WriteLine(e);
                 throw;
             }
         }

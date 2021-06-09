@@ -174,10 +174,10 @@ namespace DEHCATIA.ViewModels.NetChangePreview
         /// <summary>
         /// Updates the the corresponding variable according mapped by the <paramref name="mappedElement"/>
         /// </summary>
-        /// <param name="mappedElement">The source <see cref="MappedElementDefinitionRowViewModel"/></param>
-        private void UpdateElementRow(MappedElementDefinitionRowViewModel mappedElement)
+        /// <param name="mappedElement">The source <see cref="MappedElementRowViewModel"/></param>
+        private void UpdateElementRow(MappedElementRowViewModel mappedElement)
         {
-            CDPMessageBus.Current.SendMessage(new DstHighlightEvent(mappedElement.SelectedCatiaElement.Name));
+            CDPMessageBus.Current.SendMessage(new DstHighlightEvent(mappedElement.CatiaElement.Name));
         }
 
         /// <summary>
