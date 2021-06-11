@@ -155,6 +155,7 @@ namespace DEHCATIA
             containerBuilder.RegisterType<DstProductTreeViewModel>().As<IDstProductTreeViewModel>().SingleInstance();
             containerBuilder.RegisterType<CatiaTransferControlViewModel>().As<ITransferControlViewModel>().SingleInstance();
             containerBuilder.RegisterType<DstMappingConfigurationDialogViewModel>().As<IDstMappingConfigurationDialogViewModel>();
+            containerBuilder.RegisterType<HubMappingConfigurationDialogViewModel>().As<IHubMappingConfigurationDialogViewModel>();
             containerBuilder.RegisterType<HubNetChangePreviewViewModel>().As<IHubNetChangePreviewViewModel>().SingleInstance();
             containerBuilder.RegisterType<DstNetChangePreviewViewModel>().As<IDstNetChangePreviewViewModel>().SingleInstance();
             containerBuilder.RegisterType<DstLoginViewModel>().As<IDstLoginViewModel>();

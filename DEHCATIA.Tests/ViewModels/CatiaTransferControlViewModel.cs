@@ -70,7 +70,7 @@ namespace DEHCATIA.Tests.ViewModels
                 .Returns(new ReactiveList<(ElementRowViewModel, ElementBase)>());
 
             this.dstController.Setup(x => x.HubMapResult)
-                .Returns(new ReactiveList<MappedElementDefinitionRowViewModel>());
+                .Returns(new ReactiveList<MappedElementRowViewModel>());
 
             this.dstController.Setup(x => x.SelectedThingsToTransfer)
                 .Returns(new ReactiveList<ElementBase>());
@@ -119,9 +119,9 @@ namespace DEHCATIA.Tests.ViewModels
                 (null, new ElementDefinition())
             });
 
-            this.dstController.Setup(x => x.HubMapResult).Returns(new ReactiveList<MappedElementDefinitionRowViewModel>()
+            this.dstController.Setup(x => x.HubMapResult).Returns(new ReactiveList<MappedElementRowViewModel>()
             {
-                new MappedElementDefinitionRowViewModel()
+                new MappedElementRowViewModel()
             });
 
             Assert.IsFalse(this.viewModel.CancelCommand.CanExecute(null));

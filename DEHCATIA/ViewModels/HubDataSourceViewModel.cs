@@ -26,9 +26,7 @@ namespace DEHCATIA.ViewModels
 {
     using System;
     using System.Linq;
-    using System.Reactive;
     using System.Reactive.Linq;
-    using System.Threading.Tasks;
     using System.Windows.Input;
 
     using Autofac;
@@ -37,6 +35,7 @@ namespace DEHCATIA.ViewModels
 
     using DEHCATIA.DstController;
     using DEHCATIA.Events;
+    using DEHCATIA.ViewModels.Dialogs.Interfaces;
 
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.Services.NavigationService;
@@ -45,6 +44,7 @@ namespace DEHCATIA.ViewModels
     using DEHPCommon.UserInterfaces.Views;
 
     using DEHCATIA.ViewModels.Interfaces;
+    using DEHCATIA.Views.Dialogs;
 
     using DEHPCommon;
     using DEHPCommon.Enumerators;
@@ -120,6 +120,14 @@ namespace DEHCATIA.ViewModels
         {
             base.InitializeCommands();
 
+            var canMap = this.ObjectBrowser.CanMap.Merge(this.WhenAny(x => x.dstController.MappingDirection,
+                x => x.dstController.IsCatiaConnected,
+                (m, s) =>
+                    m.Value is MappingDirection.FromHubToDst && s.Value));
+
+            this.ObjectBrowser.MapCommand = ReactiveCommand.Create(canMap);
+            this.ObjectBrowser.MapCommand.Subscribe(_ => this.MapCommandExecute());
+
             this.ObjectBrowser.SelectedThings.CountChanged.Subscribe(_ => this.UpdateNetChangePreviewBasedOnSelection());
 
             this.WhenAny(x => x.hubController.OpenIteration,
@@ -154,6 +162,26 @@ namespace DEHCATIA.ViewModels
             }
 
             this.UpdateConnectButtonText(this.hubController.IsSessionOpen);
+        }
+
+        /// <summary>
+        /// Executes the <see cref="IObjectBrowserViewModel.MapCommand"/>
+        /// </summary>
+        public void MapCommandExecute()
+        {
+            var viewModel = AppContainer.Container.Resolve<IHubMappingConfigurationDialogViewModel>();
+
+            viewModel.HubElements.AddRange(this.ObjectBrowser
+                .SelectedThings
+                .OfType<ElementDefinitionRowViewModel>()
+                .Select(x =>
+                {
+                    x.Thing.Clone(true);
+                    return x;
+                }));
+
+            this.NavigationService.ShowDialog<HubMappingConfigurationDialog, IHubMappingConfigurationDialogViewModel>(viewModel);
+            this.ObjectBrowser.SelectedThings.Clear();
         }
     }
 }

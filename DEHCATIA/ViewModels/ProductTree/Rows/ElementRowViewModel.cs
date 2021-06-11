@@ -90,12 +90,12 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// <summary>
         /// Backing field for <see cref="Volume"/>
         /// </summary>
-        private DoubleWithUnitParameterViewModel volume;
+        private DoubleParameterViewModel volume;
 
         /// <summary>
         /// Backing field for <see cref="Mass"/>
         /// </summary>
-        private DoubleWithUnitParameterViewModel mass;
+        private DoubleParameterViewModel mass;
 
         /// <summary>
         /// Backing field for <see cref="CenterOfGravity"/>
@@ -193,7 +193,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// <summary>
         /// Gets or sets the Volume
         /// </summary>
-        public DoubleWithUnitParameterViewModel Volume
+        public DoubleParameterViewModel Volume
         {
             get => this.volume;
             set => this.RaiseAndSetIfChanged(ref this.volume, value);
@@ -202,7 +202,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// <summary>
         /// Gets or sets the Mass
         /// </summary>
-        public DoubleWithUnitParameterViewModel Mass
+        public DoubleParameterViewModel Mass
         {
             get => this.mass;
             set => this.RaiseAndSetIfChanged(ref this.mass, value);

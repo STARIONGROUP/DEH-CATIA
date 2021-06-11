@@ -34,7 +34,7 @@ namespace DEHCATIA.Extensions
     using DEHCATIA.ViewModels.ProductTree.Shapes;
 
     /// <summary>
-    /// The <see cref="DoubleWithUnitValueParameterExtension"/> provides extensions for collection of type <see cref="DoubleWithUnitParameterViewModel"/>
+    /// The <see cref="DoubleWithUnitValueParameterExtension"/> provides extensions for collection of type <see cref="DoubleParameterViewModel"/>
     /// </summary>
     public static class DoubleWithUnitValueParameterExtension
     {
@@ -127,7 +127,7 @@ namespace DEHCATIA.Extensions
         {
             var catiaBaseParameters = parameters as IDstParameterViewModel[] ?? parameters.ToArray();
 
-            var doubleParameter = catiaBaseParameters.OfType<DoubleWithUnitParameterViewModel>().ToArray();
+            var doubleParameter = catiaBaseParameters.OfType<DoubleParameterViewModel>().ToArray();
 
             var shapeKindParameter = catiaBaseParameters.FirstOrDefault(x => x.Name == ShapeKindParameterName);
 

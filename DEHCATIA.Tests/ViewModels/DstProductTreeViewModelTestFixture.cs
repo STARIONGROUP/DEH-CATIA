@@ -24,14 +24,24 @@
 
 namespace DEHCATIA.Tests.ViewModels
 {
+    using System;
     using System.Reactive.Concurrency;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Windows;
+
+    using Autofac;
+
+    using CDP4Common.EngineeringModelData;
 
     using DEHCATIA.DstController;
     using DEHCATIA.ViewModels;
+    using DEHCATIA.ViewModels.Dialogs;
+    using DEHCATIA.ViewModels.Dialogs.Interfaces;
     using DEHCATIA.ViewModels.ProductTree.Rows;
+    using DEHCATIA.Views.Dialogs;
 
+    using DEHPCommon;
     using DEHPCommon.Enumerators;
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.Services.NavigationService;
@@ -93,6 +103,24 @@ namespace DEHCATIA.Tests.ViewModels
             await Task.Delay(1);
             this.statusBar.Verify(x => x.Append(It.IsAny<string>(), StatusBarMessageSeverity.Info), Times.Exactly(2));
             Assert.IsNotNull(this.viewModel.RootElement);
+        }
+
+        [Test]
+        public void VerifyMapCommandExecute()
+        {
+            var containerBuilder = new ContainerBuilder();
+            var mock = new Mock<IDstMappingConfigurationDialogViewModel>();
+            mock.Setup(x => x.Elements).Returns(new ReactiveList<ElementRowViewModel>());
+            containerBuilder.RegisterInstance(mock.Object).As<IDstMappingConfigurationDialogViewModel>();
+            AppContainer.Container = containerBuilder.Build();
+
+            Assert.IsFalse(this.viewModel.MapCommand.CanExecute(null));
+            this.hubController.Setup(x => x.OpenIteration).Returns(new Iteration());
+            this.dstController.Setup(x => x.MappingDirection).Returns(MappingDirection.FromDstToHub);
+
+            this.viewModel = new DstProductTreeViewModel(this.dstController.Object, this.statusBar.Object, this.navigationService.Object, this.hubController.Object);
+            Assert.IsTrue(this.viewModel.MapCommand.CanExecute(null));
+            Assert.DoesNotThrow(() => this.viewModel.MapCommand.Execute(null));
         }
     }
 }

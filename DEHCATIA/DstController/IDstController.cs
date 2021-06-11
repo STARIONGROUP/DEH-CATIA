@@ -82,7 +82,7 @@ namespace DEHCATIA.DstController
         /// <summary>
         /// Gets the colection of mapped <see cref="ElementRowViewModel"/>
         /// </summary>
-        ReactiveList<MappedElementDefinitionRowViewModel> HubMapResult { get; }
+        ReactiveList<MappedElementRowViewModel> HubMapResult { get; }
 
         /// <summary>
         /// Gets this running tool name
@@ -126,6 +126,12 @@ namespace DEHCATIA.DstController
         /// </summary>
         /// <param name="topElement">The <see cref="List{T}"/> of <see cref="ElementRowViewModel"/> data</param>
         void Map(ElementRowViewModel topElement);
+
+        /// <summary>
+        /// Maps the provided collection
+        /// </summary>
+        /// <param name="elements">The <see cref="IEnumerable{T}"/> of <see cref="MappedElementRowViewModel"/> data</param>
+        void Map(IEnumerable<MappedElementRowViewModel> elements);
 
         /// <summary>
         /// Transfers the mapped variables to the Hub data source

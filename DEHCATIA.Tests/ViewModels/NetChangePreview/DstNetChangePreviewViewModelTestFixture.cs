@@ -111,19 +111,17 @@ namespace DEHCATIA.Tests.ViewModels.NetChangePreview
             };
 
             this.dstController.Setup(x => x.HubMapResult).Returns(
-                new ReactiveList<MappedElementDefinitionRowViewModel>()
+                new ReactiveList<MappedElementRowViewModel>()
                 {
-                    new MappedElementDefinitionRowViewModel()
+                    new MappedElementRowViewModel()
                     {
-                        SelectedParameters = { this.parameter0, this.parameter1 },
-                        SelectedElement = this.elementDefinition,
-                        SelectedCatiaElement = this.viewModel.RootElements.FirstOrDefault()
+                        HubElement = this.elementDefinition,
+                        CatiaElement = this.viewModel.RootElements.FirstOrDefault()
                     },
-                    new MappedElementDefinitionRowViewModel()
+                    new MappedElementRowViewModel()
                     {
-                        SelectedParameters = { this.parameterOverride },
-                        SelectedElement = this.elementUsage,
-                        SelectedCatiaElement = this.viewModel.RootElements.FirstOrDefault()?.Children.FirstOrDefault()
+                        HubElement = this.elementUsage,
+                        CatiaElement = this.viewModel.RootElements.FirstOrDefault()?.Children.FirstOrDefault()
                     }
                 });
 

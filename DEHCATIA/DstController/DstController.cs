@@ -183,7 +183,7 @@ namespace DEHCATIA.DstController
         /// <summary>
         /// Gets the colection of mapped <see cref="ElementRowViewModel"/>
         /// </summary>
-        public ReactiveList<MappedElementDefinitionRowViewModel> HubMapResult { get; private set; } = new ReactiveList<MappedElementDefinitionRowViewModel>();
+        public ReactiveList<MappedElementRowViewModel> HubMapResult { get; private set; } = new ReactiveList<MappedElementRowViewModel>();
 
         /// <summary>
         /// Gets this running tool name
@@ -429,7 +429,16 @@ namespace DEHCATIA.DstController
 
             CDPMessageBus.Current.SendMessage(new UpdateObjectBrowserTreeEvent());
         }
-        
+
+        /// <summary>
+        /// Maps the provided collection
+        /// </summary>
+        /// <param name="elements">The <see cref="IEnumerable{T}"/> of <see cref="MappedElementRowViewModel"/> data</param>
+        public void Map(IEnumerable<MappedElementRowViewModel> elements)
+        {
+            this.HubMapResult.AddRange(elements);
+        }
+
         /// <summary>
         /// Transfers the mapped variables to the Hub data source
         /// </summary>

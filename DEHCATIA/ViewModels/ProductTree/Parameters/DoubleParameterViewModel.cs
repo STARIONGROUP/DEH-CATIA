@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DoubleWithUnitParameterViewModel.cs" company="RHEA System S.A.">
+// <copyright file="DoubleParameterViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -31,22 +31,22 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
     /// <summary>
     /// Represents a <see cref="Parameter"/>
     /// </summary>
-    public class DoubleWithUnitParameterViewModel : DstParameterViewModel<DoubleWithUnitValueViewModel>
+    public class DoubleParameterViewModel : DstParameterViewModel<DoubleWithUnitValueViewModel>
     {
         /// <summary>
-        /// Initializes a new <see cref="DoubleWithUnitParameterViewModel"/>
+        /// Initializes a new <see cref="DoubleParameterViewModel"/>
         /// </summary>
         /// <param name="parameter">The <see cref="parameter"></see>
-        public DoubleWithUnitParameterViewModel(Parameter parameter) : base(parameter, default)
+        public DoubleParameterViewModel(Parameter parameter) : base(parameter, default)
         {
             this.Value = parameter.GetDoubleWithUnitValue();
         }
 
         /// <summary>
-        /// Initializes a new <see cref="DoubleWithUnitParameterViewModel"/>
+        /// Initializes a new <see cref="DoubleParameterViewModel"/>
         /// </summary>
         /// <param name="value">The <see cref="DoubleWithUnitValueViewModel"/> value</param>
-        public DoubleWithUnitParameterViewModel(DoubleWithUnitValueViewModel value) : base(default, value)
+        public DoubleParameterViewModel(DoubleWithUnitValueViewModel value) : base(default, value)
         {
         }
         
