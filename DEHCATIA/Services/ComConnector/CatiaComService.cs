@@ -34,12 +34,16 @@ namespace DEHCATIA.Services.ComConnector
     using System.Runtime.InteropServices;
     using System.Threading;
 
+    using CDP4Common.EngineeringModelData;
+
     using DEHCATIA.Enumerations;
     using DEHCATIA.Extensions;
+    using DEHCATIA.Services.ParameterTypeService;
     using DEHCATIA.ViewModels.ProductTree;
     using DEHCATIA.ViewModels.ProductTree.Parameters;
     using DEHCATIA.ViewModels.ProductTree.Rows;
     using DEHCATIA.ViewModels.ProductTree.Shapes;
+    using DEHCATIA.ViewModels.Rows;
 
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
@@ -62,6 +66,7 @@ namespace DEHCATIA.Services.ComConnector
     using SPATypeLib;
 
     using File = System.IO.File;
+    using Parameter = KnowledgewareTypeLib.Parameter;
 
     /// <summary>
     /// The <see cref="CatiaComService"/> is responsible for managing the connection with Catia
@@ -87,7 +92,7 @@ namespace DEHCATIA.Services.ComConnector
         /// The cache of read and parsed <see cref="PartDocument"/> as <see cref="DefinitionRowViewModel"/>
         /// </summary>
         private readonly Dictionary<string, DefinitionRowViewModel> catDefinitionCache = new Dictionary<string, DefinitionRowViewModel>();
-
+        
         /// <summary>
         /// Gets or sets whether there's a connection to a running CATIA client.
         /// </summary>
@@ -662,6 +667,16 @@ namespace DEHCATIA.Services.ComConnector
             }
 
             return this.CatiaApp.Documents.Open(fileName);
+        }
+
+        /// <summary>
+        /// Updates the position and orientation of the catia element specified in the <paramref name="element"/>
+        /// </summary>
+        /// <param name="element">The <see cref="MappedElementRowViewModel"/></param>
+        private void UpdatePositionAndOrientation(MappedElementRowViewModel element)
+        {
+            //var arrayOftransformation = element.HubElement.
+            //element.CatiaElement.Product.Position.SetComponents();
         }
     }
 }

@@ -24,6 +24,8 @@
 
 namespace DEHCATIA.ViewModels.ProductTree.Shapes
 {
+    using System.Collections.Generic;
+
     using DEHCATIA.ViewModels.ProductTree.Parameters;
 
     /// <summary>

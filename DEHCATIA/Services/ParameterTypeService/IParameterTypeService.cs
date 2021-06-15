@@ -127,6 +127,11 @@ namespace DEHCATIA.Services.ParameterTypeService
         ParameterType ShapeSysMassMargin { get; }
 
         /// <summary>
+        /// The Shape external shape <see cref="ParameterType"/>
+        /// </summary>
+        ParameterType ExternalShape { get; }
+
+        /// <summary>
         /// Refreshes the defined <see cref="ParameterType"/>
         /// </summary>
         void RefreshParameterType();

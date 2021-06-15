@@ -165,7 +165,6 @@ namespace DEHCATIA.ViewModels.Dialogs
                 }));
 
             this.WhenAnyValue(x => x.SelectedDstElement)
-                //.Subscribe(this.UpdateCatiaElement);
                 .Subscribe(x => this.SelectedMappedElement?.UpdateTheCatiaElement(x));
 
             this.WhenAnyValue(x => x.SelectedHubThing)
@@ -178,16 +177,6 @@ namespace DEHCATIA.ViewModels.Dialogs
 
             this.MappedElements.ItemChanged.Subscribe(x => this.CheckCanContinue());
         }
-
-        ///// <summary>
-        ///// Updates the <see cref="SelectedMappedElement"/> Catia Element
-        ///// </summary>
-        ///// <param name="element">The target <see cref="ElementRowViewModel"/></param>
-        //private void UpdateCatiaElement(ElementRowViewModel element)
-        //{
-        //    this.SelectedMappedElement?.UpdateTheCatiaElement(element);
-        //    this.VerifyValidityOfAllRow();
-        //}
 
         /// <summary>
         /// Verifies validity for all <see cref="MappedElements"/>

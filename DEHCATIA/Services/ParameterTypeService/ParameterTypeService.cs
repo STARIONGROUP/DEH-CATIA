@@ -143,6 +143,11 @@ namespace DEHCATIA.Services.ParameterTypeService
         public const string ShapeAreaShortName = "area";
         
         /// <summary>
+        /// The Shape area <see cref="ParameterType"/> short name
+        /// </summary>
+        public const string ExternalShapeShortName = "external_shape";
+        
+        /// <summary>
         /// The NLog <see cref="Logger"/>
         /// </summary>
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
@@ -348,6 +353,16 @@ namespace DEHCATIA.Services.ParameterTypeService
         public ParameterType ShapeSysMassMargin => this.shapeSysMassMargin ??= this.FetchParameterType(ShapeSysMassMarginShortName);
 
         /// <summary>
+        /// Backing field for <see cref="ExternalShape"/>
+        /// </summary>
+        private ParameterType externalShape;
+
+        /// <summary>
+        /// The Shape external shape <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ExternalShape => this.externalShape ??= this.FetchParameterType(ExternalShapeShortName);
+
+        /// <summary>
         /// Initializes a new <see cref="ParameterTypeService"/>
         /// </summary>
         /// <param name="hubController">The <see cref="IHubController"/></param>
@@ -407,6 +422,7 @@ namespace DEHCATIA.Services.ParameterTypeService
             this.shapeSysMassMargin = null;
             this.shapeMassWithMargin = null;
             this.shapeDensity = null;
+            this.externalShape = null;
         }
 
         /// <summary>

@@ -123,7 +123,6 @@ namespace DEHCATIA.ViewModels.Rows
 
             this.WhenAnyValue(x => x.ShouldCreateNewElement)
                 .Subscribe(_ => this.UpdateTheCatiaElement(this.CatiaElement ?? this.CatiaParent));
-
         }
 
         /// <summary>
@@ -160,7 +159,10 @@ namespace DEHCATIA.ViewModels.Rows
                 this.IsValid = null;
             }
 
-            CDPMessageBus.Current.SendMessage(new SelectEvent(this.HubElement, this.IsValid != true));
+            if (this.HubElement != null)
+            {
+                CDPMessageBus.Current.SendMessage(new SelectEvent(this.HubElement, this.IsValid != true));
+            }
         }
     }
 }

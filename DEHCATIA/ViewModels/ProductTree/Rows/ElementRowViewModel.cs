@@ -27,6 +27,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
     using System;
     using System.Reactive.Linq;
 
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
     using CDP4Dal;
@@ -47,6 +48,11 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
     /// </summary>
     public class ElementRowViewModel : ReactiveObject
     {
+        /// <summary>
+        /// Backing field for <see cref="Product"/>
+        /// </summary>
+        private Product product;
+
         /// <summary>
         /// Backing field for <see cref="Name"/>
         /// </summary>
@@ -126,7 +132,30 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// Backing field for <see cref="Parent"/>
         /// </summary>
         private ElementRowViewModel parent;
-        
+
+        /// <summary>
+        /// Backing field for <see cref="IsDraft"/>
+        /// </summary>
+        private bool isDraft;
+
+        /// <summary>
+        /// A value indicating whether the current represented row exist yet in the Catia model
+        /// </summary>
+        public bool IsDraft
+        {
+            get => this.isDraft;
+            set => this.RaiseAndSetIfChanged(ref this.isDraft, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the reference to the actual Catia <see cref="ProductStructureTypeLib.Product"/>.
+        /// </summary>
+        public Product Product
+        {
+            get => this.product;
+            set => this.RaiseAndSetIfChanged(ref this.product, value);
+        }
+
         /// <summary>
         /// Gets or sets the element name.
         /// </summary>
@@ -286,15 +315,35 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// </summary>
         /// <param name="product">The <see cref="Product"/> this view model represents</param>
         /// <param name="fileName">The file name of the <paramref name="product"/></param>
-        public ElementRowViewModel(Product product, string fileName)
+        public ElementRowViewModel(Product product, string fileName) : this(product.get_Name(), fileName)
         {
-            this.Name = product.get_Name();
             this.PartNumber = product.get_PartNumber();
             this.Description = product.get_DescriptionRef();
+            this.Product = product;
+        }
+
+        /// <summary>
+        /// Initializes a new <see cref="ElementRowViewModel"/>
+        /// </summary>
+        /// <param name="hubElement">The <see cref="IShortNamedThing"/> that this represented row is based upon</param>
+        /// <param name="fileName">The file name of this represented <see cref="ElementRowViewModel"/></param>
+        public ElementRowViewModel(IShortNamedThing hubElement, string fileName) : this(hubElement.ShortName, fileName)
+        {
+            this.IsDraft = true;
+        }
+
+        /// <summary>
+        /// Initializes a new <see cref="ElementRowViewModel"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="fileName">The file name of this represented <see cref="ElementRowViewModel"/></param>
+        private ElementRowViewModel(string name, string fileName)
+        {
+            this.Name = name;
             this.FileName = fileName;
 
             CDPMessageBus.Current.Listen<DstHighlightEvent>()
-                .Where(x => (string) x.TargetThingId == this.Name)
+                .Where(x => (string)x.TargetThingId == this.Name)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => this.IsHighlighted = x.ShouldHighlight);
         }
