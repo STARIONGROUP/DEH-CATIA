@@ -149,58 +149,58 @@ namespace DEHCATIA.MappingRules
             }
 
             mappedElementRowViewModel.CatiaElement.Shape.Angle =
-                this.GetNewParameterValue(mappedElementRowViewModel, parameters, 
+                this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters, 
                     mappedElementRowViewModel.CatiaElement.Shape.Angle, this.parameterTypeService.ShapeAngle?.Iid);
 
             mappedElementRowViewModel.CatiaElement.Shape.AngleSupport =
-                this.GetNewParameterValue(mappedElementRowViewModel, parameters, 
+                this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters, 
                     mappedElementRowViewModel.CatiaElement.Shape.AngleSupport, this.parameterTypeService.ShapeSupportAngle?.Iid);
 
-            mappedElementRowViewModel.CatiaElement.Shape.Area = this.GetNewParameterValue(mappedElementRowViewModel, parameters,
+            mappedElementRowViewModel.CatiaElement.Shape.Area = this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters,
                 mappedElementRowViewModel.CatiaElement.Shape.Area, this.parameterTypeService.ShapeArea?.Iid);
 
             mappedElementRowViewModel.CatiaElement.Shape.Density =
-                this.GetNewParameterValue(mappedElementRowViewModel, parameters,
+                this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters,
                     mappedElementRowViewModel.CatiaElement.Shape.Density, this.parameterTypeService.ShapeDensity?.Iid);
 
             mappedElementRowViewModel.CatiaElement.Shape.Height =
-                this.GetNewParameterValue(mappedElementRowViewModel, parameters,
+                this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters,
                     mappedElementRowViewModel.CatiaElement.Shape.Height, this.parameterTypeService.ShapeHeight?.Iid);
 
             mappedElementRowViewModel.CatiaElement.Shape.WidthOrDiameter =
-                this.GetNewParameterValue(mappedElementRowViewModel, parameters,
+                this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters,
                     mappedElementRowViewModel.CatiaElement.Shape.WidthOrDiameter, this.parameterTypeService.ShapeWidthOrDiameter?.Iid);
 
             mappedElementRowViewModel.CatiaElement.Shape.Length =
-                this.GetNewParameterValue(mappedElementRowViewModel, parameters,
+                this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters,
                     mappedElementRowViewModel.CatiaElement.Shape.Length, this.parameterTypeService.ShapeLength?.Iid);
 
             mappedElementRowViewModel.CatiaElement.Shape.LengthSupport =
-                this.GetNewParameterValue(mappedElementRowViewModel, parameters,
+                this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters,
                     mappedElementRowViewModel.CatiaElement.Shape.LengthSupport, this.parameterTypeService.ShapeSupportLength?.Iid);
 
             mappedElementRowViewModel.CatiaElement.Shape.Mass =
-                this.GetNewParameterValue(mappedElementRowViewModel, parameters,
+                this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters,
                     mappedElementRowViewModel.CatiaElement.Shape.Mass, this.parameterTypeService.Mass?.Iid);
 
             mappedElementRowViewModel.CatiaElement.Shape.MassMargin =
-                this.GetNewParameterValue(mappedElementRowViewModel, parameters,
+                this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters,
                     mappedElementRowViewModel.CatiaElement.Shape.MassMargin, this.parameterTypeService.ShapeMassMargin?.Iid);
 
             mappedElementRowViewModel.CatiaElement.Shape.MassWithMargin =
-                this.GetNewParameterValue(mappedElementRowViewModel, parameters,
+                this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters,
                     mappedElementRowViewModel.CatiaElement.Shape.MassWithMargin, this.parameterTypeService.ShapeMassWithMargin?.Iid);
 
             mappedElementRowViewModel.CatiaElement.Shape.SysMassMargin =
-                this.GetNewParameterValue(mappedElementRowViewModel, parameters,
+                this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters,
                     mappedElementRowViewModel.CatiaElement.Shape.SysMassMargin, this.parameterTypeService.ShapeSysMassMargin?.Iid);
 
             mappedElementRowViewModel.CatiaElement.Shape.Thickness =
-                this.GetNewParameterValue(mappedElementRowViewModel, parameters,
+                this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters,
                     mappedElementRowViewModel.CatiaElement.Shape.Thickness, this.parameterTypeService.ShapeThickness?.Iid);
 
             mappedElementRowViewModel.CatiaElement.Shape.Volume =
-                this.GetNewParameterValue(mappedElementRowViewModel, parameters,
+                this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters,
                     mappedElementRowViewModel.CatiaElement.Shape.Volume, this.parameterTypeService.Volume?.Iid);
 
             mappedElementRowViewModel.CatiaElement.Shape.ExternalShape = 
@@ -217,7 +217,7 @@ namespace DEHCATIA.MappingRules
         /// <param name="parameter">The <see cref="DoubleWithUnitValueViewModel"/></param>
         /// <param name="parameterTypeIid">The <see cref="Guid"/> Id of the <see cref="ParameterType"/></param>
         /// <returns>An updated <see cref="DoubleWithUnitValueViewModel"/></returns>
-        private DoubleWithUnitValueViewModel GetNewParameterValue(MappedElementRowViewModel mappedElementRowViewModel, IEnumerable<ParameterOrOverrideBase> parameters, DoubleWithUnitValueViewModel parameter, Guid? parameterTypeIid)
+        private DoubleWithUnitValueViewModel RefreshOrCreateDoubleWithUnitValueViewModel(MappedElementRowViewModel mappedElementRowViewModel, IEnumerable<ParameterOrOverrideBase> parameters, DoubleWithUnitValueViewModel parameter, Guid? parameterTypeIid)
         {
             var newAngleValue = parameterTypeIid.HasValue 
                 ? this.GetParameterValues<double>(parameters, parameterTypeIid.Value, mappedElementRowViewModel)?.FirstOrDefault()
