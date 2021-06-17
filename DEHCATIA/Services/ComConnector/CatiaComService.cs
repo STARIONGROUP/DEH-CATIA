@@ -668,15 +668,5 @@ namespace DEHCATIA.Services.ComConnector
 
             return this.CatiaApp.Documents.Open(fileName);
         }
-
-        /// <summary>
-        /// Updates the position and orientation of the catia element specified in the <paramref name="element"/>
-        /// </summary>
-        /// <param name="element">The <see cref="MappedElementRowViewModel"/></param>
-        private void UpdatePositionAndOrientation(MappedElementRowViewModel element)
-        {
-            //var arrayOftransformation = element.HubElement.
-            //element.CatiaElement.Product.Position.SetComponents();
-        }
     }
 }

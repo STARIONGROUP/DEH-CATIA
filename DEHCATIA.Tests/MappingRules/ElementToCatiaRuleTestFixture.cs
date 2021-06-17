@@ -4,14 +4,14 @@
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
-//    This file is part of DEHPEcosimPro
+//    This file is part of DEHCATIA
 // 
-//    The DEHPEcosimPro is free software; you can redistribute it and/or
+//    The DEHCATIA is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Lesser General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or (at your option) any later version.
 // 
-//    The DEHPEcosimPro is distributed in the hope that it will be useful,
+//    The DEHCATIA is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Lesser General Public License for more details.
@@ -168,28 +168,28 @@ namespace DEHCATIA.Tests.MappingRules
             var mappedElementRowViewModel = new MappedElementRowViewModel() { CatiaElement = new ElementRowViewModel(new Mock<ProductStructureTypeLib.Product>().Object, "") };
 
             IEnumerable<bool> boolResult = new List<bool>();
-            Assert.DoesNotThrow(() => boolResult = this.rule.GetParameterValue<bool>(this.elementDefinition.Parameter, this.booleanParameterType.Iid, mappedElementRowViewModel));
+            Assert.DoesNotThrow(() => boolResult = this.rule.GetParameterValues<bool>(this.elementDefinition.Parameter, this.booleanParameterType.Iid, mappedElementRowViewModel));
             Assert.AreEqual(1, boolResult.Count());
             Assert.IsTrue(boolResult.FirstOrDefault());
 
             IEnumerable<double> doubleResult = new List<double>();
-            Assert.DoesNotThrow(() => doubleResult = this.rule.GetParameterValue<double>(this.elementDefinition.Parameter, this.quantityParameterType.Iid, mappedElementRowViewModel));
+            Assert.DoesNotThrow(() => doubleResult = this.rule.GetParameterValues<double>(this.elementDefinition.Parameter, this.quantityParameterType.Iid, mappedElementRowViewModel));
             Assert.AreEqual(2, doubleResult.Count());
             Assert.AreEqual(.42, doubleResult.Last());
 
             IEnumerable<string> stringResult = new List<string>();
-            Assert.DoesNotThrow(() => stringResult = this.rule.GetParameterValue<string>(this.elementDefinition.Parameter, this.textParameterType.Iid, mappedElementRowViewModel));
+            Assert.DoesNotThrow(() => stringResult = this.rule.GetParameterValues<string>(this.elementDefinition.Parameter, this.textParameterType.Iid, mappedElementRowViewModel));
             Assert.AreEqual(1, stringResult.Count());
             Assert.AreEqual("text", stringResult.FirstOrDefault());
 
             IEnumerable<ShapeKind> enumResult = new List<ShapeKind>();
-            Assert.DoesNotThrow(() => enumResult = this.rule.GetParameterEnumValue<ShapeKind>(this.elementDefinition.Parameter, this.enumerationParameterType.Iid, mappedElementRowViewModel));
+            Assert.DoesNotThrow(() => enumResult = this.rule.GetParameterEnumValues<ShapeKind>(this.elementDefinition.Parameter, this.enumerationParameterType.Iid, mappedElementRowViewModel));
             Assert.AreEqual(1, enumResult.Count());
             Assert.AreEqual(ShapeKind.Box, enumResult.FirstOrDefault());
 
             Assert.IsEmpty(this.rule.MappingErrors);
             IEnumerable<double> badResult = new List<double>();
-            Assert.DoesNotThrow(() => badResult = this.rule.GetParameterValue<double>(this.elementDefinition.Parameter, this.textParameterType.Iid, mappedElementRowViewModel));
+            Assert.DoesNotThrow(() => badResult = this.rule.GetParameterValues<double>(this.elementDefinition.Parameter, this.textParameterType.Iid, mappedElementRowViewModel));
             Assert.AreEqual(0, badResult.Count());
             Assert.IsNotEmpty(this.rule.MappingErrors);
         }

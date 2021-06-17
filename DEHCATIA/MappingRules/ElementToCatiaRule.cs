@@ -4,14 +4,14 @@
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
-//    This file is part of DEHPEcosimPro
+//    This file is part of DEHCATIA
 // 
-//    The DEHPEcosimPro is free software; you can redistribute it and/or
+//    The DEHCATIA is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Lesser General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or (at your option) any later version.
 // 
-//    The DEHPEcosimPro is distributed in the hope that it will be useful,
+//    The DEHCATIA is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Lesser General Public License for more details.
@@ -116,7 +116,7 @@ namespace DEHCATIA.MappingRules
             {
                 if (mappedElementRowViewModel.ShouldCreateNewElement
                     && mappedElementRowViewModel.CatiaParent != null
-                    && !this.CreateCatiaElement(mappedElementRowViewModel))
+                    && !this.TryCreateCatiaElement(mappedElementRowViewModel))
                 {
                     continue;
                 }
@@ -133,10 +133,10 @@ namespace DEHCATIA.MappingRules
         /// <param name="mappedElementRowViewModel">The <see cref="MappedElementRowViewModel"/></param>
         private void MapParameters(MappedElementRowViewModel mappedElementRowViewModel)
         {
-            var parameters = this.GetParameters(mappedElementRowViewModel.HubElement).ToArray();
+            var parameters = this.GetParameterOrOverrideBases(mappedElementRowViewModel.HubElement).ToArray();
 
             if (mappedElementRowViewModel.CatiaElement.Shape is null
-                && this.GetParameterEnumValue<ShapeKind>(parameters, this.parameterTypeService.ShapeKind.Iid, mappedElementRowViewModel)?.FirstOrDefault() is { } shapeKind)
+                && this.GetParameterEnumValues<ShapeKind>(parameters, this.parameterTypeService.ShapeKind.Iid, mappedElementRowViewModel)?.FirstOrDefault() is { } shapeKind)
             {
                 mappedElementRowViewModel.CatiaElement.Shape = new CatiaShapeViewModel(true) { ShapeKind = shapeKind };
             }
@@ -204,7 +204,7 @@ namespace DEHCATIA.MappingRules
                     mappedElementRowViewModel.CatiaElement.Shape.Volume, this.parameterTypeService.Volume?.Iid);
 
             mappedElementRowViewModel.CatiaElement.Shape.ExternalShape = 
-                this.GetParameterValue<string>(parameters, this.parameterTypeService.ExternalShape?.Iid, mappedElementRowViewModel)?
+                this.GetParameterValues<string>(parameters, this.parameterTypeService.ExternalShape?.Iid, mappedElementRowViewModel)?
                     .FirstOrDefault()
                 ?? mappedElementRowViewModel.CatiaElement.Shape.ExternalShape;
         }
@@ -220,7 +220,7 @@ namespace DEHCATIA.MappingRules
         private DoubleWithUnitValueViewModel GetNewParameterValue(MappedElementRowViewModel mappedElementRowViewModel, IEnumerable<ParameterOrOverrideBase> parameters, DoubleWithUnitValueViewModel parameter, Guid? parameterTypeIid)
         {
             var newAngleValue = parameterTypeIid.HasValue 
-                ? this.GetParameterValue<double>(parameters, parameterTypeIid.Value, mappedElementRowViewModel)?.FirstOrDefault()
+                ? this.GetParameterValues<double>(parameters, parameterTypeIid.Value, mappedElementRowViewModel)?.FirstOrDefault()
                 : null;
 
             if (!newAngleValue.HasValue)
@@ -244,7 +244,7 @@ namespace DEHCATIA.MappingRules
         /// <param name="parameter">The <see cref="ParameterBase"/></param>
         /// <param name="mappedElementRowViewModel">The <see cref="MappedElementRowViewModel"/></param>
         /// <returns>A collection of <typeparamref name="TValueType"/></returns>
-        private IEnumerable<TValueType> GetValue<TValueType>(ParameterBase parameter, MappedElementRowViewModel mappedElementRowViewModel) where TValueType : IConvertible
+        private IEnumerable<TValueType> GetValues<TValueType>(ParameterBase parameter, MappedElementRowViewModel mappedElementRowViewModel) where TValueType : IConvertible
         {
             var valueSet = parameter.QueryParameterBaseValueSet(mappedElementRowViewModel.CatiaElement.SelectedOption, mappedElementRowViewModel.CatiaElement.SelectedActualFiniteState);
 
@@ -280,7 +280,7 @@ namespace DEHCATIA.MappingRules
         /// <param name="parameter">The <see cref="ParameterBase"/></param>
         /// <param name="mappedElementRowViewModel">The <see cref="MappedElementRowViewModel"/></param>
         /// <returns>A collection of <typeparamref name="TEnum"/></returns>
-        private IEnumerable<TEnum> GetEnumValue<TEnum>(ParameterBase parameter, MappedElementRowViewModel mappedElementRowViewModel) where TEnum : struct, Enum
+        private IEnumerable<TEnum> GetEnumValues<TEnum>(ParameterBase parameter, MappedElementRowViewModel mappedElementRowViewModel) where TEnum : struct, Enum
         {
             var valueSet = parameter.QueryParameterBaseValueSet(mappedElementRowViewModel.CatiaElement.SelectedOption, mappedElementRowViewModel.CatiaElement.SelectedActualFiniteState);
 
@@ -311,14 +311,14 @@ namespace DEHCATIA.MappingRules
         /// <param name="parameterTypeIid">The <see cref="ParameterType"/> Iid</param>
         /// <param name="mappedElementRowViewModel">The <see cref="MappedElementRowViewModel"/></param>
         /// <returns>A collection of <typeparamref name="TValueType"/></returns>
-        public IEnumerable<TValueType> GetParameterValue<TValueType>(IEnumerable<ParameterOrOverrideBase> parameters, Guid? parameterTypeIid, MappedElementRowViewModel mappedElementRowViewModel) 
+        public IEnumerable<TValueType> GetParameterValues<TValueType>(IEnumerable<ParameterOrOverrideBase> parameters, Guid? parameterTypeIid, MappedElementRowViewModel mappedElementRowViewModel) 
             where TValueType : IConvertible
         {
             var parameter = parameters.FirstOrDefault(x => x.ParameterType.Iid == parameterTypeIid);
 
             return parameter is null 
                 ? new List<TValueType>() 
-                : this.GetValue<TValueType>(parameter, mappedElementRowViewModel);
+                : this.GetValues<TValueType>(parameter, mappedElementRowViewModel);
         }
 
         /// <summary>
@@ -329,14 +329,14 @@ namespace DEHCATIA.MappingRules
         /// <param name="parameterTypeIid">The <see cref="ParameterType"/> Iid</param>
         /// <param name="mappedElementRowViewModel">The <see cref="MappedElementRowViewModel"/></param>
         /// <returns>A collection of <typeparamref name="TEnum"/></returns>
-        public IEnumerable<TEnum> GetParameterEnumValue<TEnum>(IEnumerable<ParameterOrOverrideBase> parameters, Guid parameterTypeIid, MappedElementRowViewModel mappedElementRowViewModel) 
+        public IEnumerable<TEnum> GetParameterEnumValues<TEnum>(IEnumerable<ParameterOrOverrideBase> parameters, Guid parameterTypeIid, MappedElementRowViewModel mappedElementRowViewModel) 
             where TEnum : struct, Enum
         {
             var parameter = parameters.FirstOrDefault(x => x.ParameterType.Iid == parameterTypeIid);
 
             return parameter is null 
                 ? new List<TEnum>() 
-                : this.GetEnumValue<TEnum>(parameter, mappedElementRowViewModel);
+                : this.GetEnumValues<TEnum>(parameter, mappedElementRowViewModel);
         }
 
         /// <summary>
@@ -345,9 +345,9 @@ namespace DEHCATIA.MappingRules
         /// <param name="hubElement">The <see cref="ElementBase"/></param>
         /// <param name="parameterType">The <see cref="ParameterType"/></param>
         /// <returns>A <see cref="ParameterOrOverrideBase"/></returns>
-        private ParameterOrOverrideBase GetParameter(ElementBase hubElement, ParameterType parameterType)
+        private ParameterOrOverrideBase GetParameterOrOverrideBase(ElementBase hubElement, ParameterType parameterType)
         {
-            return this.GetParameters(hubElement)
+            return this.GetParameterOrOverrideBases(hubElement)
                 .FirstOrDefault(x => x.ParameterType.Iid == parameterType?.Iid);
         }
 
@@ -356,17 +356,17 @@ namespace DEHCATIA.MappingRules
         /// </summary>
         /// <param name="hubElement">The <see cref="ElementBase"/></param>
         /// <returns>A collection of <see cref="ParameterOrOverrideBase"/></returns>
-        private IEnumerable<ParameterOrOverrideBase> GetParameters(ElementBase hubElement)
+        private IEnumerable<ParameterOrOverrideBase> GetParameterOrOverrideBases(ElementBase hubElement)
         {
             Func<IEnumerable<ParameterOrOverrideBase>> parameters = hubElement switch
             {
                 ElementDefinition elementDefinition => () => elementDefinition.Parameter,
                 ElementUsage elementUsage => () =>
                 {
-                    var parameterOrOveride = new List<ParameterOrOverrideBase>(elementUsage.ParameterOverride);
-                    var overridenParameter = elementUsage.ParameterOverride.Select(x => x.Parameter).ToList();
-                    parameterOrOveride.AddRange(elementUsage.ElementDefinition.Parameter.Except(overridenParameter).ToList());
-                    return parameterOrOveride;
+                    var parameterOrOverride = new List<ParameterOrOverrideBase>(elementUsage.ParameterOverride);
+                    var overriddenParameter = elementUsage.ParameterOverride.Select(x => x.Parameter).ToList();
+                    parameterOrOverride.AddRange(elementUsage.ElementDefinition.Parameter.Except(overriddenParameter).ToList());
+                    return parameterOrOverride;
                 },
                 _ => throw new ArgumentOutOfRangeException(nameof(hubElement))
             };
@@ -379,10 +379,10 @@ namespace DEHCATIA.MappingRules
         /// </summary>
         /// <param name="mappedElementRowViewModel">The <see cref="MappedElementRowViewModel"/></param>
         /// <returns>A value indicating whether the Catia element draft has been created</returns>
-        private bool CreateCatiaElement(MappedElementRowViewModel mappedElementRowViewModel)
+        private bool TryCreateCatiaElement(MappedElementRowViewModel mappedElementRowViewModel)
         {
             if (this.catiaTemplateService.TryGetFileName(
-                this.GetParameter(mappedElementRowViewModel.HubElement, this.parameterTypeService.ShapeKind),
+                this.GetParameterOrOverrideBase(mappedElementRowViewModel.HubElement, this.parameterTypeService.ShapeKind),
                 mappedElementRowViewModel.CatiaParent.SelectedOption, mappedElementRowViewModel.CatiaParent.SelectedActualFiniteState,
                 out var fileName))
             {
@@ -400,7 +400,7 @@ namespace DEHCATIA.MappingRules
         /// <param name="mappedElementRowViewModel">The <see cref="MappedElementRowViewModel"/></param>
         private void MapPosition(MappedElementRowViewModel mappedElementRowViewModel)
         {
-            var valueSet = this.GetParameter(mappedElementRowViewModel.HubElement, this.parameterTypeService.Position)?
+            var valueSet = this.GetParameterOrOverrideBase(mappedElementRowViewModel.HubElement, this.parameterTypeService.Position)?
                 .QueryParameterBaseValueSet(mappedElementRowViewModel.CatiaElement.SelectedOption,
                     mappedElementRowViewModel.CatiaElement.SelectedActualFiniteState);
 
@@ -423,7 +423,7 @@ namespace DEHCATIA.MappingRules
         /// <param name="mappedElementRowViewModel">The <see cref="MappedElementRowViewModel"/></param>
         private void MapOrientation(MappedElementRowViewModel mappedElementRowViewModel)
         {
-            var valueSet = this.GetParameter(mappedElementRowViewModel.HubElement, this.parameterTypeService.Orientation)?
+            var valueSet = this.GetParameterOrOverrideBase(mappedElementRowViewModel.HubElement, this.parameterTypeService.Orientation)?
                 .QueryParameterBaseValueSet(mappedElementRowViewModel.CatiaElement.SelectedOption,
                     mappedElementRowViewModel.CatiaElement.SelectedActualFiniteState);
 
