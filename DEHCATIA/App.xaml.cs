@@ -33,6 +33,7 @@ namespace DEHCATIA
     using Autofac;
 
     using DEHCATIA.DstController;
+    using DEHCATIA.Services.CatiaTemplateService;
     using DEHCATIA.Services.ComConnector;
     using DEHCATIA.Services.ParameterTypeService;
     using DEHCATIA.ViewModels;
@@ -140,6 +141,7 @@ namespace DEHCATIA
             containerBuilder.RegisterType<DstController.DstController>().As<IDstController>().SingleInstance();
             containerBuilder.RegisterType<CatiaComService>().As<ICatiaComService>().SingleInstance();
             containerBuilder.RegisterType<ParameterTypeService>().As<IParameterTypeService>().SingleInstance();
+            containerBuilder.RegisterType<CatiaTemplateService>().As<ICatiaTemplateService>();
         }
 
         /// <summary>

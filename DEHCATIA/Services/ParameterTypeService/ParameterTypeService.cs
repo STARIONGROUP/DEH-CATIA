@@ -4,14 +4,14 @@
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
-//    This file is part of DEHPEcosimPro
+//    This file is part of DEHCATIA
 // 
-//    The DEHPEcosimPro is free software; you can redistribute it and/or
+//    The DEHCATIA is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Lesser General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or (at your option) any later version.
 // 
-//    The DEHPEcosimPro is distributed in the hope that it will be useful,
+//    The DEHCATIA is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Lesser General Public License for more details.
@@ -141,6 +141,11 @@ namespace DEHCATIA.Services.ParameterTypeService
         /// The Shape area <see cref="ParameterType"/> short name
         /// </summary>
         public const string ShapeAreaShortName = "area";
+        
+        /// <summary>
+        /// The Shape area <see cref="ParameterType"/> short name
+        /// </summary>
+        public const string ExternalShapeShortName = "external_shape";
         
         /// <summary>
         /// The NLog <see cref="Logger"/>
@@ -348,6 +353,16 @@ namespace DEHCATIA.Services.ParameterTypeService
         public ParameterType ShapeSysMassMargin => this.shapeSysMassMargin ??= this.FetchParameterType(ShapeSysMassMarginShortName);
 
         /// <summary>
+        /// Backing field for <see cref="ExternalShape"/>
+        /// </summary>
+        private ParameterType externalShape;
+
+        /// <summary>
+        /// The Shape external shape <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType ExternalShape => this.externalShape ??= this.FetchParameterType(ExternalShapeShortName);
+
+        /// <summary>
         /// Initializes a new <see cref="ParameterTypeService"/>
         /// </summary>
         /// <param name="hubController">The <see cref="IHubController"/></param>
@@ -407,6 +422,7 @@ namespace DEHCATIA.Services.ParameterTypeService
             this.shapeSysMassMargin = null;
             this.shapeMassWithMargin = null;
             this.shapeDensity = null;
+            this.externalShape = null;
         }
 
         /// <summary>

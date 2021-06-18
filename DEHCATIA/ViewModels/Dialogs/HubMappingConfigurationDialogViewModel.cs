@@ -4,14 +4,14 @@
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
-//    This file is part of DEHPEcosimPro
+//    This file is part of DEHCATIA
 // 
-//    The DEHPEcosimPro is free software; you can redistribute it and/or
+//    The DEHCATIA is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Lesser General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or (at your option) any later version.
 // 
-//    The DEHPEcosimPro is distributed in the hope that it will be useful,
+//    The DEHCATIA is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Lesser General Public License for more details.
@@ -165,7 +165,6 @@ namespace DEHCATIA.ViewModels.Dialogs
                 }));
 
             this.WhenAnyValue(x => x.SelectedDstElement)
-                //.Subscribe(this.UpdateCatiaElement);
                 .Subscribe(x => this.SelectedMappedElement?.UpdateTheCatiaElement(x));
 
             this.WhenAnyValue(x => x.SelectedHubThing)
@@ -178,16 +177,6 @@ namespace DEHCATIA.ViewModels.Dialogs
 
             this.MappedElements.ItemChanged.Subscribe(x => this.CheckCanContinue());
         }
-
-        ///// <summary>
-        ///// Updates the <see cref="SelectedMappedElement"/> Catia Element
-        ///// </summary>
-        ///// <param name="element">The target <see cref="ElementRowViewModel"/></param>
-        //private void UpdateCatiaElement(ElementRowViewModel element)
-        //{
-        //    this.SelectedMappedElement?.UpdateTheCatiaElement(element);
-        //    this.VerifyValidityOfAllRow();
-        //}
 
         /// <summary>
         /// Verifies validity for all <see cref="MappedElements"/>

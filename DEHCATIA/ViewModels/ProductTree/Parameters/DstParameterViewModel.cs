@@ -85,7 +85,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
             get => this.isQuantityKind;
             set => this.RaiseAndSetIfChanged(ref this.isQuantityKind, value);
         }
-        
+
         /// <summary>
         /// Gets or sets the Value
         /// </summary>

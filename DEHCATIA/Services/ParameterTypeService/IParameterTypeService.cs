@@ -4,14 +4,14 @@
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
 // 
-//    This file is part of DEHPEcosimPro
+//    This file is part of DEHCATIA
 // 
-//    The DEHPEcosimPro is free software; you can redistribute it and/or
+//    The DEHCATIA is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Lesser General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or (at your option) any later version.
 // 
-//    The DEHPEcosimPro is distributed in the hope that it will be useful,
+//    The DEHCATIA is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 //    Lesser General Public License for more details.
@@ -125,6 +125,11 @@ namespace DEHCATIA.Services.ParameterTypeService
         /// The Shape sys mass margin <see cref="ParameterType"/>
         /// </summary>
         ParameterType ShapeSysMassMargin { get; }
+
+        /// <summary>
+        /// The Shape external shape <see cref="ParameterType"/>
+        /// </summary>
+        ParameterType ExternalShape { get; }
 
         /// <summary>
         /// Refreshes the defined <see cref="ParameterType"/>
