@@ -28,7 +28,8 @@ namespace DEHCATIA.ViewModels.NetChangePreview
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
-    
+    using System.Windows.Input;
+
     using CDP4Dal;
 
     using DEHCATIA.Events;
@@ -85,6 +86,26 @@ namespace DEHCATIA.ViewModels.NetChangePreview
             CDPMessageBus.Current.Listen<UpdateDstPreviewBasedOnSelectionEvent>()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => this.UpdateTreeBasedOnSelectionHandler(x.Selection.ToList()));
+
+            this.InitializeCommandsAndObservables();
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="ICommand"/> of this view model and the observable
+        /// </summary>
+        public override void InitializeCommandsAndObservables()
+        {
+            this.WhenAnyValue(x => x.DstController.ProductTree)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x =>
+                {
+                    this.RootElements.Clear();
+
+                    if (x is { })
+                    {
+                        this.RootElements.Add(x);
+                    }
+                });
         }
 
         /// <summary>
@@ -173,24 +194,6 @@ namespace DEHCATIA.ViewModels.NetChangePreview
         private void UpdateElementRow(MappedElementRowViewModel mappedElement)
         {
             CDPMessageBus.Current.SendMessage(new DstHighlightEvent(mappedElement.CatiaElement.Name));
-        }
-
-        /// <summary>
-        /// Updates the <see cref="ProductTree"/> after a CATIA connection update.
-        /// </summary>
-        protected override void UpdateProductTree()
-        {
-            this.RootElement = null;
-            this.IsBusy = true;
-
-            this.WhenAny(x => x.DstController.ProductTree,
-                    x => x.Value)
-                .Where(x => x != null)
-                .Subscribe(p =>
-                {
-                    this.RootElement = p;
-                    this.IsBusy = false;
-                });
         }
 
         /// <summary>

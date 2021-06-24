@@ -167,7 +167,24 @@ namespace DEHCATIA.ViewModels
             this.statusBar = statusBar;
             this.navigationService = navigationService;
             this.hubController = hubController;
-            this.InitializeCommands();
+            this.InitializeCommandsAndObservables();
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="ICommand"/> of this view model and the observable
+        /// </summary>
+        public virtual void InitializeCommandsAndObservables()
+        {
+            var canMap = this.WhenAny(
+                vm => vm.hubController.OpenIteration,
+                vm => vm.DstController.MappingDirection,
+                (iteration, mappingDirection) =>
+                    iteration.Value != null && mappingDirection.Value is MappingDirection.FromDstToHub)
+                .ObserveOn(RxApp.MainThreadScheduler);
+
+            this.MapCommand = ReactiveCommand.Create(canMap);
+            this.MapCommand.Subscribe(_ => this.MapCommandExecute());
+            this.MapCommand.ThrownExceptions.Subscribe(e => this.logger.Error(e));
 
             this.WhenAnyValue(x => x.RootElement)
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -186,23 +203,6 @@ namespace DEHCATIA.ViewModels
             this.WhenAnyValue(vm => vm.DstController.IsCatiaConnected)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.RunUpdateProductTree());
-        }
-
-        /// <summary>
-        /// Initializes the <see cref="ICommand"/> of this view model
-        /// </summary>
-        public void InitializeCommands()
-        {
-            var canMap = this.WhenAny(
-                vm => vm.hubController.OpenIteration,
-                vm => vm.DstController.MappingDirection,
-                (iteration, mappingDirection) =>
-                    iteration.Value != null && mappingDirection.Value is MappingDirection.FromDstToHub)
-                .ObserveOn(RxApp.MainThreadScheduler);
-
-            this.MapCommand = ReactiveCommand.Create(canMap);
-            this.MapCommand.Subscribe(_ => this.MapCommandExecute());
-            this.MapCommand.ThrownExceptions.Subscribe(e => this.logger.Error(e));
         }
         
         /// <summary>

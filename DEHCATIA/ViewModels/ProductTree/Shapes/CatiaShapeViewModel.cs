@@ -28,7 +28,6 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
     using System.Linq;
     using System.Reflection;
 
-    using DEHCATIA.Enumerations;
     using DEHCATIA.ViewModels.ProductTree.Parameters;
 
     using ReactiveUI;

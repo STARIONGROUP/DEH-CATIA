@@ -24,12 +24,6 @@
 
 namespace DEHCATIA.ViewModels.Dialogs.Interfaces
 {
-    using System.Reactive;
-
-    using DEHPCommon.UserInterfaces.Behaviors;
-
-    using ReactiveUI;
-
     /// <summary>
     /// Interface definiton for <see cref="DstLoginViewModel"/>
     /// </summary>

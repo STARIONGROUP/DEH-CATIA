@@ -28,24 +28,16 @@ namespace DEHCATIA.ViewModels.Dialogs
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
-    using System.Threading.Tasks;
     using System.Windows.Input;
 
-    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
-
-    using CDP4Dal;
 
     using DEHCATIA.DstController;
     using DEHCATIA.ViewModels.Dialogs.Interfaces;
     using DEHCATIA.ViewModels.ProductTree.Rows;
 
-    using DEHPCommon.Events;
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
-
-    using DevExpress.Xpo.DB.Helpers;
 
     using ReactiveUI;
 
