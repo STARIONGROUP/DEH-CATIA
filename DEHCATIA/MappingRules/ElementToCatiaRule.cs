@@ -144,7 +144,6 @@ namespace DEHCATIA.MappingRules
                         ShapeKind = new ShapeKindParameterViewModel(shapeKind)
                     };
                 }
-
                 else
                 {
                     var message = $"No ShapeKind found or the shape kind described in the element {mappedElementRowViewModel.HubElement.Name} isn't supported by either Catia or the adapter";
