@@ -27,16 +27,22 @@ namespace DEHCATIA.ViewModels
     using System;
     using System.Windows.Input;
 
+    using Autofac;
+
     using DEHCATIA.DstController;
+    using DEHCATIA.Services.CatiaTemplateService;
 
     using DEHPCommon.UserInterfaces.Behaviors;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using DEHCATIA.ViewModels.Interfaces;
 
+    using DEHPCommon;
     using DEHPCommon.Services.NavigationService;
     using DEHPCommon.UserInterfaces.ViewModels.NetChangePreview.Interfaces;
     using DEHPCommon.UserInterfaces.Views.ExchangeHistory;
+
+    using DevExpress.Xpo.Exceptions;
 
     using ReactiveUI;
 
@@ -125,10 +131,12 @@ namespace DEHCATIA.ViewModels
         /// <param name="dstController">The <see cref="IDstController"/></param>
         /// <param name="hubNetChangePreviewViewModel">The <see cref="IHubNetChangePreviewViewModel"/></param>
         /// <param name="dstNetChangePreviewViewModel">The <see cref="IDstNetChangePreviewViewModel"/></param>
+        /// <param name="templateService">The <see cref="ICatiaTemplateService"/></param>
         public MainWindowViewModel(IHubDataSourceViewModel hubDataSourceViewModel, IDstDataSourceViewModel dstSourceViewModel, 
             IStatusBarControlViewModel statusBarControlViewModel, INavigationService navigationService,
             ITransferControlViewModel transferControlViewModel, IDstController dstController, 
-            IHubNetChangePreviewViewModel hubNetChangePreviewViewModel, IDstNetChangePreviewViewModel dstNetChangePreviewViewModel)
+            IHubNetChangePreviewViewModel hubNetChangePreviewViewModel, IDstNetChangePreviewViewModel dstNetChangePreviewViewModel,
+            ICatiaTemplateService templateService)
         {
             this.navigationService = navigationService;
             this.TransferControlViewModel = transferControlViewModel;
@@ -138,7 +146,13 @@ namespace DEHCATIA.ViewModels
             this.StatusBarControlViewModel = statusBarControlViewModel;
             this.HubNetChangePreviewViewModel = hubNetChangePreviewViewModel;
             this.DstNetChangePreviewViewModel = dstNetChangePreviewViewModel;
-            this.StatusBarControlViewModel.Append($"Welcome to the DEH Catia adapter!");
+
+            var areTemplateReadyMessage = templateService.AreAllTemplatesAvailable() 
+                ? $"All templates are ready."
+                : $"Some template files are missing.";
+
+            this.StatusBarControlViewModel.Append($"Welcome to the DEH Catia adapter! {areTemplateReadyMessage}");
+
             this.InitializeCommands();
         }
         

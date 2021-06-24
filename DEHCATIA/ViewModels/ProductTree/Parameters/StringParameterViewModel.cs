@@ -39,5 +39,13 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
         public StringParameterViewModel(Parameter parameter, string value) : base(parameter, value)
         {
         }
+
+        /// <summary>
+        /// Initializes a new <see cref="DstParameterViewModel{TValueType}"/>
+        /// </summary>
+        /// <param name="name">The name of the represented parameter</param>
+        public StringParameterViewModel(string name) : base(name, default)
+        {
+        }
     }
 }

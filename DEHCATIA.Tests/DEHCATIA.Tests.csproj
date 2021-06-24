@@ -5,7 +5,13 @@
 	  <RootNamespace>DEHCATIA.Tests</RootNamespace>
 
     <IsPackable>false</IsPackable>
+
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="quadprismtemplate.CATPart" />
+  </ItemGroup>
 
   <ItemGroup>
 	  <COMReference Include="CATMat.dll">
@@ -91,6 +97,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DEHCATIA\DEHCATIA.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="quadprismtemplate.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

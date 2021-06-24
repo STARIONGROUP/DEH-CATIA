@@ -132,8 +132,8 @@ namespace DEHCATIA.Tests.MappingRules
             {
                 Name = "RootElementRow",
                 CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
-                Volume = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
-                Mass = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(42)),
+                Volume = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(42)),
                 MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
                 Shape = new CatiaShapeViewModel()
                 {
@@ -146,8 +146,8 @@ namespace DEHCATIA.Tests.MappingRules
             {
                 Name = "UsageRow",
                 CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
-                Volume = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
-                Mass = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(42)),
+                Volume = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(42)),
                 MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
                 Shape = new CatiaShapeViewModel()
                 {
@@ -161,8 +161,8 @@ namespace DEHCATIA.Tests.MappingRules
             {
                 Name = "DefinitionRow",
                 CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
-                Volume = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
-                Mass = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(42)),
+                Volume = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(42)),
                 MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
                 Shape = new CatiaShapeViewModel()
                 {
@@ -189,8 +189,8 @@ namespace DEHCATIA.Tests.MappingRules
             {
                 Name = "RootElementRow",
                 CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
-                Volume = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
-                Mass = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(42)),
+                Volume = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(42)),
                 MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
                 Shape = new CatiaShapeViewModel()
                 {
@@ -203,21 +203,21 @@ namespace DEHCATIA.Tests.MappingRules
             {
                 Name = "UsageRow",
                 CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
-                Volume = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
-                Mass = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(42)),
+                Volume = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(42)),
                 MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
                 Shape = new CatiaShapeViewModel()
                 {
                     PositionOrientation = new CatiaShapePositionOrientationViewModel(
                         new[] { .1, 0, 0, 0, 1, 0, 0, 0, 1 }, new[] { .0, 0, 0 }),
-                    ShapeKind = ShapeKind.CappedCone,
-                    Length = new DoubleWithUnitValueViewModel(2),
-                    WidthOrDiameter = new DoubleWithUnitValueViewModel(42),
-                    Height = new DoubleWithUnitValueViewModel(2),
-                    LengthSupport = new DoubleWithUnitValueViewModel(2),
-                    Angle = new DoubleWithUnitValueViewModel(6),
-                    AngleSupport = new DoubleWithUnitValueViewModel(453),
-                    Thickness = new DoubleWithUnitValueViewModel(54),
+                    ShapeKind = new ShapeKindParameterViewModel(ShapeKind.Cone),
+                    Length = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(2)),
+                    WidthOrDiameter = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(42)),
+                    Height = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(2)),
+                    LengthSupport = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(2)),
+                    Angle = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(6)),
+                    AngleSupport = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(453)),
+                    Thickness = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(54)),
                     IsSupported = true,
                 },
                 Parent = rootElement
@@ -227,21 +227,21 @@ namespace DEHCATIA.Tests.MappingRules
             {
                 Name = "DefinitionRow",
                 CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
-                Volume = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(.2)),
-                Mass = new DoubleParameterViewModel(new DoubleWithUnitValueViewModel(42)),
+                Volume = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(42)),
                 MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
                 Shape = new CatiaShapeViewModel()
                 {
                     PositionOrientation = new CatiaShapePositionOrientationViewModel(
                         new[] { .1, 0, 0, 0, 1, 0, 0, 0, 1 }, new[] { .0, 0, 0 }),
-                    ShapeKind = ShapeKind.Paraboloid,
-                    Length = new DoubleWithUnitValueViewModel(2),
-                    WidthOrDiameter = new DoubleWithUnitValueViewModel(42),
-                    Height = new DoubleWithUnitValueViewModel(2),
-                    LengthSupport =  new DoubleWithUnitValueViewModel(2),
-                    Angle = new DoubleWithUnitValueViewModel(6),
-                    AngleSupport = new DoubleWithUnitValueViewModel(453),
-                    Thickness = new DoubleWithUnitValueViewModel(54),
+                    ShapeKind = new ShapeKindParameterViewModel(ShapeKind.Paraboloid),
+                    Length = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(2)),
+                    WidthOrDiameter = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(42)),
+                    Height = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(2)),
+                    LengthSupport =  new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(2)),
+                    Angle = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(6)),
+                    AngleSupport = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(453)),
+                    Thickness = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(54)),
                     IsSupported = true,
                 },
                 Parent = usageRowViewModel

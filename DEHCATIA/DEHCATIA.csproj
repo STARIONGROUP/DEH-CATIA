@@ -121,6 +121,81 @@
     <None Update="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_CylindricalSegment.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_DiscSegment.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_ParaboloidSegment.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_PlanarQuadrilateral.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_Rectange.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_SphericalSegment.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_Triangle.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Box.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Capped_Cone.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Capped_Cylinder.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Capsule.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Cone.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_conical.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Cylinder.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Dish.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Ellipsoid.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Ogive.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Paraboloid.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Poly_Prism.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Quad_Prism.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_rectangular.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Sphere.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Tetrahedron.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Tri_Prism.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Wedge.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 	<ItemGroup>

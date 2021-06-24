@@ -29,10 +29,15 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
     using KnowledgewareTypeLib;
 
     /// <summary>
-    /// Interface definition for <see cref="DstParameterViewModelViewModel{TValueType}"/>
+    /// Interface definition for <see cref="DstParameterViewModel{TValueType}"/>
     /// </summary>
     public interface IDstParameterViewModel
     {
+        /// <summary>
+        /// Gets or sets the short name
+        /// </summary>
+        string Name { get; set; }
+
         /// <summary>
         /// Gets or sets the represented <see cref="KnowledgewareTypeLib.Parameter"/>
         /// </summary>
@@ -44,13 +49,23 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
         bool IsQuantityKind { get; set; }
 
         /// <summary>
-        /// Gets or sets the short name
-        /// </summary>
-        string Name { get; set; }
-
-        /// <summary>
         /// Gets or sets the Value as string
         /// </summary>
-        string ValueString { get; set; }
+        string ValueFromCatia { get; set; }
+
+        /// <summary>
+        /// Gets or sets the comment
+        /// </summary>
+        string Comment { get; set; }
+
+        /// <summary>
+        /// Gets or sets the comment
+        /// </summary>
+        string ModelCode { get; set; }
+
+        /// <summary>
+        /// Gets the actual value of the parameter contained in the Value and returns it as string
+        /// </summary>
+        string ActualValue { get; }
     }
 }

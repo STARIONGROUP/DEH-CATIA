@@ -26,9 +26,7 @@ using System.Collections.Generic;
 
 namespace DEHCATIA.ViewModels.ProductTree.Shapes
 {
-    using DEHCATIA.ViewModels.ProductTree.Parameters;
-
-    using DevExpress.Mvvm.Native;
+    using System.Linq;
 
     using ReactiveUI;
 
@@ -74,6 +72,26 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         {
             this.Orientation = new OrientationViewModel(orientation);
             this.Position = new PositionParameterValueViewModel((position[0], position[1], position[2]));
+        }
+
+        /// <summary>
+        /// Initializes a new <see cref="CatiaShapePositionOrientationViewModel"/> with default values
+        /// </summary>
+        public CatiaShapePositionOrientationViewModel()
+        {
+            this.Orientation = new OrientationViewModel(OrientationViewModel.Default);
+            this.Position = new PositionParameterValueViewModel((0,0,0));
+        }
+
+        /// <summary>
+        /// Gets the representation of this <see cref="CatiaShapePositionOrientationViewModel"/> as an array of transformation
+        /// </summary>
+        /// <returns>An array of <see cref="dynamic"/> as the catia API requires</returns>
+        public dynamic[] GetArrayOfTransformation()
+        {
+            var values = new List<double>(this.Orientation.Values);
+            values.AddRange(this.Position.Values);
+            return values.Cast<dynamic>().ToArray();
         }
     }
 }

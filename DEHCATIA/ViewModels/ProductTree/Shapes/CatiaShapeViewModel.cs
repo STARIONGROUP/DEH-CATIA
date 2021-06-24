@@ -24,6 +24,10 @@
 
 namespace DEHCATIA.ViewModels.ProductTree.Shapes
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+
     using DEHCATIA.Enumerations;
     using DEHCATIA.ViewModels.ProductTree.Parameters;
 
@@ -37,42 +41,42 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <summary>
         /// Backing field for <see cref="ShapeKind"/>
         /// </summary>
-        private ShapeKind shapeKind;
+        private ShapeKindParameterViewModel shapeKind;
 
         /// <summary>
         /// Backing field for <see cref="ReferenceUrl"/>
         /// </summary>
-        private DoubleWithUnitValueViewModel referenceUrl;
+        private DoubleParameterViewModel referenceUrl;
 
         /// <summary>
         /// Backing field for <see cref="WidthOrDiameter"/>
         /// </summary>
-        private DoubleWithUnitValueViewModel widthOrDiameter;
+        private DoubleParameterViewModel widthOrDiameter;
 
         /// <summary>
         /// Backing field for <see cref="Height"/>
         /// </summary>
-        private DoubleWithUnitValueViewModel height;
+        private DoubleParameterViewModel height;
 
         /// <summary>
         /// Backing field for <see cref="Length"/>
         /// </summary>
-        private DoubleWithUnitValueViewModel length;
+        private DoubleParameterViewModel length;
 
         /// <summary>
         /// Backing field for <see cref="LengthSupport"/>
         /// </summary>
-        private DoubleWithUnitValueViewModel lengthSupport;
+        private DoubleParameterViewModel lengthSupport;
 
         /// <summary>
         /// Backing field for <see cref="Angle"/>
         /// </summary>
-        private DoubleWithUnitValueViewModel angle;
+        private DoubleParameterViewModel angle;
 
         /// <summary>
         /// Backing field for <see cref="AngleSupport"/>
         /// </summary>
-        private DoubleWithUnitValueViewModel angleSupport;
+        private DoubleParameterViewModel angleSupport;
 
         /// <summary>
         /// Backing field for <see cref="Edges"/>
@@ -82,27 +86,27 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <summary>
         /// Backing field for <see cref="Thickness"/>
         /// </summary>
-        private DoubleWithUnitValueViewModel thickness;
+        private DoubleParameterViewModel thickness;
 
         /// <summary>
         /// Backing field for <see cref="Area"/>
         /// </summary>
-        private DoubleWithUnitValueViewModel area;
+        private DoubleParameterViewModel area;
 
         /// <summary>
         /// Backing field for <see cref="Mass"/>
         /// </summary>
-        private DoubleWithUnitValueViewModel mass;
+        private DoubleParameterViewModel mass;
 
         /// <summary>
         /// Backing field for <see cref="ExternalShape"/>
         /// </summary>
-        private string externalShape;
+        private StringParameterViewModel externalShape;
 
         /// <summary>
         /// Backing field for <see cref="PositionOrientation"/>
         /// </summary>
-        private CatiaShapePositionOrientationViewModel positionOrientation;
+        private CatiaShapePositionOrientationViewModel positionOrientation = new CatiaShapePositionOrientationViewModel();
 
         /// <summary>
         /// Backing field for <see cref="isSupported"/>
@@ -112,32 +116,32 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <summary>
         /// Backing field for <see cref="MassMargin"/>
         /// </summary>
-        private DoubleWithUnitValueViewModel massMargin;
+        private DoubleParameterViewModel massMargin;
 
         /// <summary>
         /// Backing field for <see cref="MassWithMargin"/>
         /// </summary>
-        private DoubleWithUnitValueViewModel massWithMargin;
+        private DoubleParameterViewModel massWithMargin;
 
         /// <summary>
         /// Backing field for <see cref="SysMassMargin"/>
         /// </summary>
-        private DoubleWithUnitValueViewModel sysMassMargin;
+        private DoubleParameterViewModel sysMassMargin;
 
         /// <summary>
         /// Backing field for <see cref="Density"/>
         /// </summary>
-        private DoubleWithUnitValueViewModel density;
+        private DoubleParameterViewModel density;
 
         /// <summary>
         /// Backing field for <see cref="Volume"/>
         /// </summary>
-        private DoubleWithUnitValueViewModel volume;
+        private DoubleParameterViewModel volume;
 
         /// <summary>
         /// Gets or sets the <see cref="Enumerations.ShapeKind"/>
-        /// </summary>
-        public ShapeKind ShapeKind
+        /// </summary>DoubleParameterViewModel
+        public ShapeKindParameterViewModel ShapeKind
         {
             get => this.shapeKind;
             set => this.RaiseAndSetIfChanged(ref this.shapeKind, value);
@@ -146,7 +150,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <summary>
         /// Gets or sets the reference Url
         /// </summary>
-        public DoubleWithUnitValueViewModel ReferenceUrl
+        public DoubleParameterViewModel ReferenceUrl
         {
             get => this.referenceUrl;
             set => this.RaiseAndSetIfChanged(ref this.referenceUrl, value);
@@ -155,7 +159,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <summary>
         /// Gets the dimension along the x-direction of a cartesian shape (does no apply to a body of revolution shape)
         /// </summary>
-        public DoubleWithUnitValueViewModel Length
+        public DoubleParameterViewModel Length
         {
             get => this.length;
             set => this.RaiseAndSetIfChanged(ref this.length, value);
@@ -164,7 +168,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <summary>
         /// Gets or sets the width or diameter
         /// </summary>
-        public DoubleWithUnitValueViewModel WidthOrDiameter
+        public DoubleParameterViewModel WidthOrDiameter
         {
             get => this.widthOrDiameter;
             set => this.RaiseAndSetIfChanged(ref this.widthOrDiameter, value);
@@ -173,7 +177,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <summary>
         /// Gets or sets the height
         /// </summary>
-        public DoubleWithUnitValueViewModel Height
+        public DoubleParameterViewModel Height
         {
             get => this.height;
             set => this.RaiseAndSetIfChanged(ref this.height, value);
@@ -182,7 +186,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <summary>
         /// Gets or sets the length support
         /// </summary>
-        public DoubleWithUnitValueViewModel LengthSupport
+        public DoubleParameterViewModel LengthSupport
         {
             get => this.lengthSupport;
             set => this.RaiseAndSetIfChanged(ref this.lengthSupport, value);
@@ -191,7 +195,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <summary>
         /// Gets or sets the Angle of a body of revolution shape (does not apply to a cartesian shape)
         /// </summary>
-        public DoubleWithUnitValueViewModel Angle
+        public DoubleParameterViewModel Angle
         {
             get => this.angle;
             set => this.RaiseAndSetIfChanged(ref this.angle, value);
@@ -200,7 +204,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <summary>
         /// Gets or sets the top Angle of a cone shape (only applies to a cone shape)
         /// </summary>
-        public DoubleWithUnitValueViewModel AngleSupport
+        public DoubleParameterViewModel AngleSupport
         {
             get => this.angleSupport;
             set => this.RaiseAndSetIfChanged(ref this.angleSupport, value);
@@ -209,7 +213,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <summary>
         /// Gets or sets the thickness is the wall thickness of a cylinder. If defined the shape becomes a hollow shape 
         /// </summary>
-        public DoubleWithUnitValueViewModel Thickness
+        public DoubleParameterViewModel Thickness
         {
             get => this.thickness;
             set => this.RaiseAndSetIfChanged(ref this.thickness, value);
@@ -218,7 +222,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <summary>
         /// Gets or sets the area of the shape
         /// </summary>
-        public DoubleWithUnitValueViewModel Area
+        public DoubleParameterViewModel Area
         {
             get => this.area;
             set => this.RaiseAndSetIfChanged(ref this.area, value);
@@ -227,7 +231,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <summary>
         /// Gets or sets the mass of the shape
         /// </summary>
-        public DoubleWithUnitValueViewModel Mass
+        public DoubleParameterViewModel Mass
         {
             get => this.mass;
             set => this.RaiseAndSetIfChanged(ref this.mass, value);
@@ -236,7 +240,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <summary>
         /// Gets or sets the Name of the external shape reference of the compound shape parameter
         /// </summary>
-        public string ExternalShape
+        public StringParameterViewModel ExternalShape
         {
             get => this.externalShape;
             set => this.RaiseAndSetIfChanged(ref this.externalShape, value);
@@ -272,7 +276,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <summary>
         /// Gets or sets the mass margin of the shape
         /// </summary>
-        public DoubleWithUnitValueViewModel MassMargin
+        public DoubleParameterViewModel MassMargin
         {
             get => this.massMargin;
             set => this.RaiseAndSetIfChanged(ref this.massMargin, value);
@@ -281,7 +285,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <summary>
         /// Gets or sets the sys mass margin of the shape
         /// </summary>
-        public DoubleWithUnitValueViewModel SysMassMargin
+        public DoubleParameterViewModel SysMassMargin
         {
             get => this.sysMassMargin;
             set => this.RaiseAndSetIfChanged(ref this.sysMassMargin, value);
@@ -290,7 +294,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <summary>
         /// Gets or sets the mass with margin of the shape
         /// </summary>
-        public DoubleWithUnitValueViewModel MassWithMargin
+        public DoubleParameterViewModel MassWithMargin
         {
             get => this.massWithMargin;
             set => this.RaiseAndSetIfChanged(ref this.massWithMargin, value);
@@ -299,7 +303,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <summary>
         /// Gets or sets the volume of the shape
         /// </summary>
-        public DoubleWithUnitValueViewModel Volume
+        public DoubleParameterViewModel Volume
         {
             get => this.volume;
             set => this.RaiseAndSetIfChanged(ref this.volume, value);
@@ -308,12 +312,22 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <summary>
         /// Gets or sets the density of the shape
         /// </summary>
-        public DoubleWithUnitValueViewModel Density
+        public DoubleParameterViewModel Density
         {
             get => this.density;
             set => this.RaiseAndSetIfChanged(ref this.density, value);
         }
 
+        /// <summary>
+        /// Gets all the <see cref="DoubleParameterViewModel"/> of this shape as a collection
+        /// </summary>
+        public IEnumerable<DoubleParameterViewModel> DoubleParameterViewModels =>
+            this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Where(x => x.PropertyType == typeof(DoubleParameterViewModel))
+                .Select(x => x.GetValue(this, null))
+                .Where(x => x != null)
+                .OfType<DoubleParameterViewModel>();
+        
         /// <summary>
         /// Initializes a new <see cref="CatiaShapeViewModel"/>
         /// </summary>

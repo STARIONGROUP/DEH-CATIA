@@ -28,6 +28,7 @@ namespace DEHCATIA.Services.ComConnector
 
     using DEHCATIA.ViewModels.ProductTree;
     using DEHCATIA.ViewModels.ProductTree.Rows;
+    using DEHCATIA.ViewModels.Rows;
 
     using INFITF;
 
@@ -52,7 +53,7 @@ namespace DEHCATIA.Services.ComConnector
         CatiaDocumentViewModel ActiveDocument { get; }
 
         /// <summary>
-        /// Attempts to connect to a running CATIA client and sets the <see cref="CatiaComService.CatiaApp"/> value if one is found.
+        /// Attempts to connect to a running CATIA client and sets the <see cref="CatiaApp"/> value if one is found.
         /// </summary>
         void Connect();
 
@@ -67,5 +68,16 @@ namespace DEHCATIA.Services.ComConnector
         /// <param name="cancelToken">The <see cref="CancellationToken"/></param>
         /// <returns>The top <see cref="ElementRowViewModel"/></returns>
         ElementRowViewModel GetProductTree(CancellationToken cancelToken);
+
+        /// <summary>
+        /// Adds or Updates the <see cref="MappedElementRowViewModel.CatiaElement"/> corresponding <see cref="Product"/> or adds it to the product tree
+        /// </summary>
+        /// <param name="mappedElement">The <see cref="MappedElementRowViewModel"/></param>
+        void AddOrUpdateElement(MappedElementRowViewModel mappedElement);
+
+        /// <summary>
+        /// Updates all the parameter for one given <paramref name="mappedElementRowViewModel"/>
+        /// </summary>
+        void UpdateParameters(MappedElementRowViewModel mappedElementRowViewModel);
     }
 }

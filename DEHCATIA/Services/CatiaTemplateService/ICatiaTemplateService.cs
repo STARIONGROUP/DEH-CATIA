@@ -26,6 +26,9 @@ namespace DEHCATIA.Services.CatiaTemplateService
 {
     using CDP4Common.EngineeringModelData;
 
+    using DEHCATIA.ViewModels.ProductTree.Rows;
+    using DEHCATIA.ViewModels.Rows;
+
     /// <summary>
     /// The <see cref="ICatiaTemplateService"/> is the interface definition for <see cref="CatiaTemplateService"/>
     /// </summary>
@@ -49,5 +52,26 @@ namespace DEHCATIA.Services.CatiaTemplateService
         /// <param name="shapePath">The string shape path</param>
         /// <returns>A value indicating whether the template shapehas been found</returns>
         bool TryGetFileName(ParameterOrOverrideBase parameter, Option option, ActualFiniteState state, out string shapePath );
+
+        /// <summary>
+        /// Verify if the templates folder exists and that there is templates in it
+        /// </summary>
+        /// <returns>An assert</returns>
+        bool AreAnyTemplatesAvailable();
+
+        /// <summary>
+        /// Verify if the templates folder exists and that there is templates in it
+        /// </summary>
+        /// <returns>An assert</returns>
+        bool AreAllTemplatesAvailable();
+
+        /// <summary>
+        /// Copies the template in the Catia project directory if it's not there yet and updates
+        /// the <see cref="MappedElementRowViewModel.CatiaElement"/> <see cref="ElementRowViewModel.FileName"/>
+        /// </summary>
+        /// <param name="mappedElement">The <see cref="MappedElementRowViewModel"/></param>
+        /// <param name="documentPath">The path of the current <see cref="ComConnector.CatiaComService.ActiveDocument"/></param>
+        /// <returns>A value indicating whether the installation of the template is successful</returns>
+        bool TryInstallTemplate(MappedElementRowViewModel mappedElement, string documentPath);
     }
 }

@@ -36,6 +36,11 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
     public struct OrientationViewModel
     {
         /// <summary>
+        /// The default value of the <see cref="OrientationViewModel"/>
+        /// </summary>
+        public static readonly IReadOnlyList<double> Default = new List<double>() {1, 0, 0, 0, 1, 0, 0, 0, 1}.AsReadOnly();
+
+        /// <summary>
         /// The x axis angle value
         /// </summary>
         public double? Θx { get; private set; }

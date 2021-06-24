@@ -26,8 +26,10 @@ namespace DEHCATIA.Tests.MappingRules
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
+    using System.Reflection;
 
     using Autofac;
 
@@ -82,15 +84,17 @@ namespace DEHCATIA.Tests.MappingRules
             AppContainer.Container = containerBuilder.Build();
 
             this.booleanParameterType = new BooleanParameterType(Guid.NewGuid(), null, null);
+
             this.enumerationParameterType = new EnumerationParameterType(Guid.NewGuid(), null, null)
             {
                 ValueDefinition =
                 {
-                    new EnumerationValueDefinition() { ShortName = "CappedCone"}, 
-                    new EnumerationValueDefinition() { ShortName = "Box"},
-                    new EnumerationValueDefinition() { ShortName = "Triangle"}
+                    new EnumerationValueDefinition() { ShortName = "CappedCone" },
+                    new EnumerationValueDefinition() { ShortName = "Box" },
+                    new EnumerationValueDefinition() { ShortName = "Triangle" }
                 }
             };
+
             this.textParameterType = new TextParameterType(Guid.NewGuid(), null, null);
 
             var measurementScale = new RatioScale()
@@ -193,13 +197,13 @@ namespace DEHCATIA.Tests.MappingRules
             Assert.AreEqual(0, badResult.Count());
             Assert.IsNotEmpty(this.rule.MappingErrors);
         }
-        
+
         [Test]
         public void VerifyMap()
         {
             var path = string.Empty;
-            
-            this.catiaTemplateService.Setup(x => 
+
+            this.catiaTemplateService.Setup(x =>
                 x.TryGetFileName(It.IsAny<ParameterOrOverrideBase>(), It.IsAny<Option>(), It.IsAny<ActualFiniteState>(), out path)).Returns(true);
 
             this.parameterTypeService.Setup(x => x.ShapeKind).Returns(this.enumerationParameterType);
@@ -218,7 +222,7 @@ namespace DEHCATIA.Tests.MappingRules
             Assert.DoesNotThrow(() => this.rule.Transform(mappedElement));
             Assert.IsNotEmpty(mappedElement);
             Assert.True(mappedElement.First().CatiaElement?.IsDraft);
-            Assert.AreEqual(2, this.rule.MappingErrors.Count);
+            Assert.Zero(this.rule.MappingErrors.Count);
         }
     }
 }

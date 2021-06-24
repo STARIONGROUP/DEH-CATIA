@@ -127,7 +127,7 @@ namespace DEHCATIA.Tests.ViewModels.Dialogs
             Assert.DoesNotThrow(() => this.viewModel.ContinueCommand.Execute(null));
 
             this.dstController.Verify(x => 
-                x.Map(It.IsAny<IEnumerable<MappedElementRowViewModel>>()), Times.Once);
+                x.Map(It.IsAny<List<MappedElementRowViewModel>>()), Times.Once);
         }
 
         [Test]

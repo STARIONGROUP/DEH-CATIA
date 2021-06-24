@@ -30,7 +30,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
         /// Initializes a new <see cref="DstParameterViewModel{TValueType}"/>
         /// </summary>
         /// <param name="value">The value</param>
-        public MomentOfInertiaParameterViewModel(MassMomentOfInertiaViewModel value) : base(default, value)
+        public MomentOfInertiaParameterViewModel(MassMomentOfInertiaViewModel value) : base("MomentOfInertia", value)
         {
             this.Name = "MomentOfInertia";
         }
@@ -39,7 +39,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
         /// <returns>A string that represents the current object.</returns>
         public override string ToString()
         {
-            return $"{this.Value.ToString()}";
+            return $"{this.Value}";
         }
     }
 }

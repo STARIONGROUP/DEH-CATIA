@@ -116,17 +116,11 @@ namespace DEHCATIA.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.UpdateCanTransfer);
 
-            this.dstController.SelectedThingsToTransfer.CountChanged.Subscribe(x =>
-            {
-                this.UpdateCanTransfer(x > 0);
-                this.UpdateNumberOfThingsToTransfer();
-            });
+            this.dstController.SelectedThingsToTransfer.CountChanged.Subscribe(_ => this.UpdateNumberOfThingsToTransfer());
+            this.dstController.HubMapResult.CountChanged.Subscribe(_ => this.UpdateNumberOfThingsToTransfer());
 
-            this.dstController.HubMapResult.CountChanged.Subscribe(x =>
-            {
-                this.UpdateCanTransfer(x > 0);
-                this.UpdateNumberOfThingsToTransfer();
-            });
+            this.WhenAnyValue(x => x.dstController.MappingDirection)
+                .Subscribe(x => this.UpdateNumberOfThingsToTransfer());
 
             this.TransferCommand = ReactiveCommand.CreateAsyncTask(
                 this.WhenAnyValue(x => x.CanTransfer),
@@ -152,14 +146,22 @@ namespace DEHCATIA.ViewModels
         /// </summary>
         private void UpdateNumberOfThingsToTransfer()
         {
-            this.NumberOfThing = this.dstController.SelectedThingsToTransfer.DistinctBy(x => x.ShortName).Count() + this.dstController.HubMapResult.Count;
+            this.NumberOfThing = this.dstController.MappingDirection switch
+            {
+                MappingDirection.FromHubToDst => this.dstController.HubMapResult.Count,
+                MappingDirection.FromDstToHub => this.dstController.SelectedThingsToTransfer.DistinctBy(x => x.ShortName).Count(),
+                _ => throw new ArgumentOutOfRangeException(nameof(this.dstController.MappingDirection), 
+                    this.dstController.MappingDirection, $"Use of forbidden value of {nameof(this.dstController.MappingDirection)}")
+            };
+
+            this.UpdateCanTransfer(this.NumberOfThing > 0);
         }
 
         /// <summary>
         /// Updates the <see cref="CanTransfer"/>
         /// </summary>
         private void UpdateCanTransfer(bool value)
-            {
+        {
             this.CanTransfer = value;
         }
 
@@ -191,7 +193,16 @@ namespace DEHCATIA.ViewModels
             this.AreThereAnyTransferInProgress = true;
             this.IsIndeterminate = true;
             this.statusBar.Append($"Transfers in progress");
-            await this.dstController.TransferMappedThingsToHub();
+
+            if (this.dstController.MappingDirection is MappingDirection.FromDstToHub)
+            {
+                await this.dstController.TransferMappedThingsToHub();
+            }
+            else
+            {
+                this.dstController.TransferMappedThingToCatia();
+            }
+
             await this.exchangeHistoryService.Write();
             timer.Stop();
             this.statusBar.Append($"Transfers completed in {timer.ElapsedMilliseconds} ms");
