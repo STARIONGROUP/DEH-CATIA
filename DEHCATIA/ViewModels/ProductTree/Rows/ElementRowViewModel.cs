@@ -153,7 +153,12 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         public Product Product
         {
             get => this.product;
-            set => this.RaiseAndSetIfChanged(ref this.product, value);
+            set
+            {
+                this.PartNumber = value.get_PartNumber();
+                this.Description = value.get_DescriptionRef();
+                this.RaiseAndSetIfChanged(ref this.product, value);
+            }
         }
 
         /// <summary>
@@ -317,8 +322,6 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// <param name="fileName">The file name of the <paramref name="product"/></param>
         public ElementRowViewModel(Product product, string fileName) : this(product.get_Name(), fileName)
         {
-            this.PartNumber = product.get_PartNumber();
-            this.Description = product.get_DescriptionRef();
             this.Product = product;
         }
 

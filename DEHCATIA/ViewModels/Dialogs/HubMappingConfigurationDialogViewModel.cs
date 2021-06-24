@@ -157,11 +157,10 @@ namespace DEHCATIA.ViewModels.Dialogs
             this.ContinueCommand.Subscribe(_ => this.ExecuteContinueCommand(
                 () =>
                 {
-                    var mappedElement =
-                        this.MappedElements.Where(x => x.IsValid is true).ToList();
-
+                    var mappedElement = this.MappedElements.Where(x => x.IsValid is true).ToList();
+                    
                     this.DstController.Map(mappedElement);
-                    this.StatusBar.Append($"Mapping in progress of {mappedElement.Count} element(s)...");
+                    this.StatusBar.Append($"Mapping in progress of {mappedElement.Count()} element(s)...");
                 }));
 
             this.WhenAnyValue(x => x.SelectedDstElement)

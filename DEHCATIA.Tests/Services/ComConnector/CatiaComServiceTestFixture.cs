@@ -24,26 +24,64 @@
 
 namespace DEHCATIA.Tests.Services.ComConnector
 {
+    using System;
+    using System.IO;
+    using System.Linq;
     using System.Threading;
 
-    using DEHCATIA.Services.ComConnector;
+    using CDP4Common.EngineeringModelData;
 
+    using DEHCATIA.Extensions;
+    using DEHCATIA.Services.CatiaTemplateService;
+    using DEHCATIA.Services.ComConnector;
+    using DEHCATIA.ViewModels.ProductTree.Parameters;
+    using DEHCATIA.ViewModels.ProductTree.Rows;
+    using DEHCATIA.ViewModels.ProductTree.Shapes;
+    using DEHCATIA.ViewModels.Rows;
+
+    using DEHPCommon.Services.ExchangeHistory;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using Moq;
 
     using NUnit.Framework;
 
+    using File = System.IO.File;
+    using Parameter = KnowledgewareTypeLib.Parameter;
+
     public class CatiaComServiceTestFixture
     {
+        private const string TemplatePartName = "quadprismtemplate.CATPart";
         private CatiaComService service;
         private Mock<IStatusBarControlViewModel> statusBar;
+        private MappedElementRowViewModel element;
+        private CatiaTemplateService templateService;
+        private DirectoryInfo templateDirectory;
 
         [SetUp]
         public void Setup()
         {
+            this.templateDirectory = CatiaTemplateService.TemplateDirectory;
+            this.templateDirectory.Create();
+            
             this.statusBar = new Mock<IStatusBarControlViewModel>();
-            this.service = new CatiaComService(this.statusBar.Object);
+            this.service = new CatiaComService(this.statusBar.Object, new Mock<IExchangeHistoryService>().Object, new Mock<ICatiaTemplateService>().Object);
+            this.templateService = new CatiaTemplateService();
+
+            this.element = new MappedElementRowViewModel();
+        }
+
+        [TearDown]
+        public void Teardown()
+        {
+            try
+            {
+                this.templateDirectory.Delete(true);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"Test PASSED but an exception on occured on TearDown : {exception}");
+            }
         }
 
         [Test]
@@ -73,6 +111,75 @@ namespace DEHCATIA.Tests.Services.ComConnector
         {
             Assert.DoesNotThrow(() => this.service.Connect());
             Assert.IsNotNull(this.service.GetProductTree(CancellationToken.None));
+        }
+
+        [Test]  
+        public void VerifyUpdateElement()
+        {
+            Assert.DoesNotThrow(() => this.service.Connect());
+            var productTree = this.service.GetProductTree(new CancellationToken());
+            this.element.CatiaElement = productTree.Children.FirstOrDefault(x => x.Name == "SKF_60012_3.1");
+            Assert.IsNotNull(this.element.CatiaElement);
+            this.element.CatiaElement.Parameters.Clear();
+
+            var shapeKindParameter = new Mock<Parameter>();
+            shapeKindParameter.Setup(x => x.get_Name()).Returns("kind");
+            shapeKindParameter.Setup(x => x.ValueAsString()).Returns("quadprism");
+            this.element.CatiaElement.Parameters.Add(new StringParameterViewModel(shapeKindParameter.Object, "quadprism"));
+
+            var heightParameter = new Mock<Parameter>();
+            heightParameter.Setup(x => x.get_Name()).Returns("height");
+            heightParameter.Setup(x => x.ValueAsString()).Returns("888mm");
+            this.element.CatiaElement.Parameters.Add(new DoubleParameterViewModel(heightParameter.Object));
+
+            var massParameter = new Mock<Parameter>();
+            massParameter.Setup(x => x.get_Name()).Returns("ext_shape");
+            massParameter.Setup(x => x.ValueAsString()).Returns("56,4");
+            this.element.CatiaElement.Parameters.Add(new StringParameterViewModel(massParameter.Object, "56.4"));
+
+            this.element.CatiaElement.Shape = this.element.CatiaElement.Parameters.GetShape();
+            Assert.IsTrue(this.element.CatiaElement.Shape.IsSupported);
+            this.element.CatiaElement.Parameters.Clear();
+            this.element.CatiaElement.Shape.PositionOrientation = new CatiaShapePositionOrientationViewModel(new double[] { .5, .0, 0, 0, 1, 0, 0, 0, .5 }, new[] { .0, 0, 0 });
+            Assert.DoesNotThrow(() => this.service.AddOrUpdateElement(this.element));
+        }
+
+        [Test]
+        public void VerifyCreateElement()
+        {
+            var destFileName = Path.Combine(this.templateDirectory.FullName, TemplatePartName);
+            Assert.DoesNotThrow(() => this.service.Connect());
+            var productTree = this.service.GetProductTree(new CancellationToken());
+            this.element.CatiaParent = productTree;
+            this.element.CatiaElement = new ElementRowViewModel(new ElementDefinition() {ShortName = "nol"}, destFileName);
+            var shapeKindParameter = new Mock<Parameter>();
+            shapeKindParameter.Setup(x => x.get_Name()).Returns("kind");
+            shapeKindParameter.Setup(x => x.ValueAsString()).Returns("quadprism");
+            this.element.CatiaElement.Parameters.Add(new StringParameterViewModel(shapeKindParameter.Object, "quadprism"));
+
+            var heightParameter = new Mock<Parameter>();
+            heightParameter.Setup(x => x.get_Name()).Returns("height");
+            heightParameter.Setup(x => x.ValueAsString()).Returns("888");
+            this.element.CatiaElement.Parameters.Add(new DoubleParameterViewModel(heightParameter.Object));
+
+            var massParameter = new Mock<Parameter>();
+            massParameter.Setup(x => x.get_Name()).Returns("m");
+            massParameter.Setup(x => x.ValueAsString()).Returns("56,4");
+            this.element.CatiaElement.Parameters.Add(new DoubleParameterViewModel(massParameter.Object));
+
+            this.element.CatiaElement.Shape = this.element.CatiaElement.Parameters.GetShape();
+            File.Copy(Path.Combine(TestContext.CurrentContext.TestDirectory, TemplatePartName), destFileName);
+            Assert.IsTrue(this.element.CatiaElement.Shape.IsSupported);
+            this.element.CatiaElement.Shape.PositionOrientation = new CatiaShapePositionOrientationViewModel(new double[] { .1, .0, 0, 0, 1, 0, 0, 0, 1 }, new[] { .0, 0, 0 });
+            Assert.Throws<InvalidOperationException>(() => this.service.AddOrUpdateElement(this.element));
+        }
+
+        [Test]
+        public void VerifyUpdateParameters()
+        {
+            var productTree = this.service.GetProductTree(new CancellationToken());
+            this.element.CatiaElement = productTree;
+            Assert.IsFalse(false);
         }
     }
 }

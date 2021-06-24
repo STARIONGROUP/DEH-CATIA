@@ -183,18 +183,18 @@ namespace DEHCATIA.MappingRules
             if (definitionRow.Shape.IsSupported)
             {
                 this.MapParameter(this.parameterTypeService.ShapeKind, ParameterTypeService.ShapeKindShortName, definitionRow, definitionRow.Shape.ShapeKind.ToString());
-                this.MapParameter(this.parameterTypeService.ShapeLength, ParameterTypeService.ShapeLengthShortName, definitionRow, definitionRow.Shape.Length?.Value);
-                this.MapParameter(this.parameterTypeService.ShapeWidthOrDiameter, ParameterTypeService.ShapeWidthOrDiameterShortName, definitionRow, definitionRow.Shape.WidthOrDiameter?.Value);
-                this.MapParameter(this.parameterTypeService.ShapeHeight, ParameterTypeService.ShapeHeightShortName, definitionRow, definitionRow.Shape.Height?.Value);
-                this.MapParameter(this.parameterTypeService.ShapeSupportLength, ParameterTypeService.ShapeSupportLengthShortName, definitionRow, definitionRow.Shape.LengthSupport?.Value);
-                this.MapParameter(this.parameterTypeService.ShapeAngle, ParameterTypeService.ShapeAngleShortName, definitionRow, definitionRow.Shape.Angle?.Value);
-                this.MapParameter(this.parameterTypeService.ShapeSupportAngle, ParameterTypeService.ShapeSupportAngleShortName, definitionRow, definitionRow.Shape.AngleSupport?.Value);
-                this.MapParameter(this.parameterTypeService.ShapeThickness, ParameterTypeService.ShapeThicknessShortName, definitionRow, definitionRow.Shape.Thickness?.Value);
-                this.MapParameter(this.parameterTypeService.ShapeArea, ParameterTypeService.ShapeAreaShortName, definitionRow, definitionRow.Shape.Area?.Value);
-                this.MapParameter(this.parameterTypeService.ShapeDensity, ParameterTypeService.ShapeDensityShortName, definitionRow, definitionRow.Shape.Density?.Value);
-                this.MapParameter(this.parameterTypeService.ShapeMassMargin, ParameterTypeService.ShapeMassMarginShortName, definitionRow, definitionRow.Shape.MassMargin?.Value);
-                this.MapParameter(this.parameterTypeService.ShapeMassWithMargin, ParameterTypeService.ShapeMassWithMarginShortName, definitionRow, definitionRow.Shape.MassWithMargin?.Value);
-                this.MapParameter(this.parameterTypeService.ShapeSysMassMargin, ParameterTypeService.ShapeSysMassMarginShortName, definitionRow, definitionRow.Shape.SysMassMargin?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeLength, ParameterTypeService.ShapeLengthShortName, definitionRow, definitionRow.Shape.Length?.Value?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeWidthOrDiameter, ParameterTypeService.ShapeWidthOrDiameterShortName, definitionRow, definitionRow.Shape.WidthOrDiameter?.Value?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeHeight, ParameterTypeService.ShapeHeightShortName, definitionRow, definitionRow.Shape.Height?.Value?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeSupportLength, ParameterTypeService.ShapeSupportLengthShortName, definitionRow, definitionRow.Shape.LengthSupport?.Value?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeAngle, ParameterTypeService.ShapeAngleShortName, definitionRow, definitionRow.Shape.Angle?.Value?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeSupportAngle, ParameterTypeService.ShapeSupportAngleShortName, definitionRow, definitionRow.Shape.AngleSupport?.Value?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeThickness, ParameterTypeService.ShapeThicknessShortName, definitionRow, definitionRow.Shape.Thickness?.Value?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeArea, ParameterTypeService.ShapeAreaShortName, definitionRow, definitionRow.Shape.Area?.Value?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeDensity, ParameterTypeService.ShapeDensityShortName, definitionRow, definitionRow.Shape.Density?.Value?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeMassMargin, ParameterTypeService.ShapeMassMarginShortName, definitionRow, definitionRow.Shape.MassMargin?.Value?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeMassWithMargin, ParameterTypeService.ShapeMassWithMarginShortName, definitionRow, definitionRow.Shape.MassWithMargin?.Value?.Value);
+                this.MapParameter(this.parameterTypeService.ShapeSysMassMargin, ParameterTypeService.ShapeSysMassMarginShortName, definitionRow, definitionRow.Shape.SysMassMargin?.Value?.Value);
             }
         }
 

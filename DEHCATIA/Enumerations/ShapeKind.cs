@@ -75,25 +75,10 @@ namespace DEHCATIA.Enumerations
         CappedCylinder,
 
         /// <summary>
-        /// Shape kind is a Capped Cone
-        /// </summary>
-        CappedCone,
-
-        /// <summary>
         /// Shape kind is a Poly Prism
         /// </summary>
         PolyPrism,
 
-        /// <summary>
-        /// Shape kind is an Ellipsoid
-        /// </summary>
-        Ellipsoid,
-
-        /// <summary>
-        /// Shape kind is an Ogive
-        /// </summary>
-        Ogive,
-        
         /// <summary>
         /// Shape kind is a Tetrahedron
         /// </summary>
@@ -110,7 +95,7 @@ namespace DEHCATIA.Enumerations
         Capsule,
 
         /// <summary>
-        /// Shape kind is a Capsule
+        /// Shape kind is a Triangle
         /// </summary>
         Triangle,
 
@@ -122,7 +107,7 @@ namespace DEHCATIA.Enumerations
         /// <summary>
         /// Shape kind is a sperical segment
         /// </summary>
-        SpericalSegment,
+        SphericalSegment,
 
         /// <summary>
         /// Shape kind is a planar quadrilateral

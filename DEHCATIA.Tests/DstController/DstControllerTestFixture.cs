@@ -26,6 +26,7 @@ namespace DEHCATIA.Tests.DstController
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reactive.Concurrency;
     using System.Threading;
 
@@ -41,6 +42,7 @@ namespace DEHCATIA.Tests.DstController
     using DEHCATIA.DstController;
     using DEHCATIA.Services.ComConnector;
     using DEHCATIA.ViewModels.ProductTree.Rows;
+    using DEHCATIA.ViewModels.Rows;
 
     using DEHPCommon.Enumerators;
     using DEHPCommon.HubController.Interfaces;
@@ -461,6 +463,24 @@ namespace DEHCATIA.Tests.DstController
             this.elementRow.SelectedActualFiniteState = this.state;
             Assert.DoesNotThrow(() => this.controller.SaveElementMapping(this.elementRow));
             Assert.AreEqual(3, this.controller.ExternalIdentifierMap.Correspondence.Count);
+        }
+
+        [Test]
+        public void VerifyTransfertMappedThingToCatia()
+        {
+            this.comService.Setup(x => x.AddOrUpdateElement(It.IsAny<MappedElementRowViewModel>()));
+            
+            this.controller.HubMapResult.AddRange(Enumerable
+                .Repeat(new MappedElementRowViewModel()
+                {
+                    CatiaElement = new ElementRowViewModel(new ElementDefinition() {ShortName = string.Empty}, string.Empty)
+                }, 12));
+
+            this.controller.TransferMappedThingToCatia();
+            this.comService.Verify(x => x.AddOrUpdateElement(It.IsAny<MappedElementRowViewModel>()), Times.Exactly(12));
+            this.comService.Setup(x => x.AddOrUpdateElement(It.IsAny<MappedElementRowViewModel>())).Throws<InvalidOperationException>();
+            this.controller.TransferMappedThingToCatia();
+            this.comService.Verify(x => x.AddOrUpdateElement(It.IsAny<MappedElementRowViewModel>()), Times.Exactly(24));
         }
     }
 }

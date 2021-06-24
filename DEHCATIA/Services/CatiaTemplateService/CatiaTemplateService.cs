@@ -25,14 +25,20 @@
 namespace DEHCATIA.Services.CatiaTemplateService
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
 
     using CDP4Common.EngineeringModelData;
 
     using DEHCATIA.Enumerations;
+    using DEHCATIA.Services.ComConnector;
+    using DEHCATIA.ViewModels.ProductTree.Rows;
+    using DEHCATIA.ViewModels.Rows;
 
     using NLog;
+
+    using File = System.IO.File;
 
     /// <summary>
     /// The <see cref="CatiaTemplateService"/> provides a way to handle file operations related to Catia templates
@@ -40,14 +46,19 @@ namespace DEHCATIA.Services.CatiaTemplateService
     public class CatiaTemplateService : ICatiaTemplateService
     {
         /// <summary>
-        /// The directory name at the root of this assembly binaries containing all the Catia templates
+        /// The search pattern base string
         /// </summary>
-        private const string TemplateDirectory = "Templates";
-        
+        private const string SearchPattern = "*.CATPart";
+
         /// <summary>
         /// The current class logger
         /// </summary>
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
+        /// The template directory <see cref="DirectoryInfo"/>
+        /// </summary>
+        public static readonly DirectoryInfo TemplateDirectory = new DirectoryInfo(Path.Combine("Services", "CatiaTemplateService", "Templates"));
         
         /// <summary>
         /// Get the file name from the shape <paramref name="parameter"/> value
@@ -95,7 +106,83 @@ namespace DEHCATIA.Services.CatiaTemplateService
         /// <returns>A path containing the reference path where the shape template is</returns>
         private string GetFileName(ShapeKind shapeKind)
         {
-            return Directory.EnumerateFiles(TemplateDirectory, $"*{shapeKind}*", SearchOption.AllDirectories).FirstOrDefault();
+            return TemplateDirectory.EnumerateFiles($"*{shapeKind}{SearchPattern}", SearchOption.AllDirectories).FirstOrDefault()?.FullName;
+        }
+
+        /// <summary>
+        /// Verify if the templates folder exists and that there is templates in it
+        /// </summary>
+        /// <returns>An assert</returns>
+        public bool AreAnyTemplatesAvailable()
+        {
+            TemplateDirectory.Refresh();
+
+            return TemplateDirectory.Exists
+                   && TemplateDirectory.EnumerateFiles(SearchPattern, SearchOption.AllDirectories).Any();
+        }
+
+        /// <summary>
+        /// Verify if the templates folder exists and that there is templates in it
+        /// </summary>
+        /// <returns>An assert</returns>
+        public bool AreAllTemplatesAvailable()
+        {
+            var stopWatch = new Stopwatch();
+
+            stopWatch.Start();
+
+            if (!TemplateDirectory.Exists)
+            {
+                return false;
+            }
+
+            var filesInTemplateDirectory = TemplateDirectory.EnumerateFiles(SearchPattern, SearchOption.AllDirectories);
+
+            var enumStringValues = Enum.GetNames(typeof(ShapeKind))
+                .Where(x => x != $"{ShapeKind.None}");
+
+            var missingTemplates = enumStringValues.Where(x => filesInTemplateDirectory
+                .All(f => f.Name.IndexOf(x, StringComparison.CurrentCultureIgnoreCase) == -1)).ToList();
+
+            stopWatch.Stop();
+            this.logger.Debug($"Checking templates directories done in {stopWatch.ElapsedMilliseconds} ms and {missingTemplates.Count} templates are missing");
+
+            return !missingTemplates.Any();
+        }
+
+        /// <summary>
+        /// Copies the template in the Catia project directory if it's not there yet and updates
+        /// the <see cref="MappedElementRowViewModel.CatiaElement"/> <see cref="ElementRowViewModel.FileName"/>
+        /// </summary>
+        /// <param name="mappedElement">The <see cref="MappedElementRowViewModel"/></param>
+        /// <param name="documentPath">The path of the current <see cref="CatiaComService.ActiveDocument"/></param>
+        /// <returns>A value indicating whether the installation of the template is successful</returns>
+        public bool TryInstallTemplate(MappedElementRowViewModel mappedElement, string documentPath)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(documentPath))
+                {
+                    this.logger.Warn($"The {nameof(documentPath)}: {documentPath} or {nameof(documentPath)}: {documentPath} is invalid");
+                    return false;
+                }
+
+                var catiaElementTemplate = new FileInfo(mappedElement.CatiaElement.FileName);
+                var installedTemplate = new FileInfo(Path.Combine(documentPath, catiaElementTemplate.Name));
+
+                if (!installedTemplate.Exists)
+                {
+                    catiaElementTemplate.CopyTo(installedTemplate.FullName);
+                }
+
+                mappedElement.CatiaElement.FileName = installedTemplate.FullName;
+                return true;
+            }
+            catch (Exception exception)
+            {
+                this.logger.Error($"Could not install template because: {exception}");
+                return false;
+            }
         }
     }
 }

@@ -130,11 +130,16 @@ namespace DEHCATIA.DstController
         /// <summary>
         /// Maps the provided collection
         /// </summary>
-        /// <param name="elements">The <see cref="IEnumerable{T}"/> of <see cref="MappedElementRowViewModel"/> data</param>
-        void Map(IEnumerable<MappedElementRowViewModel> elements);
+        /// <param name="elements">The <see cref="List{T}"/> of <see cref="MappedElementRowViewModel"/> data</param>
+        void Map(List<MappedElementRowViewModel> elements);
 
         /// <summary>
-        /// Transfers the mapped variables to the Hub data source
+        /// Transfers the <see cref="DstController.HubMapResult"/> to Catia
+        /// </summary>
+        void TransferMappedThingToCatia();
+
+        /// <summary>
+        /// Transfers the <see cref="DstController.DstMapResult"/> to the Hub
         /// </summary>
         /// <returns>A <see cref="Task"/></returns>
         Task TransferMappedThingsToHub();

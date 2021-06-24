@@ -36,7 +36,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
         /// <summary>
         /// Initializes a new <see cref="DoubleParameterViewModel"/>
         /// </summary>
-        /// <param name="parameter">The <see cref="parameter"></see>
+        /// <param name="parameter">The <see cref="parameter"></see></param>
         public DoubleParameterViewModel(Parameter parameter) : base(parameter, default)
         {
             this.Value = parameter.GetDoubleWithUnitValue();
@@ -45,8 +45,9 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
         /// <summary>
         /// Initializes a new <see cref="DoubleParameterViewModel"/>
         /// </summary>
+        /// <param name="name">The name of the represented parameter</param>
         /// <param name="value">The <see cref="DoubleWithUnitValueViewModel"/> value</param>
-        public DoubleParameterViewModel(DoubleWithUnitValueViewModel value) : base(default, value)
+        public DoubleParameterViewModel(string name, DoubleWithUnitValueViewModel value) : base(name, value)
         {
         }
         

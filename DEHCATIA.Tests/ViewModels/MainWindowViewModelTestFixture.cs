@@ -25,6 +25,7 @@
 namespace DEHCATIA.Tests.ViewModels
 {
     using DEHCATIA.DstController;
+    using DEHCATIA.Services.CatiaTemplateService;
 
     using DEHPCommon.Enumerators;
     using DEHPCommon.UserInterfaces.Behaviors;
@@ -66,7 +67,7 @@ namespace DEHCATIA.Tests.ViewModels
 
             this.viewModel = new MainWindowViewModel(this.hubDataSourceViewModel.Object, this.dstSourceViewModel.Object,
                 this.statusBarViewModel.Object, this.navigationService.Object, this.transferControl.Object, this.dstController.Object,
-                this.hubNetChangePreview.Object, this.dstNetChangePreview.Object);
+                this.hubNetChangePreview.Object, this.dstNetChangePreview.Object, new Mock<ICatiaTemplateService>().Object);
         }
 
         [Test]

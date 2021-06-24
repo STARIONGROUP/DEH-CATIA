@@ -28,10 +28,7 @@ namespace DEHCATIA.ViewModels.NetChangePreview
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
-
-    using CDP4Common.CommonData;
-    using CDP4Common.EngineeringModelData;
-
+    
     using CDP4Dal;
 
     using DEHCATIA.Events;
@@ -39,10 +36,8 @@ namespace DEHCATIA.ViewModels.NetChangePreview
     using DEHCATIA.ViewModels.ProductTree.Rows;
     using DEHCATIA.ViewModels.Rows;
 
-    using DEHPCommon.Enumerators;
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.Services.NavigationService;
-    using DEHPCommon.UserInterfaces.ViewModels;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
     using DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows;
 

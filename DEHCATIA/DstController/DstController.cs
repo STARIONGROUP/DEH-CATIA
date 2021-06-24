@@ -39,6 +39,7 @@ namespace DEHCATIA.DstController
     using CDP4Dal;
     using CDP4Dal.Operations;
 
+    using DEHCATIA.Events;
     using DEHCATIA.Services.ComConnector;
     using DEHCATIA.ViewModels.ProductTree.Rows;
     using DEHCATIA.ViewModels.Rows;
@@ -52,7 +53,7 @@ namespace DEHCATIA.DstController
     using DEHPCommon.UserInterfaces.ViewModels;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
     using DEHPCommon.UserInterfaces.Views;
-
+    
     using NLog;
 
     using ReactiveUI;
@@ -433,14 +434,38 @@ namespace DEHCATIA.DstController
         /// <summary>
         /// Maps the provided collection
         /// </summary>
-        /// <param name="elements">The <see cref="IEnumerable{T}"/> of <see cref="MappedElementRowViewModel"/> data</param>
-        public void Map(IEnumerable<MappedElementRowViewModel> elements)
+        /// <param name="elements">The <see cref="List{T}"/> of <see cref="MappedElementRowViewModel"/> data</param>
+        public void Map(List<MappedElementRowViewModel> elements)
         {
-            this.HubMapResult.AddRange(elements);
+            if (this.mappingEngine.Map(elements) is List<MappedElementRowViewModel> mappedElements && mappedElements.Any())
+            {
+                this.HubMapResult.Clear();
+                this.HubMapResult.AddRange(mappedElements);
+            }
+
+            CDPMessageBus.Current.SendMessage(new UpdateDstElementTreeEvent());
         }
 
         /// <summary>
-        /// Transfers the mapped variables to the Hub data source
+        /// Transfers the <see cref="HubMapResult"/> to Catia
+        /// </summary>
+        public void TransferMappedThingToCatia()
+        {
+            foreach (var mappedElement in this.HubMapResult)
+            {
+                try
+                {
+                    this.catiaComService.AddOrUpdateElement(mappedElement);
+                }
+                catch (Exception exception)
+                {
+                    this.logger.Error($"The transfer of {mappedElement.CatiaElement.Name} failed to complete successfuly: {exception}");
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Transfers the <see cref="DstMapResult"/> to the Hub
         /// </summary>
         /// <returns>A <see cref="Task"/></returns>
         public async Task TransferMappedThingsToHub()

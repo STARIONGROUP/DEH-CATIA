@@ -27,25 +27,34 @@ namespace DEHCATIA.Tests.Services.CatiaTemplateService
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
+    using DEHCATIA.Enumerations;
     using DEHCATIA.Services.CatiaTemplateService;
+    using DEHCATIA.ViewModels.ProductTree.Rows;
+    using DEHCATIA.ViewModels.Rows;
 
     using NUnit.Framework;
+    using NUnit.Framework.Internal;
 
     [TestFixture]
     public class CatiaTemplateServiceTestFixture
     {
+        private const string TestFilePartName = "test.CATPart";
         private CatiaTemplateService service;
         private Parameter shapeKindParameter;
         private EnumerationParameterType enumerationParameterType;
+        private DirectoryInfo templateDirectory;
 
         [SetUp]
         public void Setup()
         {
+            this.templateDirectory = CatiaTemplateService.TemplateDirectory;
+
             this.enumerationParameterType = new EnumerationParameterType(Guid.NewGuid(), null, null)
             {
                 ValueDefinition =
@@ -69,13 +78,87 @@ namespace DEHCATIA.Tests.Services.CatiaTemplateService
                 }
             };
 
+            _ = new ElementDefinition() { ShortName = "element", Parameter = { this.shapeKindParameter }};
+
             this.service = new CatiaTemplateService();
+        }
+
+        [TearDown]
+        public void Teardown()
+        {
+            try
+            {
+                this.templateDirectory.Delete(true);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"Test PASSED but an exception on occured on TearDown : {exception}");
+            }
         }
 
         [Test]
         public void VerifyTryGetFileName()
         {
-            Assert.Throws<DirectoryNotFoundException>(() => this.service.TryGetFileName(this.shapeKindParameter, null, null, out var path));
+            this.templateDirectory.Create();
+            Assert.IsTrue(this.service.TryGetFileName(this.shapeKindParameter, null, null, out var path));
+        }
+
+        [Test]
+        public void VerifyAreAnyTemplatesAvailable()
+        {
+            Assert.IsTrue(this.service.AreAnyTemplatesAvailable());
+            this.templateDirectory.Create();
+            var threeDTemplatesDirectory = this.templateDirectory.CreateSubdirectory("3dTemplates");
+
+            threeDTemplatesDirectory.Create();
+            Assert.IsTrue(threeDTemplatesDirectory.Exists);
+
+            Assert.IsTrue(this.service.AreAnyTemplatesAvailable());
+            var tempmlateFile = new FileInfo(Path.Combine(threeDTemplatesDirectory.FullName, "box.CATPart"));
+            tempmlateFile.Create();
+            Assert.IsTrue(this.service.AreAnyTemplatesAvailable());
+        }
+
+        [Test]
+        public void VerifyAreAllTemplatesAvailable()
+        {
+            this.templateDirectory.Create();
+            var sortedTemplateDirectory = this.templateDirectory.CreateSubdirectory("3dTemplates");
+
+            Assert.IsFalse(this.service.AreAllTemplatesAvailable());
+            var randomString = new Randomizer();
+
+            foreach (var shapeKind in Enum.GetNames(typeof(ShapeKind)))
+            {
+                var tempmlateFile = new FileInfo(Path.Combine(sortedTemplateDirectory.FullName, $"{randomString.GetString(5)}{shapeKind}{randomString.GetString(5)}.CATPart"));
+
+                tempmlateFile.Create();
+            }
+
+            Assert.IsTrue(this.service.AreAllTemplatesAvailable());
+        }
+
+        [Test]
+        public void VerifyInstallTemplate()
+        {
+            this.templateDirectory.Create();
+            var workingDirectory = new DirectoryInfo("WorkingDirectory");
+            workingDirectory.Create();
+
+            var templateToCopy = new FileInfo(Path.Combine(this.templateDirectory.FullName, TestFilePartName));
+
+            var x = templateToCopy.Create();
+            x.Dispose();
+
+            var element = new ElementRowViewModel(new ElementDefinition()
+            {
+                ShortName = "test"
+            }, templateToCopy.FullName);
+
+            var mappedElement = new MappedElementRowViewModel() {CatiaElement = element};
+
+            Assert.IsTrue(this.service.TryInstallTemplate(mappedElement, workingDirectory.FullName));
+            Assert.IsTrue(workingDirectory.EnumerateFiles().Any(x => x.Name == TestFilePartName));
         }
     }
 }
