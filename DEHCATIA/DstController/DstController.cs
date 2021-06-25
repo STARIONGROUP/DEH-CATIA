@@ -554,6 +554,8 @@ namespace DEHCATIA.DstController
 
                 if (element is ElementDefinition elementDefinition)
                 {
+                    this.RemoveExcludedContainedElement(elementDefinition);
+
                     if (elementDefinition.Iid == Guid.Empty)
                     {
                         iterationClone.Element.Add(elementDefinition);
@@ -576,6 +578,32 @@ namespace DEHCATIA.DstController
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// For the transaction sanity, it removes the contained elements from <paramref name="elementDefinition"/> not present in the transaction
+        /// </summary>
+        /// <param name="elementDefinition">The <see cref="ElementDefinition"/></param>
+        private void RemoveExcludedContainedElement(ElementDefinition elementDefinition)
+        {
+            var isUsageUsedToBeContained =
+                this.hubController.GetThingById(elementDefinition.Iid, this.hubController.OpenIteration, out ElementDefinition cachedElementDefinition)
+                    ? x => cachedElementDefinition?.ContainedElement.Any(u => x.Iid == u.Iid) == true
+                    : (Func<ElementUsage, bool>) (_ => true);
+
+            var excludedElement = elementDefinition.ContainedElement.Where(x => !this.SelectedThingsToTransfer.Contains(x)).ToList();
+            
+            if (!elementDefinition.ContainedElement.Any() || !excludedElement.Any())
+            {
+                return;
+            }
+
+            var elementRemoved = excludedElement.Sum(element => elementDefinition.ContainedElement.Remove(element) ? 1 : 0);
+
+            var elementUsagesToAdd = cachedElementDefinition?.ContainedElement.Where(isUsageUsedToBeContained).ToList() ?? new List<ElementUsage>();
+            elementDefinition.ContainedElement.AddRange(elementUsagesToAdd);
+
+            this.logger.Debug($"{elementRemoved} removed out of {excludedElement.Count} => {(elementRemoved/excludedElement.Count)*100}% Then {elementUsagesToAdd.Count} got Re-added");
         }
 
         /// <summary>
