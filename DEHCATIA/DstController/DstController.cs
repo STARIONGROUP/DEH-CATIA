@@ -219,6 +219,7 @@ namespace DEHCATIA.DstController
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x =>
                 {
+                    this.RefreshMappedThings();
                     this.Map(this.ReadyToMapTopElement);
                     this.ReadyToMapTopElement = null;
                 });
@@ -246,6 +247,36 @@ namespace DEHCATIA.DstController
             if (shouldResetTheTrees)
             {
                 CDPMessageBus.Current.SendMessage(new UpdateObjectBrowserTreeEvent(true));
+            }
+        }
+
+        /// <summary>
+        /// Refreshes mapped <see cref="ElementDefinition"/> and <see cref="ElementUsage"/>
+        /// </summary>
+        /// <param name="elements">The collection of <see cref="ElementRowViewModel"/></param>
+        public void RefreshMappedThings(IEnumerable<ElementRowViewModel> elements = null)
+        {
+            elements ??= new []{ this.ReadyToMapTopElement };
+
+            foreach (var element in elements)
+            {
+                if (element?.ElementDefinition is { })
+                {
+                    element.ElementDefinition = this.hubController.OpenIteration.Element.FirstOrDefault(x => x.Iid == element.ElementDefinition.Iid)?.Clone(true);
+                }
+
+                if (element is UsageRowViewModel usageRow && usageRow.ElementUsage is { } && element.ElementDefinition is { } elementDefinition)
+                {
+                    usageRow.ElementUsage =
+                        this.hubController.OpenIteration.Element.SelectMany(d => d.ContainedElement)
+                            .Where(u => u.ElementDefinition.Iid == elementDefinition.Iid)
+                            .FirstOrDefault(x => x.Iid == usageRow.ElementUsage.Iid)?.Clone(true);
+                }
+
+                if (element?.Children.Any() == true)
+                {
+                    this.RefreshMappedThings(element.Children);
+                }
             }
         }
 
@@ -463,9 +494,9 @@ namespace DEHCATIA.DstController
                 }
             }
         }
-        
+
         /// <summary>
-        /// Transfers the <see cref="DstMapResult"/> to the Hub
+        /// Transfers the <see cref="SelectedThingsToTransfer"/> to the Hub
         /// </summary>
         /// <returns>A <see cref="Task"/></returns>
         public async Task TransferMappedThingsToHub()
@@ -755,6 +786,10 @@ namespace DEHCATIA.DstController
             {
                 this.ExternalIdentifierMap = this.ExternalIdentifierMap.Clone(true);
                 this.ExternalIdentifierMap.Iid = Guid.NewGuid();
+            }
+
+            if (iterationClone.ExternalIdentifierMap.All(x => x.Iid != this.ExternalIdentifierMap.Iid))
+            {
                 iterationClone.ExternalIdentifierMap.Add(this.ExternalIdentifierMap);
             }
 

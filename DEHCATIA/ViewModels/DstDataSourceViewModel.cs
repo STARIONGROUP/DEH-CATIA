@@ -163,7 +163,6 @@ namespace DEHCATIA.ViewModels
         /// <summary>
         /// Executes the <see cref="RefreshCommand"/>
         /// </summary>
-        /// <returns></returns>
         private void RefreshCommandExecute()
         {
             var isCompleted = false;

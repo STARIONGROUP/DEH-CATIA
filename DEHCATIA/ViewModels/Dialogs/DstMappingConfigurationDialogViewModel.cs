@@ -152,7 +152,7 @@ namespace DEHCATIA.ViewModels.Dialogs
                     {
                         this.InitializesCommandsAndObservableSubscriptions();
                         this.UpdateProperties();
-                        this.RefreshMappedThings();
+                        this.DstController.RefreshMappedThings();
                         this.CheckCanExecute();
                     });
                 });

@@ -141,7 +141,7 @@ namespace DEHCATIA.ViewModels
             this.HubNetChangePreviewViewModel = hubNetChangePreviewViewModel;
             this.DstNetChangePreviewViewModel = dstNetChangePreviewViewModel;
 
-            var areTemplateReadyMessage = templateService.AreAllTemplatesAvailable() 
+            var areTemplateReadyMessage = templateService.AreAllTemplatesAvailable()
                 ? $"All templates are ready."
                 : $"Some template files are missing.";
 

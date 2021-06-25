@@ -98,6 +98,8 @@ namespace DEHCATIA.MappingRules
         {
             try
             {
+                this.ruleOutput.Clear();
+
                 this.owner = this.hubController.CurrentDomainOfExpertise;
                 this.dstController = AppContainer.Container.Resolve<IDstController>();
 
@@ -132,7 +134,6 @@ namespace DEHCATIA.MappingRules
                     this.MapElementUsage(usageRow);
                     this.MapParameters(usageRow);
                     this.dstController.SaveElementMapping(usageRow);
-                    this.ruleOutput.Add((usageRow.Parent, usageRow.ElementDefinition));
                     this.ruleOutput.Add((usageRow.Parent, usageRow.ElementUsage));
                 }
                 else
