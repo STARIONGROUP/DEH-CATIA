@@ -31,6 +31,7 @@ namespace DEHCATIA.Tests.Services.ComConnector
 
     using CDP4Common.EngineeringModelData;
 
+    using DEHCATIA.Enumerations;
     using DEHCATIA.Extensions;
     using DEHCATIA.Services.CatiaTemplateService;
     using DEHCATIA.Services.ComConnector;
@@ -41,6 +42,10 @@ namespace DEHCATIA.Tests.Services.ComConnector
 
     using DEHPCommon.Services.ExchangeHistory;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
+
+    using DevExpress.CodeParser.VB;
+
+    using KnowledgewareTypeLib;
 
     using Moq;
 
@@ -57,15 +62,17 @@ namespace DEHCATIA.Tests.Services.ComConnector
         private MappedElementRowViewModel element;
         private CatiaTemplateService templateService;
         private DirectoryInfo templateDirectory;
+        private Mock<IExchangeHistoryService> exchangeHistory;
 
-        [SetUp]
+        [SetUp] 
         public void Setup()
         {
             this.templateDirectory = CatiaTemplateService.TemplateDirectory;
             this.templateDirectory.Create();
             
             this.statusBar = new Mock<IStatusBarControlViewModel>();
-            this.service = new CatiaComService(this.statusBar.Object, new Mock<IExchangeHistoryService>().Object, new Mock<ICatiaTemplateService>().Object);
+            this.exchangeHistory = new Mock<IExchangeHistoryService>();
+            this.service = new CatiaComService(this.statusBar.Object, this.exchangeHistory.Object, new Mock<ICatiaTemplateService>().Object);
             this.templateService = new CatiaTemplateService();
 
             this.element = new MappedElementRowViewModel();
@@ -177,9 +184,34 @@ namespace DEHCATIA.Tests.Services.ComConnector
         [Test]
         public void VerifyUpdateParameters()
         {
+            Assert.DoesNotThrow(() => this.service.Connect());
             var productTree = this.service.GetProductTree(new CancellationToken());
             this.element.CatiaElement = productTree;
-            Assert.IsFalse(false);
+            var massParameter = new Mock<Parameter>();
+            massParameter.Setup(x => x.get_Name()).Returns("eff_volume");
+            massParameter.Setup(x => x.ValueAsString()).Returns("56,4");
+            this.element.CatiaElement.Parameters.Add(new DoubleParameterViewModel(massParameter.Object));
+
+            this.element.CatiaElement.Shape = this.element.CatiaElement.Parameters.GetShape();
+            Assert.DoesNotThrow(() => this.service.UpdateParameters(this.element));
+        }
+
+        [Test]
+        public void VerifyCreateParameters()
+        {
+            var parameters = new Mock<Parameters>();
+
+            var doubleParameter = new DoubleParameterViewModel("", new DoubleWithUnitValueViewModel(2));
+            var booleanParameter = new BooleanParameterViewModel(new Mock<Parameter>().Object, true);
+            var stringParameter = new StringParameterViewModel(string.Empty);
+            var shapeKindParameter = new ShapeKindParameterViewModel(ShapeKind.Box);
+
+            Assert.DoesNotThrow(() => this.service.CreateParameter(parameters.Object, doubleParameter));
+            Assert.DoesNotThrow(() => this.service.CreateParameter(parameters.Object, booleanParameter));
+            Assert.DoesNotThrow(() => this.service.CreateParameter(parameters.Object, stringParameter));
+            Assert.DoesNotThrow(() => this.service.CreateParameter(parameters.Object, shapeKindParameter));
+
+            this.exchangeHistory.Verify(x => x.Append(It.IsAny<string>()), Times.Exactly(4));
         }
     }
 }

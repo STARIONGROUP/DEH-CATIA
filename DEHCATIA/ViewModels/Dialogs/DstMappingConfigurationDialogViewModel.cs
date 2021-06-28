@@ -157,33 +157,6 @@ namespace DEHCATIA.ViewModels.Dialogs
                     });
                 });
         }
-
-        /// <summary>
-        /// Refreshes mapped <see cref="ElementDefinition"/> and <see cref="ElementUsage"/>
-        /// </summary>
-        /// <param name="elements">The collection of <see cref="ElementRowViewModel"/></param>
-        private void RefreshMappedThings(IEnumerable<ElementRowViewModel> elements = null)
-        {
-            elements ??= this.Elements;
-
-            foreach (var element in elements)
-            {
-                if (element.ElementDefinition is {})
-                {
-                    element.ElementDefinition = this.AvailableElementDefinitions.FirstOrDefault(x => x.Iid == element.ElementDefinition.Iid);
-                }
-
-                if (element is UsageRowViewModel usageRow && usageRow.ElementUsage is {} && element.ElementDefinition is {} elementDefinition)
-                {
-                    usageRow.ElementUsage = 
-                        this.AvailableElementDefinitions.SelectMany(d => d.ContainedElement)
-                            .Where(u => u.ElementDefinition.Iid == elementDefinition.Iid)
-                            .FirstOrDefault(x => x.Iid == usageRow.ElementUsage.Iid);
-                }
-
-                this.RefreshMappedThings(element.Children);
-            }
-        }
         
         /// <summary>
         /// Initializes this view model <see cref="ICommand"/> and <see cref="Observable"/>

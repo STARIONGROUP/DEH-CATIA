@@ -22,30 +22,27 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.ViewModels
+namespace DEHCATIA.Tests.ViewModels
 {
+    using DEHCATIA.ViewModels;
+
     using DEHPCommon.Services.NavigationService;
-    using DEHPCommon.UserInterfaces.ViewModels;
 
-    /// <summary>
-    /// The <see cref="CatiaStatusBarControlViewModel"/> is the main view  model of the status bar of this dst adapter
-    /// </summary>
-    public class CatiaStatusBarControlViewModel : StatusBarControlViewModel
+    using Moq;
+
+    using NUnit.Framework;
+
+    [TestFixture]
+    public class CatiaStatusBarControlViewModelTestFixture
     {
-        /// <summary>
-        /// Initializes a new <see cref="T:DEHPCommon.UserInterfaces.ViewModels.StatusBarControlViewModel" />
-        /// </summary>
-        /// <param name="navigationService">The <see cref="INavigationService"/></param>
-        public CatiaStatusBarControlViewModel(INavigationService navigationService) : base(navigationService)
+        [Test]
+        public void VerifyExecuteUserSettingsCommand()
         {
-        }
-
-        /// <summary>
-        /// Executes the <see cref="P:DEHPCommon.UserInterfaces.ViewModels.StatusBarControlViewModel.UserSettingCommand" />
-        /// </summary>
-        protected override void ExecuteUserSettingCommand()
-        {
-            this.Append("User settings opened");
+            var viewModel = new CatiaStatusBarControlViewModel(new Mock<INavigationService>().Object);
+            Assert.IsTrue(viewModel.UserSettingCommand.CanExecute(null));
+            Assert.DoesNotThrow(() => viewModel.UserSettingCommand.Execute(null));
+            
+            Assert.IsFalse(string.IsNullOrWhiteSpace(viewModel.Message));
         }
     }
 }

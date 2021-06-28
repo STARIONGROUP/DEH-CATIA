@@ -193,7 +193,7 @@ namespace DEHCATIA.ViewModels.NetChangePreview
         /// <param name="mappedElement">The source <see cref="MappedElementRowViewModel"/></param>
         private void UpdateElementRow(MappedElementRowViewModel mappedElement)
         {
-            CDPMessageBus.Current.SendMessage(new DstHighlightEvent(mappedElement.CatiaElement.Name));
+            CDPMessageBus.Current.SendMessage(new DstHighlightEvent(mappedElement.CatiaElement?.Name));
         }
 
         /// <summary>

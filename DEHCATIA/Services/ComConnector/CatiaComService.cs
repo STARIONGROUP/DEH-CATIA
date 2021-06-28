@@ -824,7 +824,7 @@ namespace DEHCATIA.Services.ComConnector
     /// </summary>
     /// <param name="parameters">The <see cref="Parameters"/></param>
     /// <param name="parameter">The <see cref="IDstParameterViewModel"/></param>
-    private void CreateParameter(Parameters parameters, IDstParameterViewModel parameter)
+    public void CreateParameter(Parameters parameters, IDstParameterViewModel parameter)
     {
         var parameterShortName = parameter.Name;
 
