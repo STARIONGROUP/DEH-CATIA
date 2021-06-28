@@ -25,7 +25,6 @@
 namespace DEHCATIA.Tests.ViewModels
 {
     using System;
-    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     using CDP4Common.EngineeringModelData;
@@ -45,8 +44,6 @@ namespace DEHCATIA.Tests.ViewModels
     using Moq;
 
     using NUnit.Framework;
-
-    using ProductStructureTypeLib;
 
     using ReactiveUI;
 

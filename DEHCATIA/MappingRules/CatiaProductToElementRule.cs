@@ -98,6 +98,8 @@ namespace DEHCATIA.MappingRules
         {
             try
             {
+                this.ruleOutput.Clear();
+
                 this.owner = this.hubController.CurrentDomainOfExpertise;
                 this.dstController = AppContainer.Container.Resolve<IDstController>();
 

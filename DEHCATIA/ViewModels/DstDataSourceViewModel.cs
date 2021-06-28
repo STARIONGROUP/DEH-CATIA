@@ -26,10 +26,7 @@ namespace DEHCATIA.ViewModels
 {
     using System;
     using System.Diagnostics;
-    using System.Reactive;
     using System.Reactive.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
 
     using Autofac;
 
@@ -47,6 +44,8 @@ namespace DEHCATIA.ViewModels
     using DEHPCommon.Services.NavigationService;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
+    using NLog;
+
     using ReactiveUI;
 
     /// <summary>
@@ -54,6 +53,11 @@ namespace DEHCATIA.ViewModels
     /// </summary>
     public sealed class DstDataSourceViewModel : DataSourceViewModel, IDstDataSourceViewModel
     {
+        /// <summary>
+        /// The <see cref="NLog"/> logger
+        /// </summary>
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// The <see cref="IDstController"/> instance.
         /// </summary>
@@ -96,7 +100,7 @@ namespace DEHCATIA.ViewModels
         /// <summary>
         /// Gets or sets the command that refreshes the connection and the product tree
         /// </summary>
-        public ReactiveCommand<Unit> RefreshCommand { get; set; }
+        public ReactiveCommand<object> RefreshCommand { get; set; }
 
         /// <summary>
         /// Initializes a new instance of <see cref="DstDataSourceViewModel"/>.
@@ -152,24 +156,34 @@ namespace DEHCATIA.ViewModels
                         x.Value is null  && c.Value && i.Value != null)
                 .ObserveOn(RxApp.MainThreadScheduler);
 
-            this.RefreshCommand = ReactiveCommand.CreateAsyncTask(canRefresh, _ => this.RefreshCommandExecute());
+            this.RefreshCommand = ReactiveCommand.Create(canRefresh);
+            this.RefreshCommand.Subscribe(_ => this.RefreshCommandExecute());
         }
 
         /// <summary>
         /// Executes the <see cref="RefreshCommand"/>
         /// </summary>
-        /// <returns></returns>
-        private async Task RefreshCommandExecute()
+        private void RefreshCommandExecute()
         {
-            this.statusBar.Append($"Refreshing the Catia Product tree in progress");
+            var isCompleted = false;
             var timer = new Stopwatch();
-            timer.Start();
 
-            await Task.Run(() => this.dstController.Refresh()).ContinueWith(_ =>
+            try
+            {
+                this.statusBar.Append($"Refreshing the Catia Product tree in progress");
+                timer.Start();
+                this.dstController.Refresh();
+                isCompleted = true;
+            }
+            catch (Exception exception)
+            {
+                this.logger.Error(exception);
+            }
+            finally
             {
                 timer.Stop();
-                this.statusBar.Append($"Refresh {(_.IsCompleted ? "has complete in" : "has failed after")} {timer.ElapsedMilliseconds} ms");
-            });
+                this.statusBar.Append($"Refresh {(isCompleted ? "has complete in" : "has failed after")} {timer.ElapsedMilliseconds} ms");
+            }
         }
 
         /// <summary>

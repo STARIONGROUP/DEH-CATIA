@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DefinitionRowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="CatiaStatusBarControlViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -22,32 +22,27 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.ViewModels.ProductTree.Rows
+namespace DEHCATIA.Tests.ViewModels
 {
-    using CDP4Common.EngineeringModelData;
+    using DEHCATIA.ViewModels;
 
-    using DEHCATIA.Enumerations;
+    using DEHPCommon.Services.NavigationService;
 
-    using ProductStructureTypeLib;
+    using Moq;
 
-    /// <summary>
-    /// The <see cref="DefinitionRowViewModel"/> is a specific <see cref="ElementRowViewModel"/>
-    /// mappable to a <see cref="ElementDefinition"/> and representing a catia element of type <see cref="ElementType.CatDefinition"/>
-    /// </summary>
-    public class DefinitionRowViewModel : ElementRowViewModel
+    using NUnit.Framework;
+
+    [TestFixture]
+    public class CatiaStatusBarControlViewModelTestFixture
     {
-        /// <summary>
-        /// Gets or sets the type.
-        /// </summary>
-        public override ElementType ElementType => ElementType.CatDefinition;
-
-        /// <summary>
-        /// Initializes a new <see cref="DefinitionRowViewModel"/>
-        /// </summary>
-        /// <param name="product">The <see cref="Product"/> this view model represents</param>
-        /// <param name="fileName">The file name of the <paramref name="product"/></param>
-        public DefinitionRowViewModel(Product product, string fileName) : base(product, fileName)
+        [Test]
+        public void VerifyExecuteUserSettingsCommand()
         {
+            var viewModel = new CatiaStatusBarControlViewModel(new Mock<INavigationService>().Object);
+            Assert.IsTrue(viewModel.UserSettingCommand.CanExecute(null));
+            Assert.DoesNotThrow(() => viewModel.UserSettingCommand.Execute(null));
+            
+            Assert.IsFalse(string.IsNullOrWhiteSpace(viewModel.Message));
         }
     }
 }

@@ -96,7 +96,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-    <PackageReference Include="DEHPCommon" Version="1.0.219" />
+    <PackageReference Include="DEHPCommon" Version="1.0.224" />
     <PackageReference Include="NLog" Version="4.6.8" />
     <PackageReference Include="NLog.Schema" Version="4.6.8" />
     <PackageReference Include="reactiveui" Version="6.5.0" />

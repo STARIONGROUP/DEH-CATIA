@@ -25,7 +25,6 @@
 namespace DEHCATIA.ViewModels.Dialogs
 {
     using System;
-    using System.Windows;
     using System.Windows.Input;
 
     using DEHCATIA.DstController;

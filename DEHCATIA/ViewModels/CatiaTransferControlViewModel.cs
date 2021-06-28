@@ -33,7 +33,6 @@ namespace DEHCATIA.ViewModels
     using CDP4Common.Extensions;
 
     using CDP4Dal;
-    using CDP4Dal.Events;
 
     using DEHCATIA.DstController;
     using DEHCATIA.Events;

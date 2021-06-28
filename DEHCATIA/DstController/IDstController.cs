@@ -101,6 +101,12 @@ namespace DEHCATIA.DstController
         void ResetMappedElement(bool shouldResetTheTrees = false);
 
         /// <summary>
+        /// Refreshes mapped <see cref="ElementDefinition"/> and <see cref="ElementUsage"/>
+        /// </summary>
+        /// <param name="elements">The collection of <see cref="ElementRowViewModel"/></param>
+        void RefreshMappedThings(IEnumerable<ElementRowViewModel> elements = null);
+
+        /// <summary>
         /// Loads the mapping configuration and generates the map result respectively
         /// </summary>
         void LoadMapping();
@@ -139,7 +145,7 @@ namespace DEHCATIA.DstController
         void TransferMappedThingToCatia();
 
         /// <summary>
-        /// Transfers the <see cref="DstController.DstMapResult"/> to the Hub
+        /// Transfers the <see cref="DstController.SelectedThingsToTransfer"/> to the Hub
         /// </summary>
         /// <returns>A <see cref="Task"/></returns>
         Task TransferMappedThingsToHub();

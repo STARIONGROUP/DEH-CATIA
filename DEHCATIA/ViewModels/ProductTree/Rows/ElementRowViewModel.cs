@@ -37,8 +37,6 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
     using DEHCATIA.ViewModels.ProductTree.Parameters;
     using DEHCATIA.ViewModels.ProductTree.Shapes;
 
-    using DEHPCommon.Events;
-
     using ProductStructureTypeLib;
 
     using ReactiveUI;

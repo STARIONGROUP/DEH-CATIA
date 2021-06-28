@@ -27,8 +27,6 @@ namespace DEHCATIA.ViewModels
     using System;
     using System.Windows.Input;
 
-    using Autofac;
-
     using DEHCATIA.DstController;
     using DEHCATIA.Services.CatiaTemplateService;
 
@@ -37,12 +35,8 @@ namespace DEHCATIA.ViewModels
 
     using DEHCATIA.ViewModels.Interfaces;
 
-    using DEHPCommon;
     using DEHPCommon.Services.NavigationService;
-    using DEHPCommon.UserInterfaces.ViewModels.NetChangePreview.Interfaces;
     using DEHPCommon.UserInterfaces.Views.ExchangeHistory;
-
-    using DevExpress.Xpo.Exceptions;
 
     using ReactiveUI;
 
@@ -147,7 +141,7 @@ namespace DEHCATIA.ViewModels
             this.HubNetChangePreviewViewModel = hubNetChangePreviewViewModel;
             this.DstNetChangePreviewViewModel = dstNetChangePreviewViewModel;
 
-            var areTemplateReadyMessage = templateService.AreAllTemplatesAvailable() 
+            var areTemplateReadyMessage = templateService.AreAllTemplatesAvailable()
                 ? $"All templates are ready."
                 : $"Some template files are missing.";
 

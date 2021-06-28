@@ -221,7 +221,7 @@ namespace DEHCATIA.Tests.DstController
         [Test]
         public void VerifyTransferToHub()
         {
-            this.controller.ExternalIdentifierMap = new ExternalIdentifierMap();
+            this.controller.ExternalIdentifierMap = new ExternalIdentifierMap() {Correspondence = { new IdCorrespondence()}};
             
             this.navigationService.Setup(
                 x => x.ShowDxDialog<CreateLogEntryDialog, CreateLogEntryDialogViewModel>(
@@ -481,6 +481,21 @@ namespace DEHCATIA.Tests.DstController
             this.comService.Setup(x => x.AddOrUpdateElement(It.IsAny<MappedElementRowViewModel>())).Throws<InvalidOperationException>();
             this.controller.TransferMappedThingToCatia();
             this.comService.Verify(x => x.AddOrUpdateElement(It.IsAny<MappedElementRowViewModel>()), Times.Exactly(24));
+        }
+
+        [Test]
+        public void VerifyMappedThings()
+        {
+            this.elementRow.Children.Add(new UsageRowViewModel(this.product1.Object, "")
+                {
+                    ElementDefinition = this.element, ElementUsage = new ElementUsage() {ElementDefinition = this.element}
+                });
+
+            this.iteration.Element.Add(this.element);
+            this.hubController.Setup(x => x.OpenIteration).Returns(this.iteration);
+
+            this.elementRow.ElementDefinition = this.element;
+            Assert.DoesNotThrow(() => this.controller.RefreshMappedThings(new []{this.elementRow}));
         }
     }
 }

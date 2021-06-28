@@ -161,6 +161,7 @@ namespace DEHCATIA
             containerBuilder.RegisterType<HubNetChangePreviewViewModel>().As<IHubNetChangePreviewViewModel>().SingleInstance();
             containerBuilder.RegisterType<DstNetChangePreviewViewModel>().As<IDstNetChangePreviewViewModel>().SingleInstance();
             containerBuilder.RegisterType<DstLoginViewModel>().As<IDstLoginViewModel>();
+            containerBuilder.RegisterType<CatiaStatusBarControlViewModel>().As<IStatusBarControlViewModel>().SingleInstance();
         }
     }   
 }

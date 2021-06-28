@@ -24,11 +24,7 @@
 
 namespace DEHCATIA.ViewModels.Dialogs.Interfaces
 {
-    using System.Reactive.Linq;
-    using System.Windows.Input;
-
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
 
     using DEHCATIA.ViewModels.ProductTree.Rows;
 

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DefinitionRowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="CatiaStatusBarControlViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -22,32 +22,30 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.ViewModels.ProductTree.Rows
+namespace DEHCATIA.ViewModels
 {
-    using CDP4Common.EngineeringModelData;
-
-    using DEHCATIA.Enumerations;
-
-    using ProductStructureTypeLib;
+    using DEHPCommon.Services.NavigationService;
+    using DEHPCommon.UserInterfaces.ViewModels;
 
     /// <summary>
-    /// The <see cref="DefinitionRowViewModel"/> is a specific <see cref="ElementRowViewModel"/>
-    /// mappable to a <see cref="ElementDefinition"/> and representing a catia element of type <see cref="ElementType.CatDefinition"/>
+    /// The <see cref="CatiaStatusBarControlViewModel"/> is the main view  model of the status bar of this dst adapter
     /// </summary>
-    public class DefinitionRowViewModel : ElementRowViewModel
+    public class CatiaStatusBarControlViewModel : StatusBarControlViewModel
     {
         /// <summary>
-        /// Gets or sets the type.
+        /// Initializes a new <see cref="T:DEHPCommon.UserInterfaces.ViewModels.StatusBarControlViewModel" />
         /// </summary>
-        public override ElementType ElementType => ElementType.CatDefinition;
+        /// <param name="navigationService">The <see cref="INavigationService"/></param>
+        public CatiaStatusBarControlViewModel(INavigationService navigationService) : base(navigationService)
+        {
+        }
 
         /// <summary>
-        /// Initializes a new <see cref="DefinitionRowViewModel"/>
+        /// Executes the <see cref="P:DEHPCommon.UserInterfaces.ViewModels.StatusBarControlViewModel.UserSettingCommand" />
         /// </summary>
-        /// <param name="product">The <see cref="Product"/> this view model represents</param>
-        /// <param name="fileName">The file name of the <paramref name="product"/></param>
-        public DefinitionRowViewModel(Product product, string fileName) : base(product, fileName)
+        protected override void ExecuteUserSettingCommand()
         {
+            this.Append("User settings opened");
         }
     }
 }

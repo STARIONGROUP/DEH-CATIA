@@ -27,8 +27,6 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
     using DEHCATIA.Enumerations;
     using DEHCATIA.Extensions;
 
-    using KnowledgewareTypeLib;
-
     /// <summary>
     /// The <see cref="ShapeKindParameterViewModel"/> represents a Parameter in a element of the Catia Product tree that holds a <see cref="ShapeKind"/>
     /// </summary>

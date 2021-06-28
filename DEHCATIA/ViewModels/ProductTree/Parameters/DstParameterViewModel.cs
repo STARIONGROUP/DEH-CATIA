@@ -132,7 +132,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
         {
             this.Parameter = parameter;
             this.IsQuantityKind = parameter is RealParam;
-            this.ModelCode = parameter?.get_Name().Replace("\\", ".");
+            this.ModelCode = parameter?.get_Name()?.Replace("\\", ".");
             this.Comment = parameter?.get_Comment();
             this.ValueFromCatia = parameter?.ValueAsString();
         }

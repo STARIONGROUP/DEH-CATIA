@@ -27,7 +27,6 @@ namespace DEHCATIA.ViewModels.Interfaces
     using System.Windows.Input;
 
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
-    using DEHPCommon.UserInterfaces.ViewModels.NetChangePreview.Interfaces;
 
     using ReactiveUI;
 
