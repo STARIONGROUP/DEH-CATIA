@@ -1,0 +1,207 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net472</TargetFramework>
+		<RootNamespace>DEHCATIA</RootNamespace>
+		<UseWPF>true</UseWPF>
+		<AssemblyTitle>DEHCATIA</AssemblyTitle>
+		<Company>RHEA System S.A.</Company>
+		<Product>DEHCATIA</Product>
+		<Description>DEHCATIA desktop application</Description>
+		<Copyright>Copyright © RHEA System S.A.</Copyright>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<FileVersion>1.0.0.0</FileVersion>
+		<LangVersion>latest</LangVersion>
+		<StartupObject>DEHCATIA.App</StartupObject>
+		<ApplicationIcon>icon.ico</ApplicationIcon>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <PlatformTarget>x86</PlatformTarget>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <COMReference Include="CATMat.dll">
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>0</VersionMajor>
+	    <Guid>4d3f28c0-7790-11d6-8056-0030f113d1bf</Guid>
+	    <Lcid>0</Lcid>
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <Isolated>false</Isolated>
+	  </COMReference>
+	  <COMReference Include="CATRma.dll">
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>0</VersionMajor>
+	    <Guid>9be25e70-7167-11d6-8054-0030f113d1bf</Guid>
+	    <Lcid>0</Lcid>
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <Isolated>false</Isolated>
+	  </COMReference>
+	  <COMReference Include="KinTypeLib.dll">
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>0</VersionMajor>
+	    <Guid>6652fda0-ba01-11d2-88a1-0008c7194e6a</Guid>
+	    <Lcid>0</Lcid>
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <Isolated>false</Isolated>
+	  </COMReference>
+	  <COMReference Include="KnowledgewareTypeLib.dll">
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>0</VersionMajor>
+	    <Guid>0770412c-722e-11d2-8378-0060941974ff</Guid>
+	    <Lcid>0</Lcid>
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <Isolated>false</Isolated>
+	  </COMReference>
+	  <COMReference Include="MECMOD.dll">
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>0</VersionMajor>
+	    <Guid>0d90a5c9-3b08-11d1-a26c-0000f87546fd</Guid>
+	    <Lcid>0</Lcid>
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <Isolated>false</Isolated>
+	  </COMReference>
+	  <COMReference Include="PARTITF.dll">
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>0</VersionMajor>
+	    <Guid>d8431606-e4b5-11d1-a5d3-00a0c95752ed</Guid>
+	    <Lcid>0</Lcid>
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <Isolated>false</Isolated>
+	  </COMReference>
+	  <COMReference Include="ProductStructureTypeLib.dll">
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>0</VersionMajor>
+	    <Guid>5065f8b6-61bb-11d1-9d85-0000f8759f82</Guid>
+	    <Lcid>0</Lcid>
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <Isolated>false</Isolated>
+	  </COMReference>
+	  <COMReference Include="SPATypeLib.dll">
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>0</VersionMajor>
+	    <Guid>9143c8cc-1474-11d4-9461-006094eb3826</Guid>
+	    <Lcid>0</Lcid>
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <Isolated>false</Isolated>
+	  </COMReference>
+	  <COMReference Include="INFITF.dll">
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>0</VersionMajor>
+	    <Guid>14f197b2-0771-11d1-a5b1-00a0c9575177</Guid>
+	    <Lcid>0</Lcid>
+	    <Isolated>false</Isolated>
+	  </COMReference>
+	</ItemGroup>
+
+	<ItemGroup>
+    <PackageReference Include="DEHPCommon" Version="1.0.224" />
+    <PackageReference Include="NLog" Version="4.6.8" />
+    <PackageReference Include="NLog.Schema" Version="4.6.8" />
+    <PackageReference Include="reactiveui" Version="6.5.0" />
+    <PackageReference Include="Rx-Linq" Version="2.2.5" />
+    <PackageReference Include="Rx-PlatformServices" Version="2.2.5" />
+    <PackageReference Include="Splat" Version="1.6.2" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<Page Include="App.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="System.Web" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_CylindricalSegment.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_DiscSegment.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_ParaboloidSegment.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_PlanarQuadrilateral.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_Rectange.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_SphericalSegment.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_Triangle.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Box.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Capped_Cone.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Capped_Cylinder.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Capsule.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Cone.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_conical.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Cylinder.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Dish.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Ellipsoid.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Ogive.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Paraboloid.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Poly_Prism.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Quad_Prism.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_rectangular.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Sphere.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Tetrahedron.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Tri_Prism.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Wedge.CATPart">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="Views\DstProductTree.xaml">
+	    <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+	  </Page>
+	</ItemGroup>
+
+</Project>

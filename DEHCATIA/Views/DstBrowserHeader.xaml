@@ -1,0 +1,61 @@
+<UserControl x:Class="DEHCATIA.Views.DstBrowserHeader" 
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             d:DesignHeight="100" d:DesignWidth="400" mc:Ignorable="d">
+    <UserControl.ToolTip>
+        <ToolTip>
+            <StackPanel Orientation="Vertical">
+                <StackPanel Margin="3" Orientation="Horizontal">
+                    <TextBlock FontWeight="Bold" Text="Work Bench Id:" />
+                    <TextBlock Margin="3,0,0,0" Text="{Binding WorkBenchId}" />
+                </StackPanel>
+                <StackPanel Margin="3" Orientation="Horizontal">
+                    <TextBlock FontWeight="Bold" Text="Number of Documents:" />
+                    <TextBlock Margin="3,0,0,0" Text="{Binding DocumentsCount}"/>
+                </StackPanel>
+                <StackPanel Margin="3" Orientation="Horizontal">
+                    <TextBlock FontWeight="Bold" Text="Active Document Name:" />
+                    <TextBlock Margin="3,0,0,0" Text="{Binding ActiveDocumentName}"/>
+                </StackPanel>
+                <StackPanel Margin="3" Orientation="Horizontal">
+                    <TextBlock FontWeight="Bold" Text="Active Document Filter:" />
+                    <TextBlock Margin="3,0,0,0" Text="{Binding ActiveDocumentCurrentFilter}"/>
+                </StackPanel>
+                <StackPanel Margin="3" Orientation="Horizontal">
+                    <TextBlock FontWeight="Bold" Text="Active Document Layer:" />
+                    <TextBlock Margin="3,0,0,0" Text="{Binding ActiveDocumentCurrentLayer}"/>
+                </StackPanel>
+            </StackPanel>
+        </ToolTip>
+    </UserControl.ToolTip>
+    <Grid Background="AliceBlue">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Height="Auto" Margin="3" FontSize="10" FontWeight="Bold" Text="Work Bench Id: " />
+        <TextBlock Grid.Row="0" Grid.Column="1" Height="Auto" Margin="3" FontSize="10" TextTrimming="CharacterEllipsis" Text="{Binding WorkBenchId}" />
+
+        <TextBlock Grid.Row="0" Grid.Column="2" Height="Auto" Margin="6,3,3,3" FontSize="10" FontWeight="Bold" Text="Number of Documents: " />
+        <TextBlock Grid.Row="0" Grid.Column="3" Height="Auto" Margin="3" FontSize="10" TextTrimming="CharacterEllipsis" Text="{Binding DocumentsCount}" />
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Height="Auto" Margin="3" FontSize="10" FontWeight="Bold" Text="Active Document Name: " />
+        <TextBlock Grid.Row="1" Grid.Column="1" Height="Auto" Margin="3" FontSize="10" TextTrimming="CharacterEllipsis" Text="{Binding ActiveDocumentName}" />
+
+        <TextBlock Grid.Row="1" Grid.Column="2" Height="Auto" Margin="6,3,3,3" FontSize="10" FontWeight="Bold" Text="Active Document Filter: " />
+        <TextBlock Grid.Row="1" Grid.Column="3" Height="Auto" Margin="3" FontSize="10" TextTrimming="CharacterEllipsis" Text="{Binding ActiveDocumentCurrentFilter}" />
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Height="Auto" Margin="3" FontSize="10" FontWeight="Bold" Text="Active Document Layer: " />
+        <TextBlock Grid.Row="2" Grid.Column="1" Height="Auto" Margin="3" FontSize="10" TextTrimming="CharacterEllipsis" Text="{Binding ActiveDocumentCurrentLayer}"/>
+    </Grid>
+</UserControl>
