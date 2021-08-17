@@ -114,7 +114,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+<<<<<<< 502b78683eced3967b81231f6ea79853276ef003
     <PackageReference Include="DEHPCommon" Version="1.0.233" />
+=======
+    <PackageReference Include="DEHPCommon" Version="1.0.230" />
+>>>>>>> changed the DEHPCommon version number
     <PackageReference Include="NLog" Version="4.6.8" />
     <PackageReference Include="NLog.Schema" Version="4.6.8" />
     <PackageReference Include="reactiveui" Version="6.5.0" />
