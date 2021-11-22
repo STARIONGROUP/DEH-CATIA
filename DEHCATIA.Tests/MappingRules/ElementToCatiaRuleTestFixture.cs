@@ -41,6 +41,7 @@ namespace DEHCATIA.Tests.MappingRules
     using DEHCATIA.Enumerations;
     using DEHCATIA.MappingRules;
     using DEHCATIA.Services.CatiaTemplateService;
+    using DEHCATIA.Services.MappingConfiguration;
     using DEHCATIA.Services.ParameterTypeService;
     using DEHCATIA.ViewModels.ProductTree.Rows;
     using DEHCATIA.ViewModels.Rows;
@@ -67,6 +68,7 @@ namespace DEHCATIA.Tests.MappingRules
         private Mock<IParameterTypeService> parameterTypeService;
         private EnumerationParameterType enumerationParameterType;
         private Mock<ICatiaTemplateService> catiaTemplateService;
+        private Mock<IMappingConfigurationService> mappingConfiguration;
 
         [SetUp]
         public void Setup()
@@ -76,11 +78,15 @@ namespace DEHCATIA.Tests.MappingRules
             this.parameterTypeService = new Mock<IParameterTypeService>();
             this.catiaTemplateService = new Mock<ICatiaTemplateService>();
 
+
+            this.mappingConfiguration = new Mock<IMappingConfigurationService>();
+
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterInstance(this.hubController.Object).As<IHubController>();
             containerBuilder.RegisterInstance(this.dstController.Object).As<IDstController>();
             containerBuilder.RegisterInstance(this.catiaTemplateService.Object).As<ICatiaTemplateService>();
             containerBuilder.RegisterInstance(this.parameterTypeService.Object).As<IParameterTypeService>();
+            containerBuilder.RegisterInstance(this.mappingConfiguration.Object).As<IMappingConfigurationService>();
             AppContainer.Container = containerBuilder.Build();
 
             this.booleanParameterType = new BooleanParameterType(Guid.NewGuid(), null, null);

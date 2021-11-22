@@ -12,6 +12,7 @@
                    xmlns:rows="clr-namespace:DEHCATIA.ViewModels.ProductTree.Rows"
                    xmlns:converters1="clr-namespace:DEHCATIA.Converters"
                    Title="Mapping Configuration Dialog" MinWidth="800"
+                   WindowStartupLocation="CenterScreen"
                    MinHeight="600" mc:Ignorable="d" Topmost="True">
     <Window.Resources>
         <ResourceDictionary>

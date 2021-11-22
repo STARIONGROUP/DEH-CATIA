@@ -150,7 +150,7 @@ namespace DEHCATIA.ViewModels.NetChangePreview
         }
 
         /// <summary>
-        /// Adds or removes the <paramref name="row.Thing"/> and it's chain of container to the <see cref="IDstController.SelectedThingsToTransfer"/>
+        /// Adds or removes the <paramref name="row.Thing"/> and it's chain of container to the <see cref="IDstController.SelectedDstMapResultToTransfer"/>
         /// </summary>
         /// <typeparam name="TElement">The type of <see cref="ElementBase"/> the <paramref name="row"/> represents</typeparam>
         /// <param name="row">The <see cref="IRowViewModelBase{T}"/> to select or deselect</param>
@@ -166,7 +166,7 @@ namespace DEHCATIA.ViewModels.NetChangePreview
         }
 
         /// <summary>
-        /// Adds or removes the <paramref name="row.Thing"/> to the <see cref="IDstController.SelectedThingsToTransfer"/>
+        /// Adds or removes the <paramref name="row.Thing"/> to the <see cref="IDstController.SelectedDstMapResultToTransfer"/>
         /// </summary>
         /// <typeparam name="TElement">The type of <see cref="ElementBase"/> the <paramref name="row"/> represents</typeparam>
         /// <param name="row">The <see cref="IRowViewModelBase{T}"/> to select or deselect</param>
@@ -177,7 +177,7 @@ namespace DEHCATIA.ViewModels.NetChangePreview
         }
 
         /// <summary>
-        /// Adds or removes the <paramref name="element"/>  to the <see cref="IDstController.SelectedThingsToTransfer"/>
+        /// Adds or removes the <paramref name="element"/>  to the <see cref="IDstController.SelectedDstMapResultToTransfer"/>
         /// </summary>
         /// <typeparam name="TElement">The type of <paramref name="element"/></typeparam>
         /// <param name="element">The <typeparamref name="TElement"/> element to add or remove</param>
@@ -186,12 +186,12 @@ namespace DEHCATIA.ViewModels.NetChangePreview
         {
             if (isSelected)
             {
-                this.dstController.SelectedThingsToTransfer.Add(element);
+                this.dstController.SelectedDstMapResultToTransfer.Add(element);
             }
             else
             {
-                this.dstController.SelectedThingsToTransfer.RemoveAll(
-                    this.dstController.SelectedThingsToTransfer
+                this.dstController.SelectedDstMapResultToTransfer.RemoveAll(
+                    this.dstController.SelectedDstMapResultToTransfer
                         .Where(x => x.ShortName == element.ShortName && x.Iid == element.Iid).ToList());
             }
             
@@ -220,7 +220,7 @@ namespace DEHCATIA.ViewModels.NetChangePreview
         private void ComputeValuesWrapper()
         {
             this.IsBusy = true;
-            this.dstController.SelectedThingsToTransfer.Clear();
+            this.dstController.SelectedDstMapResultToTransfer.Clear();
             var isExpanded = this.Things.First().IsExpanded;
             this.ComputeValues();
             this.SelectDeselectAllForTransfer();

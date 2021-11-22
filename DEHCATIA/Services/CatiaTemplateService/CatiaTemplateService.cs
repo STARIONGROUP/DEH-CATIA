@@ -84,9 +84,15 @@ namespace DEHCATIA.Services.CatiaTemplateService
         /// <returns>A value indicating whether the template shapehas been found</returns>
         public bool TryGetFileName(ParameterOrOverrideBase parameter, Option option, ActualFiniteState state, out string shapePath )
         {
-            var valueset = parameter.QueryParameterBaseValueSet(option, state);
-
             shapePath = default;
+
+            if (parameter == null)
+            {
+                this.logger.Error($"{nameof(parameter)} is null, cannot {nameof(CatiaTemplateService.TryGetFileName)}");
+                return false;
+            }
+
+            var valueset = parameter.QueryParameterBaseValueSet(option, state);
 
             if (Enum.TryParse(valueset.ActualValue.FirstOrDefault(), true, out ShapeKind shapeKind) 
                 && this.GetFileName(shapeKind) is {} path)

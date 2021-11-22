@@ -35,6 +35,7 @@ namespace DEHCATIA
     using DEHCATIA.DstController;
     using DEHCATIA.Services.CatiaTemplateService;
     using DEHCATIA.Services.ComConnector;
+    using DEHCATIA.Services.MappingConfiguration;
     using DEHCATIA.Services.ParameterTypeService;
     using DEHCATIA.ViewModels;
     using DEHCATIA.ViewModels.Dialogs;
@@ -142,6 +143,7 @@ namespace DEHCATIA
             containerBuilder.RegisterType<CatiaComService>().As<ICatiaComService>().SingleInstance();
             containerBuilder.RegisterType<ParameterTypeService>().As<IParameterTypeService>().SingleInstance();
             containerBuilder.RegisterType<CatiaTemplateService>().As<ICatiaTemplateService>();
+            containerBuilder.RegisterType<MappingConfigurationService>().As<IMappingConfigurationService>().SingleInstance();
         }
 
         /// <summary>

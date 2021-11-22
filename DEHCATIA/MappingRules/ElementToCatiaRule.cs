@@ -39,6 +39,7 @@ namespace DEHCATIA.MappingRules
     using DEHCATIA.Enumerations;
     using DEHCATIA.Extensions;
     using DEHCATIA.Services.CatiaTemplateService;
+    using DEHCATIA.Services.MappingConfiguration;
     using DEHCATIA.Services.ParameterTypeService;
     using DEHCATIA.ViewModels.ProductTree.Parameters;
     using DEHCATIA.ViewModels.ProductTree.Rows;
@@ -46,12 +47,9 @@ namespace DEHCATIA.MappingRules
     using DEHCATIA.ViewModels.Rows;
 
     using DEHPCommon;
-    using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.MappingRules.Core;
 
     using NLog;
-
-    using ReactiveUI;
 
     /// <summary>
     /// Rule definition that transforms a collection of <see cref="MappedElementRowViewModel"/> to a collection <see cref="ElementRowViewModel"/>
@@ -64,9 +62,9 @@ namespace DEHCATIA.MappingRules
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
-        /// The <see cref="IHubController"/>
+        /// The <see cref="IMappingConfigurationService"/>
         /// </summary>
-        private readonly IHubController hubController = AppContainer.Container.Resolve<IHubController>();
+        private readonly IMappingConfigurationService mappiongConfigurationService = AppContainer.Container.Resolve<IMappingConfigurationService>();
 
         /// <summary>
         /// The <see cref="IParameterTypeService"/>
@@ -124,6 +122,8 @@ namespace DEHCATIA.MappingRules
                 this.MapParameters(mappedElementRowViewModel);
                 this.MapPosition(mappedElementRowViewModel);
                 this.MapOrientation(mappedElementRowViewModel);
+
+                this.mappiongConfigurationService.AddToExternalIdentifierMap(mappedElementRowViewModel);
             }
         }
 

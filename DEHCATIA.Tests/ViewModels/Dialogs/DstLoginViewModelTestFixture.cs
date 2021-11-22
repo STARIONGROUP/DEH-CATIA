@@ -37,6 +37,7 @@ namespace DEHCATIA.Tests.ViewModels.Dialogs
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using DEHCATIA.DstController;
+    using DEHCATIA.Services.MappingConfiguration;
     using DEHCATIA.ViewModels.Dialogs;
 
     using DEHPCommon.UserInterfaces.Behaviors;
@@ -55,6 +56,7 @@ namespace DEHCATIA.Tests.ViewModels.Dialogs
         private Mock<IStatusBarControlViewModel> statusBar;
         private DstLoginViewModel viewModel;
         private Mock<ICloseWindowBehavior> closeWindowBehavior;
+        private Mock<IMappingConfigurationService> mappingConfigurationService;
 
         [SetUp]
         public void Setup()
@@ -74,8 +76,9 @@ namespace DEHCATIA.Tests.ViewModels.Dialogs
             this.statusBar.Setup(x => x.Append(It.IsAny<string>(), It.IsAny<StatusBarMessageSeverity>()));
 
             this.closeWindowBehavior = new Mock<ICloseWindowBehavior>();
+            this.mappingConfigurationService = new Mock<IMappingConfigurationService>();
 
-            this.viewModel = new DstLoginViewModel(this.dstController.Object, this.hubController.Object)
+            this.viewModel = new DstLoginViewModel(this.hubController.Object, this.mappingConfigurationService.Object)
             {
                 CloseWindowBehavior = this.closeWindowBehavior.Object
             };
@@ -84,7 +87,6 @@ namespace DEHCATIA.Tests.ViewModels.Dialogs
         [Test]
         public void VerifyProperties()
         {
-            Assert.IsFalse(this.viewModel.LoginSuccessful);
             Assert.IsNotNull(this.viewModel.CloseWindowBehavior);
             
             Assert.IsNotNull(this.viewModel.ConnectCommand);
@@ -116,16 +118,6 @@ namespace DEHCATIA.Tests.ViewModels.Dialogs
             this.viewModel.ExternalIdentifierMapNewName = "new Name";
             Assert.IsTrue(this.viewModel.ConnectCommand.CanExecute(null));
             Assert.DoesNotThrow(() => this.viewModel.ConnectCommand.Execute(null));
-            this.closeWindowBehavior.Verify(x => x.Close(), Times.Once);
-            this.dstController.VerifySet(x => x.ExternalIdentifierMap = It.IsAny<ExternalIdentifierMap>(), Times.Once());
-        }
-        
-        [Test]
-        public void VerifyCancelCommand()
-        {
-            Assert.IsTrue(this.viewModel.CancelCommand.CanExecute(null));
-            Assert.DoesNotThrow(() => this.viewModel.CancelCommand.Execute(null));
-            this.closeWindowBehavior.Verify(x => x.Close(), Times.Once);
         }
     }
 }

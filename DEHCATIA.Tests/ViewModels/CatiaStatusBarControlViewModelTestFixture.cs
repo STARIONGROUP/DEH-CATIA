@@ -39,7 +39,7 @@ namespace DEHCATIA.Tests.ViewModels
         public void VerifyExecuteUserSettingsCommand()
         {
             var viewModel = new CatiaStatusBarControlViewModel(new Mock<INavigationService>().Object);
-            Assert.IsTrue(viewModel.UserSettingCommand.CanExecute(null));
+            Assert.IsFalse(viewModel.UserSettingCommand.CanExecute(null));
             Assert.DoesNotThrow(() => viewModel.UserSettingCommand.Execute(null));
             
             Assert.IsFalse(string.IsNullOrWhiteSpace(viewModel.Message));

@@ -38,6 +38,7 @@ namespace DEHCATIA.Tests.MappingRules
     using DEHCATIA.DstController;
     using DEHCATIA.Enumerations;
     using DEHCATIA.MappingRules;
+    using DEHCATIA.Services.MappingConfiguration;
     using DEHCATIA.Services.ParameterTypeService;
     using DEHCATIA.ViewModels.ProductTree.Parameters;
     using DEHCATIA.ViewModels.ProductTree.Rows;
@@ -66,6 +67,7 @@ namespace DEHCATIA.Tests.MappingRules
         private Mock<Product> product0;
         private Mock<Product> product1;
         private Mock<IParameterTypeService> parameterTypeService;
+        private Mock<IMappingConfigurationService> mappingConfiguration;
 
         [SetUp]
         public void Setup()
@@ -107,10 +109,13 @@ namespace DEHCATIA.Tests.MappingRules
                 Name = "MoI", ShortName = "MoI"
             });
 
+            this.mappingConfiguration = new Mock<IMappingConfigurationService>();
+
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterInstance(this.hubController.Object).As<IHubController>();
             containerBuilder.RegisterInstance(this.dstController.Object).As<IDstController>();
             containerBuilder.RegisterInstance(this.parameterTypeService.Object).As<IParameterTypeService>();
+            containerBuilder.RegisterInstance(this.mappingConfiguration.Object).As<IMappingConfigurationService>();
             AppContainer.Container = containerBuilder.Build();
 
             this.product0 = new Mock<Product>();

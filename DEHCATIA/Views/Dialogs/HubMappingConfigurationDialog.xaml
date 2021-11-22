@@ -8,7 +8,7 @@
                    xmlns:viewModels="clr-namespace:DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows;assembly=DEHPCommon"
                    xmlns:converters1="clr-namespace:DEHCATIA.Converters"
                    xmlns:rows="clr-namespace:DEHCATIA.ViewModels.ProductTree.Rows"
-                   xmlns:dialogs="clr-namespace:DEHCATIA.ViewModels.Dialogs"
+                   WindowStartupLocation="CenterScreen"
                    Title="Mapping Configuration Dialog" MinWidth="800"
                    MinHeight="600" Topmost="False" mc:Ignorable="d">
     <Window.Resources>
@@ -16,8 +16,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/DEHPCommon;component/UserInterfaces/Views/ObjectBrowser/ObjectBrowserDataTemplates.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <dx:NullableToVisibilityConverter x:Key="NullToVisibilityConverter" />
-            <converters:ListToElementUsageConverter x:Key="ListToElementUsageConverter" />
             <dx:ObjectToBooleanConverter x:Key="ObjectToBooleanConverter" />
             <converters:ElementUsageOptionsConverter x:Key="ElementUsageOptionsConverter" />
             <converters:DataTypeConverter x:Key="DataTypeConverter" />

@@ -65,11 +65,6 @@ namespace DEHCATIA.DstController
         MappingDirection MappingDirection { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="ExternalIdentifierMap"/>
-        /// </summary>
-        ExternalIdentifierMap ExternalIdentifierMap { get; set; }
-
-        /// <summary>
         /// Gets the colection of mapped <see cref="Parameter"/>s And <see cref="ParameterOverride"/>s through their container
         /// </summary>
         ReactiveList<(ElementRowViewModel Parent, ElementBase Element)> DstMapResult { get; }
@@ -77,7 +72,7 @@ namespace DEHCATIA.DstController
         /// <summary>
         /// Gets the colection of mapped <see cref="Parameter"/>s And <see cref="ParameterOverride"/>s through their container
         /// </summary>
-        ReactiveList<ElementBase> SelectedThingsToTransfer { get; }
+        ReactiveList<ElementBase> SelectedDstMapResultToTransfer { get; }
 
         /// <summary>
         /// Gets the colection of mapped <see cref="ElementRowViewModel"/>
@@ -85,9 +80,9 @@ namespace DEHCATIA.DstController
         ReactiveList<MappedElementRowViewModel> HubMapResult { get; }
 
         /// <summary>
-        /// Gets this running tool name
+        /// Gets the colection of mapped <see cref="ElementBase"/>s  that are selected for transfer
         /// </summary>
-        string ThisToolName { get; }
+        ReactiveList<MappedElementRowViewModel> SelectedHubMapResultToTransfer { get; }
 
         /// <summary>
         /// Disconnect and reconnect to the Catia product tree
@@ -142,10 +137,10 @@ namespace DEHCATIA.DstController
         /// <summary>
         /// Transfers the <see cref="DstController.HubMapResult"/> to Catia
         /// </summary>
-        void TransferMappedThingToCatia();
+        Task TransferMappedThingToCatia();
 
         /// <summary>
-        /// Transfers the <see cref="DstController.SelectedThingsToTransfer"/> to the Hub
+        /// Transfers the <see cref="DstController.SelectedDstMapResultToTransfer"/> to the Hub
         /// </summary>
         /// <returns>A <see cref="Task"/></returns>
         Task TransferMappedThingsToHub();
@@ -155,18 +150,5 @@ namespace DEHCATIA.DstController
         /// </summary>
         /// <returns>A <see cref="Task"/></returns>
         Task UpdateParametersValueSets();
-
-        /// <summary>
-        /// Creates and sets the <see cref="DstController.ExternalIdentifierMap"/>
-        /// </summary>
-        /// <param name="newName">The model name to use for creating the new <see cref="DstController.ExternalIdentifierMap"/></param>
-        /// <returns>A newly created <see cref="DstController.ExternalIdentifierMap"/></returns>
-        ExternalIdentifierMap CreateExternalIdentifierMap(string newName);
-
-        /// <summary>
-        /// Saves the mapping to the <see cref="IDstController.ExternalIdentifierMap"/>
-        /// </summary>
-        /// <param name="element">The <see cref="ElementRowViewModel"/> that holds the mapping information</param>
-        void SaveElementMapping(ElementRowViewModel element);
     }
 }
