@@ -34,6 +34,7 @@ namespace DEHCATIA.Tests.ViewModels
     using DEHCATIA.ViewModels;
     using DEHCATIA.ViewModels.Dialogs.Interfaces;
     using DEHCATIA.ViewModels.Interfaces;
+    using DEHCATIA.Views.Dialogs;
 
     using DEHPCommon;
     using DEHPCommon.HubController.Interfaces;
@@ -106,10 +107,13 @@ namespace DEHCATIA.Tests.ViewModels
 
             Assert.AreEqual("Connection is not established", this.viewModel.ConnectionStatus);
 
+            this.navigationService.Setup(x =>
+                    x.ShowDxDialog<DstLogin, IDstLoginViewModel>(It.IsAny<IDstLoginViewModel>()))
+                .Returns(true);
+
             this.dstController.Setup(x => x.ConnectToCatia())
                 .Callback(() => this.dstController.Setup(c => c.IsCatiaConnected).Returns(true));
-
-            this.dstController.Setup(x => x.ExternalIdentifierMap).Returns(new ExternalIdentifierMap());
+            
             this.viewModel.ConnectCommand.Execute(null);
             Assert.AreEqual("Connection is established", this.viewModel.ConnectionStatus);
 

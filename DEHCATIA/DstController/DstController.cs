@@ -30,7 +30,6 @@ namespace DEHCATIA.DstController
     using System.Reactive.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Windows;
 
     using CDP4Common;
     using CDP4Common.CommonData;
@@ -41,6 +40,7 @@ namespace DEHCATIA.DstController
 
     using DEHCATIA.Events;
     using DEHCATIA.Services.ComConnector;
+    using DEHCATIA.Services.MappingConfiguration;
     using DEHCATIA.ViewModels.ProductTree.Rows;
     using DEHCATIA.ViewModels.Rows;
 
@@ -63,18 +63,6 @@ namespace DEHCATIA.DstController
     /// </summary>
     public class DstController : ReactiveObject, IDstController
     {
-        /// <summary>
-        /// The indicator thats states on a <see cref="IdCorrespondence.ExternalId"/> what direction is the mapping saved for
-        /// this indicator is for <see cref="f:MappingDirection.FromDstToHub"/>
-        /// </summary>
-        private readonly string fromDstToHubIndicator = $"{MappingDirection.FromDstToHub}-";
-
-        /// <summary>
-        /// The indicator thats states on a <see cref="IdCorrespondence.ExternalId"/> what direction is the mapping saved for
-        /// this indicator is for <see cref="f:MappingDirection.FromHubToDst"/>
-        /// </summary>
-        private readonly string fromHubToDstIndicator = $"{MappingDirection.FromHubToDst}-";
-
         /// <summary>
         /// Gets the logger for the <see cref="DstController"/>.
         /// </summary>
@@ -114,6 +102,11 @@ namespace DEHCATIA.DstController
         /// The <see cref="INavigationService"/>
         /// </summary>
         private readonly INavigationService navigation;
+
+        /// <summary>
+        /// The <see cref="IMappingConfigurationService"/>
+        /// </summary>
+        private readonly IMappingConfigurationService mappingConfigurationService;
 
         /// <summary>
         /// Backing field for <see cref="IsCatiaConnected"/>.
@@ -167,29 +160,29 @@ namespace DEHCATIA.DstController
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="ExternalIdentifierMap"/>
+        /// Gets the colection of mapped <see cref="ElementRowViewModel"/>s And <see cref="ElementBase"/>s
         /// </summary>
-        public ExternalIdentifierMap ExternalIdentifierMap { get; set; }
+        public ReactiveList<(ElementRowViewModel Parent, ElementBase Element)> DstMapResult { get; private set; } = new();
 
         /// <summary>
-        /// Gets the colection of mapped <see cref="Parameter"/>s And <see cref="ParameterOverride"/>s through their container
+        /// Gets the colection of mapped <see cref="ElementBase"/>s  that are selected for transfer
         /// </summary>
-        public ReactiveList<(ElementRowViewModel Parent, ElementBase Element)> DstMapResult { get; private set; } = new ReactiveList<(ElementRowViewModel Parent, ElementBase Element)>();
+        public ReactiveList<ElementBase> SelectedDstMapResultToTransfer { get; private set; } = new();
 
         /// <summary>
-        /// Gets the colection of mapped <see cref="Parameter"/>s And <see cref="ParameterOverride"/>s through their container
+        /// Gets the colection of mapped <see cref="ElementBase"/>s  that are selected for transfer
         /// </summary>
-        public ReactiveList<ElementBase> SelectedThingsToTransfer { get; private set; } = new ReactiveList<ElementBase>();
+        public ReactiveList<MappedElementRowViewModel> SelectedHubMapResultToTransfer { get; private set; } = new();
 
         /// <summary>
         /// Gets the colection of mapped <see cref="ElementRowViewModel"/>
         /// </summary>
-        public ReactiveList<MappedElementRowViewModel> HubMapResult { get; private set; } = new ReactiveList<MappedElementRowViewModel>();
+        public ReactiveList<MappedElementRowViewModel> HubMapResult { get; private set; } = new();
 
         /// <summary>
         /// Gets this running tool name
         /// </summary>
-        public string ThisToolName => this.GetType().Assembly.GetName().Name;
+        public static string ThisToolName => typeof(DstController).Assembly.GetName().Name;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DstController"/>.
@@ -200,15 +193,18 @@ namespace DEHCATIA.DstController
         /// <param name="exchangeHistory">The <see cref="IExchangeHistoryService"/></param>
         /// <param name="hubController">The <see cref="IHubController"/></param>
         /// <param name="navigationService">The <see cref="INavigationService"/></param>
+        /// <param name="mappingConfigurationService">The <see cref="IMappingConfigurationService"/></param>
         public DstController(ICatiaComService catiaComService, IStatusBarControlViewModel statusBar,
             IMappingEngine mappingEngine, IExchangeHistoryService exchangeHistory, 
-            IHubController hubController, INavigationService navigationService)
+            IHubController hubController, INavigationService navigationService,
+            IMappingConfigurationService mappingConfigurationService)
         {
             this.catiaComService = catiaComService;
             this.statusBar = statusBar;
             this.mappingEngine = mappingEngine;
             this.exchangeHistory = exchangeHistory;
             this.navigation = navigationService;
+            this.mappingConfigurationService = mappingConfigurationService;
             this.hubController = hubController;
 
             this.WhenAnyValue(x => x.catiaComService.IsCatiaConnected)
@@ -217,7 +213,7 @@ namespace DEHCATIA.DstController
             this.WhenAnyValue(x => x.ReadyToMapTopElement)
                 .Where(x => x != null)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x =>
+                .Subscribe(_ =>
                 {
                     this.RefreshMappedThings();
                     this.Map(this.ReadyToMapTopElement);
@@ -241,7 +237,7 @@ namespace DEHCATIA.DstController
         /// <param name="shouldResetTheTrees">A value indicating whether <see cref="UpdateTreeBaseEvent"/>s should be sent</param>
         public void ResetMappedElement(bool shouldResetTheTrees = false)
         {
-            this.SelectedThingsToTransfer.Clear();
+            this.SelectedDstMapResultToTransfer.Clear();
             this.DstMapResult.Clear();
 
             if (shouldResetTheTrees)
@@ -285,40 +281,21 @@ namespace DEHCATIA.DstController
         /// </summary>
         public void LoadMapping()
         {
-            this.statusBar.Append($"Loading the mapping configuration in progress");
-            
-            if (this.ExternalIdentifierMap is null || this.ExternalIdentifierMap.Iid == Guid.Empty || !this.ExternalIdentifierMap.Correspondence.Any())
-            {
-                this.statusBar.Append($"The mapping configuration doesn't contain any mapping", StatusBarMessageSeverity.Warning);
-                return;
-            }
-            
-            this.MapElementsFromTheExternalIdentifierMap();
-        }
+            this.statusBar.Append($"Loading the mapping configuration in progress"); 
+            _ = this.mappingConfigurationService.LoadMappingFromDstToHub(new List<ElementRowViewModel>() { this.ProductTree });
+            var mappedElement = this.mappingConfigurationService.LoadMappingFromHubToDst(new List<ElementRowViewModel>() { this.ProductTree });
 
-        /// <summary>
-        /// Maps the <see cref="ElementRowViewModel"/>s defined in the <see cref="ExternalIdentifierMap"/> and sets the <see cref="ReadyToMapTopElement"/> property
-        /// </summary>
-        private void MapElementsFromTheExternalIdentifierMap()
-        {
-            foreach (var idCorrespondences in this.ExternalIdentifierMap.Correspondence.GroupBy(x => x.ExternalId))
-            {
-                if (this.FindTheMappedElement(idCorrespondences.Key, this.fromDstToHubIndicator) is { } element)
-                {
-                    this.LoadsCorrespondances(element, idCorrespondences);
-                }
-            }
-            
-            if (!(this.FindTheTopElementMapped() is {} topElement))
+            if (this.FindTheTopElementMapped() is not { } topElement)
             {
                 this.statusBar.Append($"No applicable mapping has been found in the selected mapping configuration", StatusBarMessageSeverity.Warning);
                 return;
             }
 
             this.ReadyToMapTopElement = topElement;
+            this.Map(mappedElement);
             this.statusBar.Append($"The mapping configuration has been loaded");
         }
-
+        
         /// <summary>
         /// Finds the top mapped element
         /// </summary>
@@ -349,79 +326,6 @@ namespace DEHCATIA.DstController
             return null;
         }
 
-        /// <summary>
-        /// Finds the mapped element in the <paramref name="elements"/>
-        /// </summary>
-        /// <param name="elements">The collection of <see cref="ElementRowViewModel"/></param>
-        /// <param name="externalId">The <see cref="IdCorrespondence"/> ExternalId</param>
-        /// <param name="indicator">The string indicating the mapping direction</param>
-        /// <returns>The <see cref="ElementRowViewModel"/> top element</returns>
-        private ElementRowViewModel FindTheMappedElement(string externalId, string indicator, IEnumerable<ElementRowViewModel> elements = null)
-        {
-            if (elements is null)
-            {
-                return this.AreIdentifierTheSame(externalId, indicator, this.ProductTree.Name)
-                    ? this.ProductTree
-                    : this.FindTheMappedElement(externalId, indicator, this.ProductTree.Children);
-            }
-
-            foreach (var element in elements)
-            {
-                if (this.AreIdentifierTheSame(externalId, indicator, element.Name))
-                {
-                    return element;
-                }
-
-                if (this.FindTheMappedElement(externalId, indicator, element.Children) is {} identifiedElement)
-                {
-                    return identifiedElement;
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Verify that the <paramref name="externalId"/> matches the <paramref name="indicator"/> and <paramref name="elementName"/>
-        /// </summary>
-        /// <param name="externalId">The <see cref="IdCorrespondence"/> ExternalId</param>
-        /// <param name="indicator">The string indicating the mapping direction</param>
-        /// <param name="elementName">The <see cref="ElementRowViewModel"/> name</param>
-        /// <returns>An assert</returns>
-        private bool AreIdentifierTheSame(string externalId, string indicator, string elementName)
-        {
-            return externalId == $"{indicator}{elementName}";
-        }
-
-        /// <summary>
-        ///  Loads referenced <see cref="Thing"/>s
-        /// </summary>
-        /// <param name="element">The <see cref="ElementRowViewModel"/></param>
-        /// <param name="correspondences">The collection of <see cref="IdCorrespondence"/></param>
-        private void LoadsCorrespondances(ElementRowViewModel element, IEnumerable<IdCorrespondence> correspondences = null)
-        {
-            correspondences ??= this.ExternalIdentifierMap.Correspondence.Where(x => x.ExternalId.StartsWith(this.fromDstToHubIndicator));
-
-            foreach (var idCorrespondence in correspondences)
-            {
-                if (!this.hubController.GetThingById(idCorrespondence.InternalThing, this.hubController.OpenIteration, out Thing thing))
-                {
-                    continue;
-                }
-
-                Action action = thing switch
-                {
-                    ElementDefinition elementDefinition => () => element.ElementDefinition = elementDefinition.Clone(true),
-                    ElementUsage elementUsage when element is UsageRowViewModel usageRow => () => usageRow.ElementUsage = elementUsage.Clone(true),
-                    Option option => () => element.SelectedOption = option.Clone(false),
-                    ActualFiniteState state => () => element.SelectedActualFiniteState = state.Clone(false),
-                    _ => null
-                };
-
-                Application.Current.Dispatcher.Invoke(() => { action?.Invoke(); });
-            }
-        }
-    
         /// <summary>
         /// Retrieves the product tree
         /// </summary>
@@ -480,7 +384,7 @@ namespace DEHCATIA.DstController
         /// <summary>
         /// Transfers the <see cref="HubMapResult"/> to Catia
         /// </summary>
-        public void TransferMappedThingToCatia()
+        public async Task TransferMappedThingToCatia()
         {
             foreach (var mappedElement in this.HubMapResult)
             {
@@ -493,10 +397,19 @@ namespace DEHCATIA.DstController
                     this.logger.Error($"The transfer of {mappedElement.CatiaElement.Name} failed to complete successfuly: {exception}");
                 }
             }
+
+            var (iterationClone, transaction) = this.GetIterationTransaction();
+            this.mappingConfigurationService.PersistExternalIdentifierMap(transaction, iterationClone);
+            transaction.CreateOrUpdate(iterationClone);
+            await this.hubController.Write(transaction);
+            await this.hubController.Refresh();
+            this.ResetMappedElement();
+            this.mappingConfigurationService.RefreshExternalIdentifierMap();
+            this.LoadMapping();
         }
 
         /// <summary>
-        /// Transfers the <see cref="SelectedThingsToTransfer"/> to the Hub
+        /// Transfers the <see cref="SelectedDstMapResultToTransfer"/> to the Hub
         /// </summary>
         /// <returns>A <see cref="Task"/></returns>
         public async Task TransferMappedThingsToHub()
@@ -505,7 +418,7 @@ namespace DEHCATIA.DstController
 
             try
             {
-                if (!(this.SelectedThingsToTransfer.Any() && this.TrySupplyingAndCreatingLogEntry(transaction)))
+                if (!(this.SelectedDstMapResultToTransfer.Any() && this.TrySupplyingAndCreatingLogEntry(transaction)))
                 {
                     return;
                 }
@@ -513,7 +426,7 @@ namespace DEHCATIA.DstController
                 this.RegisterAndCommitElements<ElementDefinition>(iterationClone, transaction);
                 this.RegisterAndCommitElements<ElementUsage>(iterationClone, transaction);
                 transaction.CreateOrUpdate(iterationClone);
-                this.PersistExternalIdentifierMap(transaction, iterationClone);
+                this.mappingConfigurationService.PersistExternalIdentifierMap(transaction, iterationClone);
                 await this.hubController.Write(transaction);
                 this.statusBar.Append($"Element(s) have been updated");
                 
@@ -525,8 +438,8 @@ namespace DEHCATIA.DstController
                 await this.hubController.Refresh();
                 this.ResetMappedElement();
 
-                this.hubController.GetThingById(this.ExternalIdentifierMap.Iid, this.hubController.OpenIteration, out ExternalIdentifierMap map);
-                this.ExternalIdentifierMap = map.Clone(true);
+                this.mappingConfigurationService.RefreshExternalIdentifierMap();
+
                 this.LoadMapping();
             }
             catch (Exception e)
@@ -545,7 +458,7 @@ namespace DEHCATIA.DstController
         /// <returns>A <see cref="Task"/></returns>
         private void RegisterAndCommitElements<TElement>(Iteration iterationClone, IThingTransaction transaction) where TElement : ElementBase
         {
-            foreach (var element in this.SelectedThingsToTransfer)
+            foreach (var element in this.SelectedDstMapResultToTransfer)
             {
                 if (!(element is TElement))
                 {
@@ -591,7 +504,7 @@ namespace DEHCATIA.DstController
                     ? x => cachedElementDefinition?.ContainedElement.Any(u => x.Iid == u.Iid) == true
                     : (Func<ElementUsage, bool>) (_ => true);
 
-            var excludedElement = elementDefinition.ContainedElement.Where(x => !this.SelectedThingsToTransfer.Contains(x)).ToList();
+            var excludedElement = elementDefinition.ContainedElement.Where(x => !this.SelectedDstMapResultToTransfer.Contains(x)).ToList();
             
             if (!elementDefinition.ContainedElement.Any() || !excludedElement.Any())
             {
@@ -624,18 +537,18 @@ namespace DEHCATIA.DstController
         {
             var (iterationClone, transaction) = this.GetIterationTransaction();
             
-            this.UpdateParametersValueSets(transaction, this.SelectedThingsToTransfer
+            this.UpdateParametersValueSets(transaction, this.SelectedDstMapResultToTransfer
                 .OfType<ElementDefinition>()
                 .SelectMany(x => x.Parameter));
 
-            this.UpdateParametersValueSets(transaction, this.SelectedThingsToTransfer
+            this.UpdateParametersValueSets(transaction, this.SelectedDstMapResultToTransfer
                 .OfType<ElementUsage>()
                 .SelectMany(x => x.ParameterOverride));
 
             transaction.CreateOrUpdate(iterationClone);
             await this.hubController.Write(transaction);
         }
-
+        
         /// <summary>
         /// Updates the specified <see cref="Parameter"/> <see cref="IValueSet"/>
         /// </summary>
@@ -692,7 +605,7 @@ namespace DEHCATIA.DstController
         {
             clone.Computed = valueSet.Computed;
             clone.ValueSwitch = valueSet.ValueSwitch;
-            this?.exchangeHistory.Append(clone, valueSet);
+            this.exchangeHistory.Append(clone, valueSet);
         }
 
         /// <summary>
@@ -736,107 +649,6 @@ namespace DEHCATIA.DstController
 
             this.hubController.RegisterNewLogEntryToTransaction(vm.LogEntryContent, transaction);
             return true;
-        }
-        
-        /// <summary>
-        /// Creates and sets the <see cref="ExternalIdentifierMap"/>
-        /// </summary>
-        /// <param name="newName">The model name to use for creating the new <see cref="ExternalIdentifierMap"/></param>
-        /// <returns>A newly created <see cref="ExternalIdentifierMap"/></returns>
-        public ExternalIdentifierMap CreateExternalIdentifierMap(string newName)
-        {
-            return new ExternalIdentifierMap()
-            {
-                Name = newName,
-                ExternalToolName = this.ThisToolName,
-                ExternalModelName = newName,
-                Owner = this.hubController.CurrentDomainOfExpertise
-            };
-        }
-
-        /// <summary>
-        /// Saves the mapping to the <see cref="IDstController.ExternalIdentifierMap"/>
-        /// </summary>
-        /// <param name="element">The <see cref="ElementRowViewModel"/> that holds the mapping information</param>
-        public void SaveElementMapping(ElementRowViewModel element)
-        {
-            var externalId = $"{this.fromDstToHubIndicator}{element.Name}";
-
-            this.ExternalIdentifierMap.Correspondence.RemoveAll(x => x.ExternalId.Equals(externalId, StringComparison.InvariantCultureIgnoreCase));
-
-            this.ExternalIdentifierMap.Correspondence.Add(
-                new IdCorrespondence()
-                {
-                    InternalThing = element.ElementDefinition.Iid,
-                    ExternalId = externalId,
-                });
-
-            if (element.SelectedOption is {} option)
-            {
-                this.ExternalIdentifierMap.Correspondence.Add(
-                    new IdCorrespondence()
-                    {
-                        InternalThing = option.Iid,
-                        ExternalId = externalId,
-                    });
-            }
-
-            if (element is UsageRowViewModel usageRow && usageRow.ElementUsage is {} elementUsage)
-            {
-                this.ExternalIdentifierMap.Correspondence.Add(
-                    new IdCorrespondence()
-                    {
-                        InternalThing = elementUsage.Iid,
-                        ExternalId = externalId,
-                    });
-            }
-
-            if (element.SelectedActualFiniteState is { } state)
-            {
-                this.ExternalIdentifierMap.Correspondence.Add(
-                    new IdCorrespondence()
-                    {
-                        InternalThing = state.Iid,
-                        ExternalId = externalId,
-                    });
-            }
-        }
-
-        /// <summary>
-        /// Updates the configured mapping, registering the <see cref="ExternalIdentifierMap"/> and its <see cref="IdCorrespondence"/>
-        /// to a <see name="IThingTransaction"/>
-        /// </summary>
-        /// <param name="transaction">The <see cref="IThingTransaction"/></param>
-        /// <param name="iterationClone">The <see cref="Iteration"/> clone</param>
-        private void PersistExternalIdentifierMap(IThingTransaction transaction, Iteration iterationClone)
-        {
-            if (this.ExternalIdentifierMap.Iid == Guid.Empty)
-            {
-                this.ExternalIdentifierMap = this.ExternalIdentifierMap.Clone(true);
-                this.ExternalIdentifierMap.Iid = Guid.NewGuid();
-            }
-
-            if (iterationClone.ExternalIdentifierMap.All(x => x.Iid != this.ExternalIdentifierMap.Iid))
-            {
-                iterationClone.ExternalIdentifierMap.Add(this.ExternalIdentifierMap);
-            }
-
-            foreach (var correspondence in this.ExternalIdentifierMap.Correspondence)
-            {
-                if (correspondence.Iid == Guid.Empty)
-                {
-                    correspondence.Iid = Guid.NewGuid();
-                    transaction.Create(correspondence);
-                }
-                else
-                {
-                    transaction.CreateOrUpdate(correspondence);
-                }
-            }
-
-            transaction.CreateOrUpdate(this.ExternalIdentifierMap);
-
-            this.statusBar.Append("Mapping configuration processed");
         }
     }
 }
