@@ -69,7 +69,7 @@ namespace DEHCATIA.Tests.ViewModels
             this.dstController.Setup(x => x.HubMapResult)
                 .Returns(new ReactiveList<MappedElementRowViewModel>());
 
-            this.dstController.Setup(x => x.SelectedThingsToTransfer)
+            this.dstController.Setup(x => x.SelectedDstMapResultToTransfer)
                 .Returns(new ReactiveList<ElementBase>());
 
             this.exchangeHistoryService = new Mock<IExchangeHistoryService>();

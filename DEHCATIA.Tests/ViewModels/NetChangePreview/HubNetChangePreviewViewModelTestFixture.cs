@@ -211,7 +211,7 @@ namespace DEHCATIA.Tests.ViewModels.NetChangePreview
             
             this.dstController = new Mock<IDstController>();
 
-            this.dstController.Setup(x => x.SelectedThingsToTransfer)
+            this.dstController.Setup(x => x.SelectedDstMapResultToTransfer)
                 .Returns(new ReactiveList<ElementBase>());
             
             this.product0 = new Mock<Product>();

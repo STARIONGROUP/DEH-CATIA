@@ -41,6 +41,7 @@ namespace DEHCATIA.Tests.DstController
 
     using DEHCATIA.DstController;
     using DEHCATIA.Services.ComConnector;
+    using DEHCATIA.Services.MappingConfiguration;
     using DEHCATIA.ViewModels.ProductTree.Rows;
     using DEHCATIA.ViewModels.Rows;
 
@@ -82,6 +83,7 @@ namespace DEHCATIA.Tests.DstController
         private Option option;
         private ActualFiniteState state;
         private ElementRowViewModel elementRow;
+        private Mock<IMappingConfigurationService> mappingConfigurationService;
 
         [SetUp]
         public void Setup()
@@ -133,9 +135,11 @@ namespace DEHCATIA.Tests.DstController
 
             this.option = new Option(Guid.NewGuid(), null, null);
             this.state = new ActualFiniteState(Guid.NewGuid(), null, null);
-            
+
+            this.mappingConfigurationService = new Mock<IMappingConfigurationService>();
+
             this.controller = new DstController(this.comService.Object, this.statusBar.Object, this.mappingEngine.Object,
-                this.exchangeHistory.Object, this.hubController.Object, this.navigationService.Object);
+                this.exchangeHistory.Object, this.hubController.Object, this.navigationService.Object, this.mappingConfigurationService.Object);
         }
 
         [Test]
@@ -176,7 +180,7 @@ namespace DEHCATIA.Tests.DstController
             this.comService.Setup(x => x.IsCatiaConnected).Returns(true);
 
             this.controller = new DstController(this.comService.Object, this.statusBar.Object, this.mappingEngine.Object, 
-                this.exchangeHistory.Object, this.hubController.Object, this.navigationService.Object);
+                this.exchangeHistory.Object, this.hubController.Object, this.navigationService.Object, this.mappingConfigurationService.Object);
 
             Assert.IsTrue(this.controller.IsCatiaConnected);
         }
@@ -221,8 +225,6 @@ namespace DEHCATIA.Tests.DstController
         [Test]
         public void VerifyTransferToHub()
         {
-            this.controller.ExternalIdentifierMap = new ExternalIdentifierMap() {Correspondence = { new IdCorrespondence()}};
-            
             this.navigationService.Setup(
                 x => x.ShowDxDialog<CreateLogEntryDialog, CreateLogEntryDialogViewModel>(
                 It.IsAny<CreateLogEntryDialogViewModel>())).Returns(true);
@@ -276,8 +278,10 @@ namespace DEHCATIA.Tests.DstController
 
             rootElement.Children.Add(usageRowViewModel);
 
-            this.controller.SelectedThingsToTransfer.Add(new ElementUsage() { ParameterOverride = { parameterOverride } });
-            this.controller.SelectedThingsToTransfer.Add(new ElementDefinition() { Parameter = { parameter } });
+            this.controller.ProductTree = rootElement;
+
+            this.controller.SelectedDstMapResultToTransfer.Add(new ElementUsage() { ParameterOverride = { parameterOverride } });
+            this.controller.SelectedDstMapResultToTransfer.Add(new ElementDefinition() { Parameter = { parameter } });
 
             this.hubController.Setup(x =>
                 x.GetThingById(It.IsAny<Guid>(), It.IsAny<Iteration>(), out parameter));
@@ -380,94 +384,36 @@ namespace DEHCATIA.Tests.DstController
             this.hubController.Verify(x =>
                 x.Write(It.IsAny<ThingTransaction>()), Times.Once);
         }
-
-        [Test]
-        public void VerifyCreateExternalIdentifierMap()
-        {
-            var newExternalIdentifierMap = this.controller.CreateExternalIdentifierMap("Name");
-            this.controller.ExternalIdentifierMap = newExternalIdentifierMap;
-            Assert.AreEqual("Name", this.controller.ExternalIdentifierMap.Name);
-            Assert.AreEqual("Name", this.controller.ExternalIdentifierMap.ExternalModelName);
-        }
-
+        
         [Test]
         public void VerifyLoadMapping()
         {
             var parent = new ElementRowViewModel(this.product1.Object, string.Empty);
 
             this.controller.ProductTree = parent;
-
-            Assert.DoesNotThrow(() => this.controller.LoadMapping());
-         
-            this.controller.ExternalIdentifierMap = new ExternalIdentifierMap()
-            {
-                Correspondence =
-                {
-                    new IdCorrespondence()
-                    {
-                        InternalThing = this.element.Iid,
-                        ExternalId = $"{MappingDirection.FromDstToHub}-{this.elementRow.Name}"
-                    },
-                    new IdCorrespondence()
-                    {
-                        InternalThing = this.option.Iid,
-                        ExternalId = $"{MappingDirection.FromDstToHub}-{this.elementRow.Name}"
-                    },
-                    new IdCorrespondence()
-                    {
-                        InternalThing = this.state.Iid,
-                        ExternalId = $"{MappingDirection.FromDstToHub}-{this.elementRow.Name}"
-                    }
-                }
-            };
-
-            Assert.DoesNotThrow(() => this.controller.LoadMapping());
-
-            this.controller.ExternalIdentifierMap.Iid = Guid.NewGuid();
-
-            Assert.DoesNotThrow(() => this.controller.LoadMapping());
-
-            this.hubController.Setup(x => x.GetThingById(this.element.Iid, It.IsAny<Iteration>(), out this.element)).Returns(false);
-            this.hubController.Setup(x => x.GetThingById(this.option.Iid, It.IsAny<Iteration>(), out this.option)).Returns(true);
-            this.hubController.Setup(x => x.GetThingById(this.state.Iid, It.IsAny<Iteration>(), out this.state)).Returns(true);
-
-            Assert.DoesNotThrow(() => this.controller.LoadMapping());
-
-            this.hubController.Setup(x => x.GetThingById(this.element.Iid, It.IsAny<Iteration>(), out this.element)).Returns(true);
-
-            Assert.DoesNotThrow(() => this.controller.LoadMapping());
-
-            this.controller.ProductTree.Children.Add(this.elementRow);
-
-            Assert.DoesNotThrow(() => this.controller.LoadMapping());
-
-            this.controller.ProductTree = this.elementRow;
-
+            
             Assert.DoesNotThrow(() => this.controller.LoadMapping());
 
             this.statusBar.Verify(
                 x => x.Append(It.IsAny<string>(), It.IsAny<StatusBarMessageSeverity>()),
-                Times.Exactly(14));
+                Times.Exactly(2));
         }
-
-        [Test]
-        public void VerifySaveTheMapping()
-        {
-            this.elementRow.ElementDefinition = this.element;
-            this.controller.ExternalIdentifierMap = new ExternalIdentifierMap();
-            Assert.DoesNotThrow(() => this.controller.SaveElementMapping(this.elementRow));
-            Assert.AreEqual(1, this.controller.ExternalIdentifierMap.Correspondence.Count);
-            this.elementRow.SelectedOption = this.option;
-            Assert.DoesNotThrow(() => this.controller.SaveElementMapping(this.elementRow));
-            Assert.AreEqual(2, this.controller.ExternalIdentifierMap.Correspondence.Count);
-            this.elementRow.SelectedActualFiniteState = this.state;
-            Assert.DoesNotThrow(() => this.controller.SaveElementMapping(this.elementRow));
-            Assert.AreEqual(3, this.controller.ExternalIdentifierMap.Correspondence.Count);
-        }
-
+        
         [Test]
         public void VerifyTransfertMappedThingToCatia()
         {
+            var rootElement = new ElementRowViewModel(this.product0.Object, string.Empty);
+
+            var definitionRowViewModel = new DefinitionRowViewModel(this.product1.Object, string.Empty);
+
+            var usageRowViewModel = new UsageRowViewModel(this.product1.Object, string.Empty)
+            {
+                Children = { definitionRowViewModel }
+            };
+
+            rootElement.Children.Add(usageRowViewModel);
+            this.controller.ProductTree = rootElement;
+
             this.comService.Setup(x => x.AddOrUpdateElement(It.IsAny<MappedElementRowViewModel>()));
             
             this.controller.HubMapResult.AddRange(Enumerable
@@ -476,10 +422,10 @@ namespace DEHCATIA.Tests.DstController
                     CatiaElement = new ElementRowViewModel(new ElementDefinition() {ShortName = string.Empty}, string.Empty)
                 }, 12));
 
-            this.controller.TransferMappedThingToCatia();
+            Assert.DoesNotThrowAsync(() => this.controller.TransferMappedThingToCatia());
             this.comService.Verify(x => x.AddOrUpdateElement(It.IsAny<MappedElementRowViewModel>()), Times.Exactly(12));
             this.comService.Setup(x => x.AddOrUpdateElement(It.IsAny<MappedElementRowViewModel>())).Throws<InvalidOperationException>();
-            this.controller.TransferMappedThingToCatia();
+            Assert.DoesNotThrowAsync(() => this.controller.TransferMappedThingToCatia());
             this.comService.Verify(x => x.AddOrUpdateElement(It.IsAny<MappedElementRowViewModel>()), Times.Exactly(24));
         }
 

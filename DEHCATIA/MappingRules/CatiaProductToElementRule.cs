@@ -34,9 +34,9 @@ namespace DEHCATIA.MappingRules
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
-
-    using DEHCATIA.DstController;
+    
     using DEHCATIA.Enumerations;
+    using DEHCATIA.Services.MappingConfiguration;
     using DEHCATIA.Services.ParameterTypeService;
     using DEHCATIA.ViewModels.ProductTree.Rows;
 
@@ -62,9 +62,9 @@ namespace DEHCATIA.MappingRules
         private readonly IHubController hubController = AppContainer.Container.Resolve<IHubController>();
 
         /// <summary>
-        /// The <see cref="IDstController"/>
+        /// The <see cref="IMappingConfigurationService"/>
         /// </summary>
-        private IDstController dstController;
+        private IMappingConfigurationService mappginConfigurationService;
         
         /// <summary>
         /// The <see cref="IParameterTypeService"/>
@@ -101,7 +101,7 @@ namespace DEHCATIA.MappingRules
                 this.ruleOutput.Clear();
 
                 this.owner = this.hubController.CurrentDomainOfExpertise;
-                this.dstController = AppContainer.Container.Resolve<IDstController>();
+                this.mappginConfigurationService = AppContainer.Container.Resolve<IMappingConfigurationService>();
 
                 this.Map(new List<ElementRowViewModel>{input});
 
@@ -133,7 +133,7 @@ namespace DEHCATIA.MappingRules
                     usageRow.ElementDefinition = this.MapDefinitionRowViewModel(definitionRow);
                     this.MapElementUsage(usageRow);
                     this.MapParameters(usageRow);
-                    this.dstController.SaveElementMapping(usageRow);
+                    this.mappginConfigurationService.AddToExternalIdentifierMap(usageRow);
                     this.ruleOutput.Add((usageRow.Parent, usageRow.ElementDefinition));
                     this.ruleOutput.Add((usageRow.Parent, usageRow.ElementUsage));
                 }
@@ -209,7 +209,7 @@ namespace DEHCATIA.MappingRules
         {
             this.MapElementDefinition(elementRowViewModel);
             this.ruleOutput.Add((elementRowViewModel.Parent, elementRowViewModel.ElementDefinition));
-            this.dstController.SaveElementMapping(elementRowViewModel);
+            this.mappginConfigurationService.AddToExternalIdentifierMap(elementRowViewModel);
         }
 
         /// <summary>

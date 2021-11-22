@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CatiaStatusBarControlViewModel.cs" company="RHEA System S.A.">
+// <copyright file="ExternalIdentifier.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -22,27 +22,32 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DEHCATIA.Tests.ViewModels
+namespace DEHCATIA.Services.MappingConfiguration
 {
-    using DEHCATIA.ViewModels;
+    using System;
 
-    using DEHPCommon.Services.NavigationService;
+    using CDP4Common.EngineeringModelData;
 
-    using Moq;
+    using DEHPCommon.Enumerators;
 
-    using NUnit.Framework;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Converters;
 
-    [TestFixture]
-    public class CatiaStatusBarControlViewModelTestFixture
+    /// <summary>
+    /// The <see cref="ExternalIdentifier"/> is a POCO class that represents a serializable <see cref="IdCorrespondence.ExternalId"/>
+    /// </summary>
+    [Serializable]
+    public class ExternalIdentifier
     {
-        [Test]
-        public void VerifyExecuteUserSettingsCommand()
-        {
-            var viewModel = new CatiaStatusBarControlViewModel(new Mock<INavigationService>().Object);
-            Assert.IsFalse(viewModel.UserSettingCommand.CanExecute(null));
-            Assert.DoesNotThrow(() => viewModel.UserSettingCommand.Execute(null));
-            
-            Assert.IsFalse(string.IsNullOrWhiteSpace(viewModel.Message));
-        }
+        /// <summary>
+        /// Gets or sets the mapping direction this <see cref="ExternalIdentifier"/> applies to
+        /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
+        public MappingDirection MappingDirection { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the identifier
+        /// </summary>
+        public object Identifier { get; set; }
     }
 }

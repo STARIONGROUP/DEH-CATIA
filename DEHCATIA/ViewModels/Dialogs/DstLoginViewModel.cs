@@ -33,6 +33,7 @@ namespace DEHCATIA.ViewModels.Dialogs
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using DEHCATIA.DstController;
+    using DEHCATIA.Services.MappingConfiguration;
     using DEHCATIA.ViewModels.Dialogs.Interfaces;
 
     using ReactiveUI;
@@ -43,10 +44,15 @@ namespace DEHCATIA.ViewModels.Dialogs
     public class DstLoginViewModel : ReactiveObject, IDstLoginViewModel, ICloseWindowViewModel
     {
         /// <summary>
-        /// The <see cref="IDstController"/> instance
+        /// The <see cref="IMappingConfigurationService"/>
         /// </summary>
-        private readonly IDstController dstController;
+        private readonly IMappingConfigurationService mappingConfigurationService;
         
+        /// <summary>
+        /// Gets or sets the behavior instance
+        /// </summary>
+        public ICloseWindowBehavior CloseWindowBehavior { get; set; }
+
         /// <summary>
         /// Backing field for <see cref="IsBusy"/>
         /// </summary>
@@ -60,36 +66,12 @@ namespace DEHCATIA.ViewModels.Dialogs
             get => this.isBusy;
             set => this.RaiseAndSetIfChanged(ref this.isBusy, value);
         }
-
-        /// <summary>
-        /// Backing field for the <see cref="LoginSuccessful"/> property
-        /// </summary>
-        private bool loginSuccessful;
-
-        /// <summary>
-        /// Gets or sets login succesfully flag
-        /// </summary>
-        public bool LoginSuccessful
-        {
-            get => this.loginSuccessful;
-            private set => this.RaiseAndSetIfChanged(ref this.loginSuccessful, value);
-        }
-
+        
         /// <summary>
         /// Gets the connection command
         /// </summary>
         public ReactiveCommand<object> ConnectCommand { get; private set; }
-
-        /// <summary>
-        /// Gets the cancel command
-        /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
         
-        /// <summary>
-        /// Gets or sets the <see cref="ICloseWindowBehavior"/> instance
-        /// </summary>
-        public ICloseWindowBehavior CloseWindowBehavior { get; set; }
-
         /// <summary>
         /// Backing field for <see cref="SelectedExternalIdentifierMap"/>
         /// </summary>
@@ -121,8 +103,8 @@ namespace DEHCATIA.ViewModels.Dialogs
         /// <summary>
         /// Backing field for <see cref="CreateNewMappingConfigurationChecked"/>
         /// </summary>
-        private bool createNewMappingConfigurationChecked;
-
+        private bool createNewMappingConfigurationChecked; 
+        
         /// <summary>
         /// Gets or sets the checked checkbox assert that selects that a new mapping configuration will be created
         /// </summary>
@@ -140,14 +122,14 @@ namespace DEHCATIA.ViewModels.Dialogs
         /// <summary>
         /// Initializes a new instance of the <see cref="DstLoginViewModel"/> class.
         /// </summary>
-        /// <param name="dstController">The <see cref="IDstController"/></param>
         /// <param name="hubController">The <see cref="IHubController"/></param>
-        public DstLoginViewModel(IDstController dstController, IHubController hubController)
+        /// <param name="mappingConfigurationService">The <see cref="IMappingConfigurationService"/></param>
+        public DstLoginViewModel(IHubController hubController, IMappingConfigurationService mappingConfigurationService)
         {
-            this.dstController = dstController;
+            this.mappingConfigurationService = mappingConfigurationService;
 
             this.AvailableExternalIdentifierMap = new ReactiveList<ExternalIdentifierMap>(
-                hubController.AvailableExternalIdentifierMap(this.dstController.ThisToolName));
+                hubController.AvailableExternalIdentifierMap(DstController.ThisToolName));
 
             this.WhenAnyValue(x => x.SelectedExternalIdentifierMap).Subscribe(_ =>
             {
@@ -174,9 +156,6 @@ namespace DEHCATIA.ViewModels.Dialogs
 
             this.ConnectCommand = ReactiveCommand.Create(canConnect);
             this.ConnectCommand.Subscribe(_ => this.ExecuteLogin());
-
-            this.CancelCommand = ReactiveCommand.Create();
-            this.CancelCommand.Subscribe(_ => this.CloseWindowBehavior?.Close());
             
             this.WhenAnyValue(x => x.CreateNewMappingConfigurationChecked).Subscribe(_ => this.UpdateExternalIdentifierSelectors());
         }
@@ -201,19 +180,16 @@ namespace DEHCATIA.ViewModels.Dialogs
         /// </summary>
         private void ExecuteLogin()
         {
-            this.IsBusy = true;
             this.ProcessExternalIdentifierMap();
-            this.CloseWindowBehavior?.Close();
-            this.IsBusy = false;
         }
 
         /// <summary>
-        /// Creates a new <see cref="ExternalIdentifierMap"/> and or set the <see cref="IDstController.ExternalIdentifierMap"/>
+        /// Creates a new <see cref="ExternalIdentifierMap"/> and or set the <see cref="IMappingConfigurationService.ExternalIdentifierMap"/>
         /// </summary>
         private void ProcessExternalIdentifierMap()
         {
-            this.dstController.ExternalIdentifierMap = this.SelectedExternalIdentifierMap?.Clone(true) ??
-                                                       this.dstController.CreateExternalIdentifierMap(this.ExternalIdentifierMapNewName);
+            this.mappingConfigurationService.ExternalIdentifierMap = this.SelectedExternalIdentifierMap?.Clone(true) ??
+                                                       this.mappingConfigurationService.CreateExternalIdentifierMap(this.ExternalIdentifierMapNewName);
         }
     }
 }

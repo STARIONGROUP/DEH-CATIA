@@ -1,0 +1,7 @@
+{
+  "solution": "DEHCATIA.sln",
+  "mappings": {
+    "DEHPCommon": "../../DEHP-Common/DEHPCommon/DEHPCommon.csproj"
+  },
+  "removeProjects": true
+}

@@ -207,9 +207,7 @@ namespace DEHCATIA.ViewModels
             {
                 var viewModel = AppContainer.Container.Resolve<IDstLoginViewModel>();
 
-                this.NavigationService.ShowDialog<DstLogin, IDstLoginViewModel>(viewModel);
-
-                if (this.dstController.ExternalIdentifierMap is null)
+                if(this.NavigationService.ShowDxDialog<DstLogin, IDstLoginViewModel>(viewModel) != true)
                 {
                     this.statusBar.Append("Connection to CATIA has been canceled");
                     return;
