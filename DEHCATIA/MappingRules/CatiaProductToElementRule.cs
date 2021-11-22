@@ -64,7 +64,7 @@ namespace DEHCATIA.MappingRules
         /// <summary>
         /// The <see cref="IMappingConfigurationService"/>
         /// </summary>
-        private IMappingConfigurationService mappginConfigurationService;
+        private IMappingConfigurationService mappingConfigurationService;
         
         /// <summary>
         /// The <see cref="IParameterTypeService"/>
@@ -101,7 +101,7 @@ namespace DEHCATIA.MappingRules
                 this.ruleOutput.Clear();
 
                 this.owner = this.hubController.CurrentDomainOfExpertise;
-                this.mappginConfigurationService = AppContainer.Container.Resolve<IMappingConfigurationService>();
+                this.mappingConfigurationService = AppContainer.Container.Resolve<IMappingConfigurationService>();
 
                 this.Map(new List<ElementRowViewModel>{input});
 
@@ -133,7 +133,7 @@ namespace DEHCATIA.MappingRules
                     usageRow.ElementDefinition = this.MapDefinitionRowViewModel(definitionRow);
                     this.MapElementUsage(usageRow);
                     this.MapParameters(usageRow);
-                    this.mappginConfigurationService.AddToExternalIdentifierMap(usageRow);
+                    this.mappingConfigurationService.AddToExternalIdentifierMap(usageRow);
                     this.ruleOutput.Add((usageRow.Parent, usageRow.ElementDefinition));
                     this.ruleOutput.Add((usageRow.Parent, usageRow.ElementUsage));
                 }
@@ -209,7 +209,7 @@ namespace DEHCATIA.MappingRules
         {
             this.MapElementDefinition(elementRowViewModel);
             this.ruleOutput.Add((elementRowViewModel.Parent, elementRowViewModel.ElementDefinition));
-            this.mappginConfigurationService.AddToExternalIdentifierMap(elementRowViewModel);
+            this.mappingConfigurationService.AddToExternalIdentifierMap(elementRowViewModel);
         }
 
         /// <summary>

@@ -255,7 +255,7 @@ namespace DEHCATIA.Services.MappingConfiguration
                     _ => null
                 };
 
-                action?.Invoke();
+                Application.Current.Dispatcher.Invoke(() => action?.Invoke());
             }
         }
         
@@ -348,6 +348,24 @@ namespace DEHCATIA.Services.MappingConfiguration
         }
 
         /// <summary>
+        /// Adds one correspondence to the <see cref="MappingConfigurationService.ExternalIdentifierMap"/>
+        /// </summary>
+        /// <param name="elementRowViewModel">The <see cref="ElementRowViewModel"/> that holds mapping information</param>
+        public void AddToExternalIdentifierMap(ElementRowViewModel elementRowViewModel)
+        {
+            this.AddToExternalIdentifierMap(elementRowViewModel.ElementDefinition.Iid, elementRowViewModel.Product.get_Name(), MappingDirection.FromDstToHub);
+        }
+
+        /// <summary>
+        /// Adds one correspondence to the <see cref="MappingConfigurationService.ExternalIdentifierMap"/>
+        /// </summary>
+        /// <param name="usageRowViewModel">The <see cref="UsageRowViewModel"/> that holds mapping information</param>
+        public void AddToExternalIdentifierMap(UsageRowViewModel usageRowViewModel)
+        {
+            this.AddToExternalIdentifierMap(usageRowViewModel.ElementUsage.Iid, usageRowViewModel.Product.get_Name(), MappingDirection.FromDstToHub);
+        }
+
+        /// <summary>
         /// If it already exists gets the <see cref="IdCorrespondence"/> that corresponds to the provided
         /// <paramref name="internalId"/> and <paramref name="externalIdentifier"/>
         /// </summary>
@@ -368,7 +386,7 @@ namespace DEHCATIA.Services.MappingConfiguration
                 return true;
             }
 
-            if(this.ExternalIdentifierMap.Correspondence.FirstOrDefault(x => x.InternalThing == internalId) is {} existingCorrespondence)
+            if (this.ExternalIdentifierMap.Correspondence.FirstOrDefault(x => x.InternalThing == internalId) is { } existingCorrespondence)
             {
                 var existingExternalIdentifier = JsonConvert.DeserializeObject<ExternalIdentifier>(existingCorrespondence.ExternalId ?? string.Empty);
 
@@ -382,24 +400,6 @@ namespace DEHCATIA.Services.MappingConfiguration
 
             correspondence = null;
             return false;
-        }
-
-        /// <summary>
-        /// Adds one correspondence to the <see cref="MappingConfigurationService.ExternalIdentifierMap"/>
-        /// </summary>
-        /// <param name="elementRowViewModel">The <see cref="ElementRowViewModel"/> that holds mapping information</param>
-        public void AddToExternalIdentifierMap(ElementRowViewModel elementRowViewModel)
-        {
-            this.AddToExternalIdentifierMap(elementRowViewModel.ElementDefinition.Iid, elementRowViewModel.Product.get_Name(), MappingDirection.FromDstToHub);
-        }
-
-        /// <summary>
-        /// Adds one correspondence to the <see cref="MappingConfigurationService.ExternalIdentifierMap"/>
-        /// </summary>
-        /// <param name="usageRowViewModel">The <see cref="UsageRowViewModel"/> that holds mapping information</param>
-        public void AddToExternalIdentifierMap(UsageRowViewModel usageRowViewModel)
-        {
-            this.AddToExternalIdentifierMap(usageRowViewModel.ElementUsage.Iid, usageRowViewModel.Product.get_Name(), MappingDirection.FromDstToHub);
         }
 
         /// <summary>
