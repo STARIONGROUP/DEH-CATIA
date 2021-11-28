@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DefinitionRowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="BodyRowViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -24,32 +24,41 @@
 
 namespace DEHCATIA.ViewModels.ProductTree.Rows
 {
-    using System.Collections.Generic;
-
-    using CDP4Common.EngineeringModelData;
+    using CATMat;
 
     using DEHCATIA.Enumerations;
 
-    using ProductStructureTypeLib;
+    using MECMOD;
+
+    using ReactiveUI;
 
     /// <summary>
-    /// The <see cref="DefinitionRowViewModel"/> is a specific <see cref="ElementRowViewModel"/>
-    /// mappable to a <see cref="ElementDefinition"/> and representing a catia element of type <see cref="ElementType.CatDefinition"/>
+    /// The <see cref="BodyRowViewModel"/> represents one <see cref="Body"/> in a <see cref="Part"/> represented by <see cref="DefinitionRowViewModel"/>
     /// </summary>
-    public class DefinitionRowViewModel : ElementRowViewModel
+    public class BodyRowViewModel : ElementRowViewModel
     {
         /// <summary>
         /// Gets or sets the type.
         /// </summary>
-        public override ElementType ElementType => ElementType.CatDefinition;
-        
+        public override ElementType ElementType => ElementType.CatBody;
+
         /// <summary>
-        /// Initializes a new <see cref="DefinitionRowViewModel"/>
+        /// Initializes a new <see cref="BodyRowViewModel"/>
         /// </summary>
-        /// <param name="product">The <see cref="Product"/> this view model represents</param>
-        /// <param name="fileName">The file name of the <paramref name="product"/></param>
-        public DefinitionRowViewModel(Product product, string fileName) : base(product, fileName)
+        /// <param name="body">The represented <see cref="Body"/></param>
+        /// <param name="materialName">The <see cref="Material"/> name</param>
+        public BodyRowViewModel(Body body, string materialName) : base(body, "")
         {
+            this.MaterialName = materialName;
+        }
+
+        /// <summary>
+        /// Gets the typed <see cref="Body"/> object represented
+        /// </summary>
+        /// <returns>the <see cref="Body"/></returns>
+        public Body GetBody()
+        {
+            return (Body)this.Element;
         }
     }
 }

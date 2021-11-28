@@ -49,6 +49,8 @@ namespace DEHCATIA.Tests.MappingRules
     using DEHPCommon;
     using DEHPCommon.HubController.Interfaces;
 
+    using MECMOD;
+
     using Moq;
 
     using NUnit.Framework;
@@ -167,9 +169,23 @@ namespace DEHCATIA.Tests.MappingRules
                                 ValueSwitch = ParameterSwitchKind.MANUAL
                             }
                         }
+                    },
+                    new Parameter()
+                    {
+                        ParameterType = new SampledFunctionParameterType(),
+                        ValueSet =
+                        {
+                            new ParameterValueSet()
+                            {
+                                Manual = new ValueArray<string>(new List<string>() { "body.0", "material0" }),
+                                ValueSwitch = ParameterSwitchKind.MANUAL
+                            }
+                        }
                     }
                 }
             };
+
+            this.parameterTypeService.Setup(x => x.Material).Returns(new SampledFunctionParameterType());
         }
 
         [Test]
@@ -214,21 +230,42 @@ namespace DEHCATIA.Tests.MappingRules
 
             this.parameterTypeService.Setup(x => x.ShapeKind).Returns(this.enumerationParameterType);
             this.parameterTypeService.Setup(x => x.ShapeAngle).Returns(this.quantityParameterType);
+            
+            var elementUsage = new ElementUsage()
+            {
+                ElementDefinition = this.elementDefinition
+            };
+
+            var body = new Mock<Body>();
+            body.Setup(x => x.get_Name()).Returns("body.0");
 
             var mappedElement = new List<MappedElementRowViewModel>()
             {
-                new MappedElementRowViewModel()
+                new()
                 {
                     HubElement = this.elementDefinition,
-                    CatiaParent = new ElementRowViewModel(new Mock<Product>().Object, ""),
-                    ShouldCreateNewElement = true
+                    CatiaParent = new DefinitionRowViewModel(new Mock<Product>().Object, ""),
+                    ShouldCreateNewElement = true,
+                },
+                new()
+                {
+                    HubElement = elementUsage,
+                    CatiaElement = new UsageRowViewModel(new Mock<Product>().Object, "")
+                },
+                new()
+                {
+                    HubElement = this.elementDefinition,
+                    CatiaElement = new DefinitionRowViewModel(new Mock<Product>().Object, "")
+                    {
+                        Children = { new BodyRowViewModel(body.Object, "") }
+                    }
                 }
             };
 
             Assert.DoesNotThrow(() => this.rule.Transform(mappedElement));
             Assert.IsNotEmpty(mappedElement);
             Assert.True(mappedElement.First().CatiaElement?.IsDraft);
-            Assert.Zero(this.rule.MappingErrors.Count);
+            Assert.IsEmpty(this.rule.MappingErrors);
         }
     }
 }

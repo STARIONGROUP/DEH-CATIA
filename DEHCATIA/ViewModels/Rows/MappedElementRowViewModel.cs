@@ -138,8 +138,12 @@ namespace DEHCATIA.ViewModels.Rows
             }
             else
             {
-                this.CatiaParent = null;
-                this.CatiaElement = element;
+                if (element is UsageRowViewModel && this.HubElement is ElementUsage
+                    || element is DefinitionRowViewModel && this.HubElement is ElementDefinition)
+                {
+                    this.CatiaParent = null;
+                    this.CatiaElement = element;
+                }
             }
         }
 

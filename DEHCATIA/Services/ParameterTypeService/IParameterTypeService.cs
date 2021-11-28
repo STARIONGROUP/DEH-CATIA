@@ -24,6 +24,8 @@
 
 namespace DEHCATIA.Services.ParameterTypeService
 {
+    using System.Collections.Generic;
+
     using CDP4Common.SiteDirectoryData;
 
     /// <summary>
@@ -32,102 +34,107 @@ namespace DEHCATIA.Services.ParameterTypeService
     public interface IParameterTypeService
     {
         /// <summary>
-        /// The Moment of Inertia <see cref="ParameterType"/>
+        /// Gets the Material <see cref="ParameterType"/>
+        /// </summary>
+        ParameterType Material { get; set; }
+
+        /// <summary>
+        /// Gets the Moment of Inertia <see cref="ParameterType"/>
         /// </summary>
         ParameterType MomentOfInertia { get; }
 
         /// <summary>
-        /// The Center of Gravity <see cref="ParameterType"/>
+        /// Gets the Center of Gravity <see cref="ParameterType"/>
         /// </summary>
         ParameterType CenterOfGravity { get; }
 
         /// <summary>
-        /// The Volume <see cref="ParameterType"/>
+        /// Gets the Volume <see cref="ParameterType"/>
         /// </summary>
         ParameterType Volume { get; }
 
         /// <summary>
-        /// The Mass <see cref="ParameterType"/>
+        /// Gets the Mass <see cref="ParameterType"/>
         /// </summary>
         ParameterType Mass { get; }
 
         /// <summary>
-        /// The Mass <see cref="ParameterType"/>
+        /// Gets the Orientation <see cref="ParameterType"/>
         /// </summary>
         ParameterType Orientation { get; }
 
         /// <summary>
-        /// The Mass <see cref="ParameterType"/>
+        /// Gets the Position <see cref="ParameterType"/>
         /// </summary>
         ParameterType Position { get; }
 
         /// <summary>
-        /// The Shape kind <see cref="ParameterType"/>
+        /// Gets the Shape kind <see cref="ParameterType"/>
         /// </summary>
         ParameterType ShapeKind { get; }
 
         /// <summary>
-        /// The Shape length <see cref="ParameterType"/>
+        /// Gets the Shape length <see cref="ParameterType"/>
         /// </summary>
         ParameterType ShapeLength { get; }
 
         /// <summary>
-        /// The Shape width or diameter <see cref="ParameterType"/>
+        /// Gets the Shape width or diameter <see cref="ParameterType"/>
         /// </summary>
         ParameterType ShapeWidthOrDiameter { get; }
 
         /// <summary>
-        /// The Shape height <see cref="ParameterType"/>
+        /// Gets the Shape height <see cref="ParameterType"/>
         /// </summary>
         ParameterType ShapeHeight { get; }
 
         /// <summary>
-        /// The Shape support length <see cref="ParameterType"/>
+        /// Gets the Shape support length <see cref="ParameterType"/>
         /// </summary>
         ParameterType ShapeSupportLength { get; }
 
         /// <summary>
-        /// The Shape angle <see cref="ParameterType"/>
+        /// Gets the Shape angle <see cref="ParameterType"/>
         /// </summary>
         ParameterType ShapeAngle { get; }
 
         /// <summary>
-        /// The Shape support angle <see cref="ParameterType"/>
+        /// Gets the Shape support angle <see cref="ParameterType"/>
         /// </summary>
         ParameterType ShapeSupportAngle { get; }
 
         /// <summary>
-        /// The Shape thickness <see cref="ParameterType"/>
+        /// Gets the Shape thickness <see cref="ParameterType"/>
         /// </summary>
         ParameterType ShapeThickness { get; }
 
         /// <summary>
-        /// The Shape area <see cref="ParameterType"/>
+        /// Gets the Shape area <see cref="ParameterType"/>
         /// </summary>
         ParameterType ShapeArea { get; }
 
         /// <summary>
-        /// The Shape density <see cref="ParameterType"/>
+        /// Gets the Shape density <see cref="ParameterType"/>
         /// </summary>
         ParameterType ShapeDensity { get; }
 
         /// <summary>
-        /// The Shape mass margin <see cref="ParameterType"/>
+        /// Gets the Shape mass margin <see cref="ParameterType"/>
         /// </summary>
         ParameterType ShapeMassMargin { get; }
 
         /// <summary>
-        /// The Shape mass with all margin <see cref="ParameterType"/>
+        /// Gets the Shape mass with all margin <see cref="ParameterType"/>
         /// </summary>
         ParameterType ShapeMassWithMargin { get; }
 
         /// <summary>
-        /// The Shape sys mass margin <see cref="ParameterType"/>
+        /// Gets the Shape sys mass margin <see cref="ParameterType"/>
         /// </summary>
         ParameterType ShapeSysMassMargin { get; }
 
         /// <summary>
-        /// The Shape external shape <see cref="ParameterType"/>
+        /// Gets the Shape external shape <see cref="ParameterType"/>
         /// </summary>
         ParameterType ExternalShape { get; }
 
@@ -135,5 +142,11 @@ namespace DEHCATIA.Services.ParameterTypeService
         /// Refreshes the defined <see cref="ParameterType"/>
         /// </summary>
         void RefreshParameterType();
+
+        /// <summary>
+        /// Gets the collection of <see cref="SampledFunctionParameterType"/> that can hold Material information
+        /// </summary>
+        /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="SampledFunctionParameterType"/></returns>
+        IEnumerable<SampledFunctionParameterType> GetEligibleParameterTypeForMaterial();
     }
 }

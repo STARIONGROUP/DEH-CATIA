@@ -54,6 +54,11 @@ namespace DEHCATIA.Enumerations
         /// CATIA materials can be stored inside a material library
         /// </summary>
         CatMaterial,
+        
+        /// <summary>
+        /// Represents a body contained inside a <see cref="CatPart"/>
+        /// </summary>
+        CatBody,
 
         /// <summary>
         /// A Component refers an Assembly or a Part file and contains position information

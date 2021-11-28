@@ -35,6 +35,7 @@ namespace DEHCATIA.Tests.Services.ComConnector
     using DEHCATIA.Extensions;
     using DEHCATIA.Services.CatiaTemplateService;
     using DEHCATIA.Services.ComConnector;
+    using DEHCATIA.Services.MaterialService;
     using DEHCATIA.ViewModels.ProductTree.Parameters;
     using DEHCATIA.ViewModels.ProductTree.Rows;
     using DEHCATIA.ViewModels.ProductTree.Shapes;
@@ -63,6 +64,7 @@ namespace DEHCATIA.Tests.Services.ComConnector
         private CatiaTemplateService templateService;
         private DirectoryInfo templateDirectory;
         private Mock<IExchangeHistoryService> exchangeHistory;
+        private Mock<IMaterialService> materialService;
 
         [SetUp] 
         public void Setup()
@@ -72,7 +74,9 @@ namespace DEHCATIA.Tests.Services.ComConnector
             
             this.statusBar = new Mock<IStatusBarControlViewModel>();
             this.exchangeHistory = new Mock<IExchangeHistoryService>();
-            this.service = new CatiaComService(this.statusBar.Object, this.exchangeHistory.Object, new Mock<ICatiaTemplateService>().Object);
+            this.materialService = new Mock<IMaterialService>();
+            this.service = new CatiaComService(this.statusBar.Object, this.exchangeHistory.Object, 
+                new Mock<ICatiaTemplateService>().Object, this.materialService.Object);
             this.templateService = new CatiaTemplateService();
 
             this.element = new MappedElementRowViewModel();
@@ -145,7 +149,7 @@ namespace DEHCATIA.Tests.Services.ComConnector
             this.element.CatiaElement.Parameters.Add(new StringParameterViewModel(massParameter.Object, "56.4"));
 
             this.element.CatiaElement.Shape = this.element.CatiaElement.Parameters.GetShape();
-            Assert.IsTrue(this.element.CatiaElement.Shape.IsSupported);
+            Assert.IsFalse(this.element.CatiaElement.Shape.IsSupported);
             this.element.CatiaElement.Parameters.Clear();
             this.element.CatiaElement.Shape.PositionOrientation = new CatiaShapePositionOrientationViewModel(new double[] { .5, .0, 0, 0, 1, 0, 0, 0, .5 }, new[] { .0, 0, 0 });
             Assert.DoesNotThrow(() => this.service.AddOrUpdateElement(this.element));
@@ -176,7 +180,7 @@ namespace DEHCATIA.Tests.Services.ComConnector
 
             this.element.CatiaElement.Shape = this.element.CatiaElement.Parameters.GetShape();
             File.Copy(Path.Combine(TestContext.CurrentContext.TestDirectory, TemplatePartName), destFileName);
-            Assert.IsTrue(this.element.CatiaElement.Shape.IsSupported);
+            Assert.IsFalse(this.element.CatiaElement.Shape.IsSupported);
             this.element.CatiaElement.Shape.PositionOrientation = new CatiaShapePositionOrientationViewModel(new double[] { .1, .0, 0, 0, 1, 0, 0, 0, 1 }, new[] { .0, 0, 0 });
             Assert.Throws<InvalidOperationException>(() => this.service.AddOrUpdateElement(this.element));
         }

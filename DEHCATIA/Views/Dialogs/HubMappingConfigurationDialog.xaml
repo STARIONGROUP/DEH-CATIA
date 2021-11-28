@@ -236,6 +236,7 @@
                                         <dxg:TreeListControl.Columns>
                                             <dxg:TreeListColumn FieldName="Name" Fixed="Left" />
                                             <dxg:TreeListColumn FieldName="PartNumber" Header="Part Number" />
+                                            <dxg:TreeListColumn FieldName="MaterialName" Header="Material" />
                                             <dxg:TreeListColumn FieldName="ElementType" Header="Element Type" />
                                         </dxg:TreeListControl.Columns>
                                     </dxg:TreeListControl>

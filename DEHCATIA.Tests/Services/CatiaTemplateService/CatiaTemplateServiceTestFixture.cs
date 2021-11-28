@@ -100,20 +100,20 @@ namespace DEHCATIA.Tests.Services.CatiaTemplateService
         public void VerifyTryGetFileName()
         {
             this.templateDirectory.Create();
-            Assert.IsTrue(this.service.TryGetFileName(this.shapeKindParameter, null, null, out var path));
+            Assert.IsFalse(this.service.TryGetFileName(this.shapeKindParameter, null, null, out var path));
         }
 
         [Test]
         public void VerifyAreAnyTemplatesAvailable()
         {
-            Assert.IsTrue(this.service.AreAnyTemplatesAvailable());
+            Assert.IsFalse(this.service.AreAnyTemplatesAvailable());
             this.templateDirectory.Create();
             var threeDTemplatesDirectory = this.templateDirectory.CreateSubdirectory("3dTemplates");
 
             threeDTemplatesDirectory.Create();
             Assert.IsTrue(threeDTemplatesDirectory.Exists);
 
-            Assert.IsTrue(this.service.AreAnyTemplatesAvailable());
+            Assert.IsFalse(this.service.AreAnyTemplatesAvailable());
             var tempmlateFile = new FileInfo(Path.Combine(threeDTemplatesDirectory.FullName, "box.CATPart"));
             tempmlateFile.Create();
             Assert.IsTrue(this.service.AreAnyTemplatesAvailable());

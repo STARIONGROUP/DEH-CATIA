@@ -58,27 +58,7 @@ namespace DEHCATIA.Enumerations
         /// Shape kind is a Paraboloid
         /// </summary>
         Paraboloid,
-
-        /// <summary>
-        /// Shape kind is a Triangular Prism
-        /// </summary>
-        TriPrism,
-
-        /// <summary>
-        /// Shape kind is a Quadrilateral Prism
-        /// </summary>
-        QuadPrism,
-
-        /// <summary>
-        /// Shape kind is a Capped Cylinder
-        /// </summary>
-        CappedCylinder,
-
-        /// <summary>
-        /// Shape kind is a Poly Prism
-        /// </summary>
-        PolyPrism,
-
+        
         /// <summary>
         /// Shape kind is a Tetrahedron
         /// </summary>

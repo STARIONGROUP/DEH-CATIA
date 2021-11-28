@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CatiaViewModelBase.cs" company="RHEA System S.A.">
+// <copyright file="CatiaRowViewModelBase.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -29,7 +29,7 @@ namespace DEHCATIA.ViewModels.ProductTree
     /// <summary>
     /// Base view model for all view models that represents object from catia
     /// </summary>
-    public class CatiaViewModelBase : ReactiveObject, ICatiaViewModelBase
+    public class CatiaRowViewModelBase : ReactiveObject, ICatiaRowViewModelBase
     {
         /// <summary>
         /// Backing field for <see cref="Name"/>

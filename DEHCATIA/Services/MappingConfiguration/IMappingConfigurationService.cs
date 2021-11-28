@@ -29,6 +29,7 @@ namespace DEHCATIA.Services.MappingConfiguration
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Dal.Operations;
 
@@ -114,5 +115,11 @@ namespace DEHCATIA.Services.MappingConfiguration
         /// Refreshes the <see cref="MappingConfigurationService.ExternalIdentifierMap"/> usually done after a session write
         /// </summary>
         void RefreshExternalIdentifierMap();
+
+        /// <summary>
+        /// Saves the specified <see cref="ParameterType"/> as the one used for mapping material in the current loaded configuration
+        /// </summary>
+        /// <param name="materialParameterType">The material <see cref="ParameterType"/></param>
+        void SaveMaterialParameterType(ParameterType materialParameterType);
     }
 }

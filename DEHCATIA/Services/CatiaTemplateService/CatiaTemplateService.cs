@@ -38,8 +38,6 @@ namespace DEHCATIA.Services.CatiaTemplateService
 
     using NLog;
 
-    using File = System.IO.File;
-
     /// <summary>
     /// The <see cref="CatiaTemplateService"/> provides a way to handle file operations related to Catia templates
     /// </summary>

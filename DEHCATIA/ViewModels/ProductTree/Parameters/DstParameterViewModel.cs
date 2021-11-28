@@ -37,7 +37,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Parameters
     /// Represents one <see cref="Parameter"/>
     /// </summary>
     /// <typeparam name="TValueType">The type of the value that parameter holds</typeparam>
-    public abstract class DstParameterViewModel<TValueType> : CatiaViewModelBase, IDstParameterViewModel
+    public abstract class DstParameterViewModel<TValueType> : CatiaRowViewModelBase, IDstParameterViewModel
     {
         /// <summary>
         /// Backing field for <see cref="Parameter"/>

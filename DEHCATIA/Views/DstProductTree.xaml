@@ -11,7 +11,6 @@
              xmlns:converters="clr-namespace:DEHCATIA.Converters"
              xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
              xmlns:rows="clr-namespace:DEHCATIA.ViewModels.ProductTree.Rows"
-             xmlns:dxpg="http://schemas.devexpress.com/winfx/2008/xaml/pivotgrid"
              d:DesignHeight="600" d:DesignWidth="400" mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -87,6 +86,7 @@
                     <dxg:TreeListControl.Columns>
                         <dxg:TreeListColumn FieldName="Name" Fixed="Left"/>
                         <dxg:TreeListColumn FieldName="PartNumber" Header="Part Number"/>
+                        <dxg:TreeListColumn FieldName="MaterialName" Header="Material"/>
                         <dxg:TreeListColumn FieldName="ElementType" Header="Element Type"/>
                     </dxg:TreeListControl.Columns>
                 </dxg:TreeListControl>

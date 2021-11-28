@@ -35,7 +35,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
     /// <summary>
     /// Represents a Catia Shape with its geometric parameters
     /// </summary>
-    public class CatiaShapeViewModel : CatiaViewModelBase
+    public class CatiaShapeViewModel : CatiaRowViewModelBase
     {
         /// <summary>
         /// Backing field for <see cref="ShapeKind"/>

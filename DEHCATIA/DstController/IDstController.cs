@@ -47,7 +47,7 @@ namespace DEHCATIA.DstController
         /// <summary>
         /// Gets or sets the ready to map <see cref="ElementRowViewModel"/> resulting of the automapping done by the <see cref="LoadMapping"/>
         /// </summary>
-        ElementRowViewModel ReadyToMapTopElement { get; set; }
+        ElementRowViewModel ReadyToMapDstTopElement { get; set; }
 
         /// <summary>
         /// Gets or sets value the catia ProductTree

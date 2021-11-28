@@ -139,7 +139,7 @@
     <None Update="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_CylindricalSegment.CATPart">
+    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_CylinderSegment.CATPart">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_DiscSegment.CATPart">
@@ -220,6 +220,11 @@
 	  <Page Update="Views\DstProductTree.xaml">
 	    <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 	  </Page>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Services\MaterialService\" />
+	  <Folder Include="ViewModels\ProductTree\Rows\Interfaces\" />
 	</ItemGroup>
 
 </Project>
