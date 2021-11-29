@@ -113,7 +113,7 @@ namespace DEHCATIA.Services.ComConnector
         /// <summary>
         /// Gets the <see cref="Application"/> instance of a running CATIA client.
         /// </summary>
-        public Application CatiaApp { get; private set; }
+        public Application CatiaApp { get; set; }
 
         /// <summary>
         /// Gets the current active document from the running CATIA client.
@@ -686,8 +686,8 @@ namespace DEHCATIA.Services.ComConnector
         /// <returns>The document which contains filename respectively PartNumber.</returns>
         private Document OpenDocument(string fileName)
         {
-            if ((this.CatiaApp.Documents.Cast<Document>()
-                .FirstOrDefault(x => x.get_Name() == fileName) is { } openDocument))
+            if (this.CatiaApp.Documents.Cast<Document>()
+                .FirstOrDefault(x => x.get_Name() == fileName) is { } openDocument)
             {
                 if (openDocument.Saved)
                 {
@@ -713,7 +713,7 @@ namespace DEHCATIA.Services.ComConnector
             {
                 this.CreateElement(mappedElement);
                 exchangeHistoryEntry = $"Element: [{mappedElement.CatiaElement.Name}] has been created and added to element [{mappedElement.CatiaParent.Name}]";
-                    mappedElement.CatiaElement.IsDraft = false;
+                mappedElement.CatiaElement.IsDraft = false;
             }
 
             this.UpdatePositionAndOrientation(mappedElement.CatiaElement);
@@ -772,7 +772,7 @@ namespace DEHCATIA.Services.ComConnector
         /// <returns>A value indicating whether the element has been successfuly created</returns>
         private void CreateElement(MappedElementRowViewModel mappedElement)
         {
-            if (!this.templateService.TryInstallTemplate(mappedElement, this.ActiveDocument.Path))
+            if (!this.templateService.TryInstallTemplate(mappedElement, this.ActiveDocument?.Path))
             {
                 var message = $"The installation of the template {mappedElement.CatiaElement.FileName} could not be done. Check above log messages.";
                 this.logger.Error(message);

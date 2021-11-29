@@ -230,7 +230,7 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
 
             var mappedRows = new List<MappedElementRowViewModel>();
             Assert.DoesNotThrow(() => mappedRows = this.service.LoadMappingFromHubToDst(this.elements));
-            ElementDefinition element = null;
+            ElementBase element = null;
             this.hubController.Setup(x => x.GetThingById(It.IsAny<Guid>(), It.IsAny<Iteration>(), out element));
             Assert.DoesNotThrow(() => mappedRows = this.service.LoadMappingFromHubToDst(this.elements));
 
@@ -238,8 +238,8 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
             this.hubController.Setup(x => x.GetThingById(It.IsAny<Guid>(), It.IsAny<Iteration>(), out element)).Returns(true);
            Assert.DoesNotThrow(() => mappedRows = this.service.LoadMappingFromHubToDst(this.elements));
 
-           this.hubController.Verify(x => x.GetThingById(It.IsAny<Guid>(), It.IsAny<Iteration>(), out element), Times.Exactly(0)); 
-           Assert.AreEqual(0, mappedRows.Count);
+           this.hubController.Verify(x => x.GetThingById(It.IsAny<Guid>(), It.IsAny<Iteration>(), out element), Times.Exactly(3)); 
+           Assert.AreEqual(1, mappedRows.Count);
         }
         
         [Test]

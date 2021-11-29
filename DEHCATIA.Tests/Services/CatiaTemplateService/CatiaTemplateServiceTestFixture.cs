@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CatiaTemplateServiceTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
@@ -122,16 +122,16 @@ namespace DEHCATIA.Tests.Services.CatiaTemplateService
         [Test]
         public void VerifyAreAllTemplatesAvailable()
         {
+            Assert.IsFalse(this.service.AreAllTemplatesAvailable());
+
             this.templateDirectory.Create();
             var sortedTemplateDirectory = this.templateDirectory.CreateSubdirectory("3dTemplates");
 
-            Assert.IsFalse(this.service.AreAllTemplatesAvailable());
             var randomString = new Randomizer();
 
             foreach (var shapeKind in Enum.GetNames(typeof(ShapeKind)))
             {
                 var tempmlateFile = new FileInfo(Path.Combine(sortedTemplateDirectory.FullName, $"{randomString.GetString(5)}{shapeKind}{randomString.GetString(5)}.CATPart"));
-
                 tempmlateFile.Create();
             }
 

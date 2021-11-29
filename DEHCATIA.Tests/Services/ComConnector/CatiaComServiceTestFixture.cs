@@ -25,9 +25,11 @@
 namespace DEHCATIA.Tests.Services.ComConnector
 {
     using System;
+    using System.Collections;
     using System.IO;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using CDP4Common.EngineeringModelData;
 
@@ -45,19 +47,26 @@ namespace DEHCATIA.Tests.Services.ComConnector
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using DevExpress.CodeParser.VB;
+    using DevExpress.Mvvm.Native;
+
+    using INFITF;
 
     using KnowledgewareTypeLib;
+
+    using MECMOD;
 
     using Moq;
 
     using NUnit.Framework;
+
+    using ProductStructureTypeLib;
 
     using File = System.IO.File;
     using Parameter = KnowledgewareTypeLib.Parameter;
 
     public class CatiaComServiceTestFixture
     {
-        private const string TemplatePartName = "quadprismtemplate.CATPart";
+        private const string TemplatePartName = "sphericalsegment.CATPart";
         private CatiaComService service;
         private Mock<IStatusBarControlViewModel> statusBar;
         private MappedElementRowViewModel element;
@@ -127,16 +136,67 @@ namespace DEHCATIA.Tests.Services.ComConnector
         [Test]  
         public void VerifyUpdateElement()
         {
-            Assert.DoesNotThrow(() => this.service.Connect());
-            var productTree = this.service.GetProductTree(new CancellationToken());
-            this.element.CatiaElement = productTree.Children.FirstOrDefault(x => x.Name == "SKF_60012_3.1");
-            Assert.IsNotNull(this.element.CatiaElement);
+            var application = new Mock<Application>();
+            var documents = new Mock<Documents>();
+            var document = new Mock<Document>();
+            var docPath = It.IsAny<string>();
+            documents.Setup(x => x.Read(ref docPath)).Returns(document.Object);
+            var documentsEnumerator = new Mock<IEnumerator>();
+            documentsEnumerator.Setup(x => x.MoveNext()).Returns(true);
+            documentsEnumerator.Setup(x => x.Current).Returns(document.Object);
+            documents.Setup(x => x.GetEnumerator()).Returns(documentsEnumerator.Object);
+            application.Setup(x => x.Documents).Returns(documents.Object);
+
+            this.service.CatiaApp = application.Object;
+
+            var product = new Mock<Product>();
+            product.Setup(x => x.get_Name()).Returns("product");
+            var products = new Mock<Products>();
+            var refPath = It.IsAny<string>();
+            products.Setup(x => x.AddComponentsFromFiles(It.IsAny<Array>(), ref refPath));
+            products.Setup(x => x.Count).Returns(1);
+            var refCount = It.IsAny<object>();
+            products.Setup(x => x.Item(ref refCount)).Returns(new Mock<Product>().Object);
+
+            product.Setup(x => x.Products).Returns(products.Object);
+
+            var position = new Mock<Position>();
+
+            position.Setup(x => x.GetComponents(It.IsAny<dynamic[]>())).Callback<Array>(x =>
+            {
+                x.SetValue(1d, 0);
+                x.SetValue(1d, 0);
+                x.SetValue(0d, 1);
+                x.SetValue(0d, 2);
+                x.SetValue(0d, 3);
+                x.SetValue(1d, 4);
+                x.SetValue(0d, 5);
+                x.SetValue(0d, 6);
+                x.SetValue(0d, 7);
+                x.SetValue(1d, 8);
+                x.SetValue(0d, 9);
+                x.SetValue(0d, 10);
+                x.SetValue(0d, 11);
+            });
+
+            product.Setup(x => x.Position).Returns(position.Object);
+            this.element.CatiaElement = new UsageRowViewModel(product.Object, "")
+            {
+                Children =
+                {
+                    new BodyRowViewModel(new Mock<Body>().Object, "material0"),
+                    new BodyRowViewModel(new Mock<Body>().Object, "material1"),
+                    new BodyRowViewModel(new Mock<Body>().Object, "material0"),
+                    new BodyRowViewModel(new Mock<Body>().Object, "material2"),
+                }
+            };
+
             this.element.CatiaElement.Parameters.Clear();
 
             var shapeKindParameter = new Mock<Parameter>();
             shapeKindParameter.Setup(x => x.get_Name()).Returns("kind");
-            shapeKindParameter.Setup(x => x.ValueAsString()).Returns("quadprism");
-            this.element.CatiaElement.Parameters.Add(new StringParameterViewModel(shapeKindParameter.Object, "quadprism"));
+            shapeKindParameter.Setup(x => x.ValueAsString()).Returns("sphericalsegment");
+            this.element.CatiaElement.Parameters.Add(new StringParameterViewModel(shapeKindParameter.Object, "sphericalsegment") { Name = "kind" });
 
             var heightParameter = new Mock<Parameter>();
             heightParameter.Setup(x => x.get_Name()).Returns("height");
@@ -149,24 +209,107 @@ namespace DEHCATIA.Tests.Services.ComConnector
             this.element.CatiaElement.Parameters.Add(new StringParameterViewModel(massParameter.Object, "56.4"));
 
             this.element.CatiaElement.Shape = this.element.CatiaElement.Parameters.GetShape();
-            Assert.IsFalse(this.element.CatiaElement.Shape.IsSupported);
+            Assert.IsTrue(this.element.CatiaElement.Shape.IsSupported);
             this.element.CatiaElement.Parameters.Clear();
-            this.element.CatiaElement.Shape.PositionOrientation = new CatiaShapePositionOrientationViewModel(new double[] { .5, .0, 0, 0, 1, 0, 0, 0, .5 }, new[] { .0, 0, 0 });
-            Assert.DoesNotThrow(() => this.service.AddOrUpdateElement(this.element));
+            this.element.CatiaElement.Shape.PositionOrientation = new CatiaShapePositionOrientationViewModel(new[] { .5, .0, 0, 0, 1, 0, 0, 0, .5 }, new[] { .0, 0, 0 });
+            
+            var elementDefinition = new ElementDefinition()
+            {
+                Name = "elementDefinition0",
+                ShortName = "elementDefinition1"
+            };
+
+            var element1 =
+                new MappedElementRowViewModel()
+                {
+                    CatiaElement = new ElementRowViewModel(elementDefinition, "")
+                    {
+                        IsDraft = true,
+                        Parent = new ElementRowViewModel(product.Object, ""),
+                        MaterialName = "mat"
+                    },
+                    CatiaParent = new ElementRowViewModel(product.Object, ""),
+                    HubElement = elementDefinition
+                };
+
+            var mockedTemplateService = new Mock<ICatiaTemplateService>();
+
+            mockedTemplateService.Setup(x => 
+                x.TryInstallTemplate(It.IsAny<MappedElementRowViewModel>(), It.IsAny<string>())).Returns(false);
+
+            this.service = new CatiaComService(this.statusBar.Object, this.exchangeHistory.Object, mockedTemplateService.Object, this.materialService.Object);
+
+            element1.CatiaElement.Shape = element1.CatiaElement.Parameters.GetShape();
+            
+            Task.WhenAll(
+                Task.Run(() => Assert.DoesNotThrow(() => this.service.AddOrUpdateElement(this.element))),
+                Task.Run(() => Assert.DoesNotThrow(() => this.service.AddOrUpdateElement(element1))),
+                Task.Run(async () =>
+                {
+                    await Task.Delay(3);
+                    documentsEnumerator.Setup(x => x.MoveNext()).Returns(false);
+                }));
+
+            mockedTemplateService.Setup(x =>
+                x.TryInstallTemplate(It.IsAny<MappedElementRowViewModel>(), It.IsAny<string>())).Returns(true);
+
+
+
+            Task.WhenAll(
+                Task.Run(() => Assert.DoesNotThrow(() => this.service.AddOrUpdateElement(element1))),
+                Task.Run(async () =>
+                {
+                    await Task.Delay(3);
+                    documentsEnumerator.Setup(x => x.MoveNext()).Returns(false);
+                }));
         }
 
         [Test]
         public void VerifyCreateElement()
         {
             var destFileName = Path.Combine(this.templateDirectory.FullName, TemplatePartName);
-            Assert.DoesNotThrow(() => this.service.Connect());
-            var productTree = this.service.GetProductTree(new CancellationToken());
-            this.element.CatiaParent = productTree;
-            this.element.CatiaElement = new ElementRowViewModel(new ElementDefinition() {ShortName = "nol"}, destFileName);
+
+            var application = new Mock<Application>();
+            var documents = new Mock<Documents>();
+            var document = new Mock<Document>();
+            var docPath = It.IsAny<string>();
+            documents.Setup(x => x.Read(ref docPath)).Returns(document.Object);
+            var documentsEnumerator = new Mock<IEnumerator>();
+            documentsEnumerator.Setup(x => x.MoveNext()).Returns(true);
+            documentsEnumerator.Setup(x => x.Current).Returns(document.Object);
+            documents.Setup(x => x.GetEnumerator()).Returns(documentsEnumerator.Object);
+            application.Setup(x => x.Documents).Returns(documents.Object);
+
+            this.service.CatiaApp = application.Object;
+
+            var product = new Mock<Product>();
+            product.Setup(x => x.get_Name()).Returns("product");
+            var position = new Mock<Position>();
+
+            position.Setup(x => x.GetComponents(It.IsAny<dynamic[]>())).Callback<Array>(x =>
+            {
+                x.SetValue(1d, 0);
+                x.SetValue(1d, 0);
+                x.SetValue(0d, 1);
+                x.SetValue(0d, 2);
+                x.SetValue(0d, 3);
+                x.SetValue(1d, 4);
+                x.SetValue(0d, 5);
+                x.SetValue(0d, 6);
+                x.SetValue(0d, 7);
+                x.SetValue(1d, 8);
+                x.SetValue(0d, 9);
+                x.SetValue(0d, 10);
+                x.SetValue(0d, 11);
+            });
+
+            product.Setup(x => x.Position).Returns(position.Object);
+            this.element.CatiaElement = new UsageRowViewModel(product.Object, destFileName);
+            this.element.CatiaElement.Parameters.Clear();
             var shapeKindParameter = new Mock<Parameter>();
             shapeKindParameter.Setup(x => x.get_Name()).Returns("kind");
-            shapeKindParameter.Setup(x => x.ValueAsString()).Returns("quadprism");
-            this.element.CatiaElement.Parameters.Add(new StringParameterViewModel(shapeKindParameter.Object, "quadprism"));
+            shapeKindParameter.Setup(x => x.ValueAsString()).Returns("sphericalsegment");
+            this.element.CatiaElement.Parameters.Add(new StringParameterViewModel(shapeKindParameter.Object, "sphericalsegment"));
 
             var heightParameter = new Mock<Parameter>();
             heightParameter.Setup(x => x.get_Name()).Returns("height");
@@ -180,23 +323,77 @@ namespace DEHCATIA.Tests.Services.ComConnector
 
             this.element.CatiaElement.Shape = this.element.CatiaElement.Parameters.GetShape();
             File.Copy(Path.Combine(TestContext.CurrentContext.TestDirectory, TemplatePartName), destFileName);
-            Assert.IsFalse(this.element.CatiaElement.Shape.IsSupported);
-            this.element.CatiaElement.Shape.PositionOrientation = new CatiaShapePositionOrientationViewModel(new double[] { .1, .0, 0, 0, 1, 0, 0, 0, 1 }, new[] { .0, 0, 0 });
-            Assert.Throws<InvalidOperationException>(() => this.service.AddOrUpdateElement(this.element));
+            Assert.IsTrue(this.element.CatiaElement.Shape.IsSupported);
+            this.element.CatiaElement.Shape.PositionOrientation = new CatiaShapePositionOrientationViewModel(new[] { .1, .0, 0, 0, 1, 0, 0, 0, 1 }, new[] { .0, 0, 0 });
+
+            Task.WhenAll(
+                Task.Run(() => Assert.DoesNotThrow(() => this.service.AddOrUpdateElement(this.element))),
+                Task.Run(async () =>
+                {
+                    await Task.Delay(2);
+                    documentsEnumerator.Setup(x => x.MoveNext()).Returns(false);
+                }));
         }
 
         [Test]
         public void VerifyUpdateParameters()
         {
-            Assert.DoesNotThrow(() => this.service.Connect());
-            var productTree = this.service.GetProductTree(new CancellationToken());
-            this.element.CatiaElement = productTree;
+            var application = new Mock<Application>();
+            var documents = new Mock<Documents>();
+            var document = new Mock<Document>();
+            var docPath = It.IsAny<string>();
+            documents.Setup(x => x.Read(ref docPath)).Returns(document.Object);
+            var documentsEnumerator = new Mock<IEnumerator>();
+            documentsEnumerator.Setup(x => x.MoveNext()).Returns(true);
+            documentsEnumerator.Setup(x => x.Current).Returns(document.Object);
+            documents.Setup(x => x.GetEnumerator()).Returns(documentsEnumerator.Object);
+            application.Setup(x => x.Documents).Returns(documents.Object);
+
+            this.service.CatiaApp = application.Object;
+
+            var product = new Mock<Product>();
+            product.Setup(x => x.get_Name()).Returns("product");
+            var position = new Mock<Position>();
+
+            position.Setup(x => x.GetComponents(It.IsAny<dynamic[]>())).Callback<Array>(x =>
+            {
+                x.SetValue(1d, 0);
+                x.SetValue(1d, 0);
+                x.SetValue(0d, 1);
+                x.SetValue(0d, 2);
+                x.SetValue(0d, 3);
+                x.SetValue(1d, 4);
+                x.SetValue(0d, 5);
+                x.SetValue(0d, 6);
+                x.SetValue(0d, 7);
+                x.SetValue(1d, 8);
+                x.SetValue(0d, 9);
+                x.SetValue(0d, 10);
+                x.SetValue(0d, 11);
+            });
+
+            product.Setup(x => x.Position).Returns(position.Object);
+
+            this.element.CatiaElement = new UsageRowViewModel(product.Object, "")
+            {
+                Children =
+                {
+                    new BodyRowViewModel(new Mock<Body>().Object, "material0"),
+                    new BodyRowViewModel(new Mock<Body>().Object, "material1"),
+                    new BodyRowViewModel(new Mock<Body>().Object, "material0"),
+                    new BodyRowViewModel(new Mock<Body>().Object, "material2"),
+                }
+            };
+
+            this.element.CatiaElement.Parameters.Clear();
+
             var massParameter = new Mock<Parameter>();
             massParameter.Setup(x => x.get_Name()).Returns("eff_volume");
             massParameter.Setup(x => x.ValueAsString()).Returns("56,4");
             this.element.CatiaElement.Parameters.Add(new DoubleParameterViewModel(massParameter.Object));
 
             this.element.CatiaElement.Shape = this.element.CatiaElement.Parameters.GetShape();
+
             Assert.DoesNotThrow(() => this.service.UpdateParameters(this.element));
         }
 

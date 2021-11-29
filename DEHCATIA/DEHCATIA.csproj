@@ -151,7 +151,7 @@
     <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_PlanarQuadrilateral.CATPart">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_Rectange.CATPart">
+    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_Rectangle.CATPart">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_SphericalSegment.CATPart">

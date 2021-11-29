@@ -103,5 +103,15 @@ namespace DEHCATIA.Enumerations
         /// Shape kind is a Paraboloid
         /// </summary>
         ParaboloidSegment,
+
+        /// <summary>
+        /// Shape kind is a Dish
+        /// </summary>
+        Dish,
+
+        /// <summary>
+        /// Shape kind is a Dish
+        /// </summary>
+        Rectangle
     }
 }

@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="quadprismtemplate.CATPart" />
+    <None Remove="sphericalsegment.CATPart" />
   </ItemGroup>
 
   <ItemGroup>
@@ -101,7 +101,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="quadprismtemplate.CATPart">
+    <EmbeddedResource Include="sphericalsegment.CATPart">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
