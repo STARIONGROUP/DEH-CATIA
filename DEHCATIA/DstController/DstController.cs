@@ -30,6 +30,7 @@ namespace DEHCATIA.DstController
     using System.Reactive.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Windows;
 
     using CDP4Common;
     using CDP4Common.CommonData;
