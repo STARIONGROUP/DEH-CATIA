@@ -9,8 +9,8 @@
 		<Product>DEHCATIA</Product>
 		<Description>DEHCATIA desktop application</Description>
 		<Copyright>Copyright © RHEA System S.A.</Copyright>
-		<AssemblyVersion>1.1.0.0</AssemblyVersion>
-		<FileVersion>1.1.0.0</FileVersion>
+		<AssemblyVersion>1.2.0</AssemblyVersion>
+		<FileVersion>1.2.0</FileVersion>
 		<LangVersion>latest</LangVersion>
 		<StartupObject>DEHCATIA.App</StartupObject>
 		<ApplicationIcon>icon.ico</ApplicationIcon>
