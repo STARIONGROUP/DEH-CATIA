@@ -49,6 +49,8 @@ namespace DEHCATIA.Tests.MappingRules
     using DEHPCommon;
     using DEHPCommon.HubController.Interfaces;
 
+    using MECMOD;
+
     using Moq;
 
     using NUnit.Framework;
@@ -167,9 +169,26 @@ namespace DEHCATIA.Tests.MappingRules
                                 ValueSwitch = ParameterSwitchKind.MANUAL
                             }
                         }
+                    },
+                    new Parameter()
+                    {
+                        ParameterType = new SampledFunctionParameterType(),
+                        ValueSet =
+                        {
+                            new ParameterValueSet()
+                            {
+                                Manual = new ValueArray<string>(new List<string>()
+                                {
+                                    "body.0", "material0", "body.1", "material1", "body.2", "material0", "body.3", "material2"
+                                }),
+                                ValueSwitch = ParameterSwitchKind.MANUAL
+                            }
+                        }
                     }
                 }
             };
+
+            this.parameterTypeService.Setup(x => x.Material).Returns(new SampledFunctionParameterType());
         }
 
         [Test]
@@ -214,21 +233,58 @@ namespace DEHCATIA.Tests.MappingRules
 
             this.parameterTypeService.Setup(x => x.ShapeKind).Returns(this.enumerationParameterType);
             this.parameterTypeService.Setup(x => x.ShapeAngle).Returns(this.quantityParameterType);
+            
+            var elementUsage = new ElementUsage()
+            {
+                ElementDefinition = this.elementDefinition
+            };
+
+            var body0 = new Mock<Body>();
+            body0.Setup(x => x.get_Name()).Returns("body.0");
+            var body1 = new Mock<Body>();
+            body0.Setup(x => x.get_Name()).Returns("body.1");
+            var body2 = new Mock<Body>();
+            body0.Setup(x => x.get_Name()).Returns("body.2");
+            var body3 = new Mock<Body>();
+            body0.Setup(x => x.get_Name()).Returns("body.3");
 
             var mappedElement = new List<MappedElementRowViewModel>()
             {
-                new MappedElementRowViewModel()
+                new()
                 {
                     HubElement = this.elementDefinition,
-                    CatiaParent = new ElementRowViewModel(new Mock<Product>().Object, ""),
-                    ShouldCreateNewElement = true
+                    CatiaParent = new DefinitionRowViewModel(new Mock<Product>().Object, ""),
+                    ShouldCreateNewElement = true,
+                },
+                new()
+                {
+                    HubElement = elementUsage,
+                    CatiaElement = new UsageRowViewModel(new Mock<Product>().Object, "")
+                },
+                new()
+                {
+                    HubElement = this.elementDefinition,
+                    CatiaElement = new DefinitionRowViewModel(new Mock<Product>().Object, "")
+                    {
+                        Children =
+                        {
+                            new BodyRowViewModel(body0.Object, "") { Name = "body.0" },
+                            new BodyRowViewModel(body1.Object, "material.5") { Name = "body.1" },
+                            new BodyRowViewModel(body2.Object, "") { Name = "body.2" },
+                            new BodyRowViewModel(body3.Object, "material.6") { Name = "body.3" },
+                        }
+                    }
                 }
             };
 
             Assert.DoesNotThrow(() => this.rule.Transform(mappedElement));
             Assert.IsNotEmpty(mappedElement);
-            Assert.True(mappedElement.First().CatiaElement?.IsDraft);
-            Assert.Zero(this.rule.MappingErrors.Count);
+            Assert.IsTrue(mappedElement.First().CatiaElement?.IsDraft);
+            Assert.AreEqual("material0", mappedElement.Last().CatiaElement.Children[0].MaterialName);
+            Assert.AreEqual("material1", mappedElement.Last().CatiaElement.Children[1].MaterialName);
+            Assert.AreEqual("material0", mappedElement.Last().CatiaElement.Children[2].MaterialName);
+            Assert.AreEqual("material2", mappedElement.Last().CatiaElement.Children[3].MaterialName);
+            Assert.IsEmpty(this.rule.MappingErrors);
         }
     }
 }

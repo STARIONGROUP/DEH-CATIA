@@ -49,6 +49,8 @@ namespace DEHCATIA.MappingRules
     using DEHPCommon;
     using DEHPCommon.MappingRules.Core;
 
+    using DevExpress.Mvvm.Native;
+
     using NLog;
 
     /// <summary>
@@ -64,7 +66,7 @@ namespace DEHCATIA.MappingRules
         /// <summary>
         /// The <see cref="IMappingConfigurationService"/>
         /// </summary>
-        private readonly IMappingConfigurationService mappiongConfigurationService = AppContainer.Container.Resolve<IMappingConfigurationService>();
+        private readonly IMappingConfigurationService mappingConfigurationService = AppContainer.Container.Resolve<IMappingConfigurationService>();
 
         /// <summary>
         /// The <see cref="IParameterTypeService"/>
@@ -122,9 +124,12 @@ namespace DEHCATIA.MappingRules
                 this.MapParameters(mappedElementRowViewModel);
                 this.MapPosition(mappedElementRowViewModel);
                 this.MapOrientation(mappedElementRowViewModel);
+                this.MapMaterial(mappedElementRowViewModel);
 
-                this.mappiongConfigurationService.AddToExternalIdentifierMap(mappedElementRowViewModel);
+                this.mappingConfigurationService.AddToExternalIdentifierMap(mappedElementRowViewModel);
             }
+
+            this.mappingConfigurationService.SaveMaterialParameterType(this.parameterTypeService.Material);
         }
 
         /// <summary>
@@ -137,7 +142,7 @@ namespace DEHCATIA.MappingRules
 
             if (mappedElementRowViewModel.CatiaElement.Shape is null)
             {
-                if(this.GetParameterEnumValues<ShapeKind>(parameters, this.parameterTypeService.ShapeKind?.Iid, mappedElementRowViewModel)?.FirstOrDefault() is { } shapeKind)
+                if (this.GetParameterEnumValues<ShapeKind>(parameters, this.parameterTypeService.ShapeKind?.Iid, mappedElementRowViewModel)?.FirstOrDefault() is { } shapeKind)
                 {
                     mappedElementRowViewModel.CatiaElement.Shape = new CatiaShapeViewModel(true)
                     {
@@ -154,15 +159,15 @@ namespace DEHCATIA.MappingRules
             }
 
             mappedElementRowViewModel.CatiaElement.Shape.Angle =
-                this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters, 
+                this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters,
                     mappedElementRowViewModel.CatiaElement.Shape.Angle, this.parameterTypeService.ShapeAngle?.Iid,
                     DoubleWithUnitValueParameterExtension.AngleParameterName);
-            
+
             mappedElementRowViewModel.CatiaElement.Shape.AngleSupport =
-                this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters, 
+                this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters,
                     mappedElementRowViewModel.CatiaElement.Shape.AngleSupport, this.parameterTypeService.ShapeSupportAngle?.Iid,
                     DoubleWithUnitValueParameterExtension.AngleSupportParameterName);
-            
+
             mappedElementRowViewModel.CatiaElement.Shape.Area = this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters,
                 mappedElementRowViewModel.CatiaElement.Shape.Area, this.parameterTypeService.ShapeArea?.Iid,
                 DoubleWithUnitValueParameterExtension.AreaParameterName);
@@ -186,7 +191,7 @@ namespace DEHCATIA.MappingRules
                 this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters,
                     mappedElementRowViewModel.CatiaElement.Shape.Length, this.parameterTypeService.ShapeLength?.Iid,
                     DoubleWithUnitValueParameterExtension.LenghtParameterName);
-            
+
             mappedElementRowViewModel.CatiaElement.Shape.LengthSupport =
                 this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters,
                     mappedElementRowViewModel.CatiaElement.Shape.LengthSupport, this.parameterTypeService.ShapeSupportLength?.Iid,
@@ -210,7 +215,7 @@ namespace DEHCATIA.MappingRules
             mappedElementRowViewModel.CatiaElement.Shape.SysMassMargin =
                 this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters,
                     mappedElementRowViewModel.CatiaElement.Shape.SysMassMargin, this.parameterTypeService.ShapeSysMassMargin?.Iid,
-            DoubleWithUnitValueParameterExtension.SysMassParameterName);
+                    DoubleWithUnitValueParameterExtension.SysMassParameterName);
 
             mappedElementRowViewModel.CatiaElement.Shape.Thickness =
                 this.RefreshOrCreateDoubleWithUnitValueViewModel(mappedElementRowViewModel, parameters,
@@ -240,10 +245,10 @@ namespace DEHCATIA.MappingRules
         /// <param name="parameterTypeIid">The <see cref="Guid"/> Id of the <see cref="ParameterType"/></param>
         /// <param name="parameterName">The name of the parameter in case its creation is required</param>
         /// <returns>An updated <see cref="DoubleParameterViewModel"/></returns>
-        private DoubleParameterViewModel RefreshOrCreateDoubleWithUnitValueViewModel(MappedElementRowViewModel mappedElementRowViewModel, 
+        private DoubleParameterViewModel RefreshOrCreateDoubleWithUnitValueViewModel(MappedElementRowViewModel mappedElementRowViewModel,
             IEnumerable<ParameterOrOverrideBase> parameters, DoubleParameterViewModel parameter, Guid? parameterTypeIid, string parameterName)
         {
-            var newValue = parameterTypeIid.HasValue 
+            var newValue = parameterTypeIid.HasValue
                 ? this.GetParameterValues<double>(parameters, parameterTypeIid.Value, mappedElementRowViewModel)?.FirstOrDefault()
                 : null;
 
@@ -312,7 +317,7 @@ namespace DEHCATIA.MappingRules
 
             foreach (var value in valueSet.ActualValue)
             {
-                if(Enum.TryParse(value, true, out TEnum enumResult))
+                if (Enum.TryParse(value, true, out TEnum enumResult))
                 {
                     values.Add(enumResult);
                 }
@@ -335,13 +340,13 @@ namespace DEHCATIA.MappingRules
         /// <param name="parameterTypeIid">The <see cref="ParameterType"/> Iid</param>
         /// <param name="mappedElementRowViewModel">The <see cref="MappedElementRowViewModel"/></param>
         /// <returns>A collection of <typeparamref name="TValueType"/></returns>
-        public IEnumerable<TValueType> GetParameterValues<TValueType>(IEnumerable<ParameterOrOverrideBase> parameters, Guid? parameterTypeIid, MappedElementRowViewModel mappedElementRowViewModel) 
+        public IEnumerable<TValueType> GetParameterValues<TValueType>(IEnumerable<ParameterOrOverrideBase> parameters, Guid? parameterTypeIid, MappedElementRowViewModel mappedElementRowViewModel)
             where TValueType : IConvertible
         {
             var parameter = parameters.FirstOrDefault(x => x.ParameterType.Iid == parameterTypeIid);
 
-            return parameter is null 
-                ? new List<TValueType>() 
+            return parameter is null
+                ? new List<TValueType>()
                 : this.GetValues<TValueType>(parameter, mappedElementRowViewModel);
         }
 
@@ -353,13 +358,13 @@ namespace DEHCATIA.MappingRules
         /// <param name="parameterTypeIid">The <see cref="ParameterType"/> Iid</param>
         /// <param name="mappedElementRowViewModel">The <see cref="MappedElementRowViewModel"/></param>
         /// <returns>A collection of <typeparamref name="TEnum"/></returns>
-        public IEnumerable<TEnum> GetParameterEnumValues<TEnum>(IEnumerable<ParameterOrOverrideBase> parameters, Guid? parameterTypeIid, MappedElementRowViewModel mappedElementRowViewModel) 
+        public IEnumerable<TEnum> GetParameterEnumValues<TEnum>(IEnumerable<ParameterOrOverrideBase> parameters, Guid? parameterTypeIid, MappedElementRowViewModel mappedElementRowViewModel)
             where TEnum : struct, Enum
         {
             var parameter = parameters.FirstOrDefault(x => x.ParameterType.Iid == parameterTypeIid);
 
-            return parameter is null 
-                ? new List<TEnum>() 
+            return parameter is null
+                ? new List<TEnum>()
                 : this.GetEnumValues<TEnum>(parameter, mappedElementRowViewModel);
         }
 
@@ -428,13 +433,13 @@ namespace DEHCATIA.MappingRules
                 .QueryParameterBaseValueSet(mappedElementRowViewModel.CatiaElement.SelectedOption,
                     mappedElementRowViewModel.CatiaElement.SelectedActualFiniteState);
 
-            if (valueSet is {} values && (values.ActualValue.Count != 3 || values.ActualValue.Any(x => x == "-")))
+            if (valueSet is { } values && (values.ActualValue.Count != 3 || values.ActualValue.Any(x => x == "-")))
             {
                 this.mappingErrors.Add($"The Position parameter was found but could not be mapped for the element {mappedElementRowViewModel.HubElement.Name}");
             }
 
-            var positionMatrix = (Convert.ToDouble(valueSet?.ActualValue[0], CultureInfo.InvariantCulture), 
-                Convert.ToDouble(valueSet?.ActualValue[1], CultureInfo.InvariantCulture), 
+            var positionMatrix = (Convert.ToDouble(valueSet?.ActualValue[0], CultureInfo.InvariantCulture),
+                Convert.ToDouble(valueSet?.ActualValue[1], CultureInfo.InvariantCulture),
                 Convert.ToDouble(valueSet?.ActualValue[2], CultureInfo.InvariantCulture));
 
             mappedElementRowViewModel.CatiaElement.Shape.PositionOrientation.Position = new PositionParameterValueViewModel(positionMatrix);
@@ -457,6 +462,62 @@ namespace DEHCATIA.MappingRules
 
             var orientationMatrix = valueSet?.ActualValue.Select(x => Convert.ToDouble(x, CultureInfo.InvariantCulture)) ?? OrientationViewModel.Default;
             mappedElementRowViewModel.CatiaElement.Shape.PositionOrientation.Orientation = new OrientationViewModel(orientationMatrix.ToList());
+        }
+
+        /// <summary>
+        /// Maps the material Parameter
+        /// </summary>
+        /// <param name="mappedElementRowViewModel">The <see cref="MappedElementRowViewModel"/></param>
+        private void MapMaterial(MappedElementRowViewModel mappedElementRowViewModel)
+        {
+            var valueSet = this.GetParameterOrOverrideBase(mappedElementRowViewModel.HubElement, this.parameterTypeService.Material)?
+                .QueryParameterBaseValueSet(mappedElementRowViewModel.CatiaElement.SelectedOption,
+                    mappedElementRowViewModel.CatiaElement.SelectedActualFiniteState);
+            
+            if (valueSet != null && valueSet.ActualValue.Count > 1)
+            {
+                if (mappedElementRowViewModel.CatiaElement is DefinitionRowViewModel definitionRow
+                    && definitionRow.Children.OfType<BodyRowViewModel>().Any())
+                {
+                    foreach (var (body, material) in this.GetPairsOfElementNameMaterial(valueSet))
+                    {
+                        if (definitionRow.Children.OfType<BodyRowViewModel>()
+                            .FirstOrDefault(x => x.Name == body) is { } bodyRowViewModel)
+                        {
+                            bodyRowViewModel.MaterialName = material;
+                        }
+                    }
+                }
+                else if(mappedElementRowViewModel.CatiaElement is UsageRowViewModel && valueSet.ActualValue.Count == 2)
+                {
+                    mappedElementRowViewModel.CatiaElement.MaterialName = this.GetPairsOfElementNameMaterial(valueSet).FirstOrDefault().materialName;
+                }
+            }
+            else
+            {
+                this.mappingErrors.Add($"The material parameter was found but could not be mapped for the element {mappedElementRowViewModel.HubElement.Name}");
+            }
+        }
+
+        /// <summary>
+        /// Gets the pairs of body name associated with material names
+        /// </summary>
+        /// <param name="valueSet">The <see cref="IValueSet"/> that contains the values</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of <code>(string, string)</code></returns>
+        private IEnumerable<(string bodyName, string materialName)> GetPairsOfElementNameMaterial(IValueSet valueSet)
+        {
+            using var enumerator = valueSet.ActualValue.GetEnumerator();
+
+            while (enumerator.MoveNext())
+            {
+                var first = enumerator.Current;
+
+                if (enumerator.MoveNext())
+                {
+                    var second = enumerator.Current;
+                    yield return (first, second);
+                }
+            }
         }
     }
 }

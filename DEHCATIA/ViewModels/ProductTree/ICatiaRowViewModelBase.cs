@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ICatiaViewModelBase.cs" company="RHEA System S.A.">
+// <copyright file="ICatiaRowViewModelBase.cs" company="RHEA System S.A.">
 //    Copyright (c) 2020-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski.
@@ -25,9 +25,9 @@
 namespace DEHCATIA.ViewModels.ProductTree
 {
     /// <summary>
-    /// Interface definition for <see cref="CatiaViewModelBase"/>
+    /// Interface definition for <see cref="CatiaRowViewModelBase"/>
     /// </summary>
-    public interface ICatiaViewModelBase
+    public interface ICatiaRowViewModelBase
     {
     }
 }

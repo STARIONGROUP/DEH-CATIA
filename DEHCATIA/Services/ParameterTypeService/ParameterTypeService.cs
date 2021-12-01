@@ -45,7 +45,7 @@ namespace DEHCATIA.Services.ParameterTypeService
     /// The <see cref="ParameterTypeService"/> provides an encapsulated way to retrieve the <see cref="ParameterType"/>
     /// that this adapter needs in order to make proper mapping
     /// </summary>
-    public class ParameterTypeService : ReactiveObject, IParameterTypeService
+    public class ParameterTypeService : IParameterTypeService
     {
         /// <summary>
         /// The Moment of inertia <see cref="ParameterType"/> short name
@@ -163,12 +163,17 @@ namespace DEHCATIA.Services.ParameterTypeService
         private List<ParameterType> parameterTypes;
 
         /// <summary>
+        /// Gets the Material <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType Material { get; set; }
+
+        /// <summary>
         /// Backing field for <see cref="MomentOfInertia"/>
         /// </summary>
         private ParameterType momentOfInertia;
 
         /// <summary>
-        /// The Moment of Inertia <see cref="ParameterType"/>
+        /// Gets the Moment of Inertia <see cref="ParameterType"/>
         /// </summary>
         public ParameterType MomentOfInertia => this.momentOfInertia ??= this.FetchParameterType(MomentOfInertiaShortName);
 
@@ -178,7 +183,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType centerOfGravity;
 
         /// <summary>
-        /// The Center of Gravity <see cref="ParameterType"/>
+        /// Gets the Center of Gravity <see cref="ParameterType"/>
         /// </summary>
         public ParameterType CenterOfGravity => this.centerOfGravity ??= this.FetchParameterType(CenterOfGravityShortName);
 
@@ -188,7 +193,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType volume;
 
         /// <summary>
-        /// The Volume <see cref="ParameterType"/>
+        /// Gets the Volume <see cref="ParameterType"/>
         /// </summary>
         public ParameterType Volume => this.volume ??= this.FetchParameterType(VolumeShortName);
 
@@ -198,7 +203,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType mass;
 
         /// <summary>
-        /// The Mass <see cref="ParameterType"/>
+        /// Gets the Mass <see cref="ParameterType"/>
         /// </summary>
         public ParameterType Mass => this.mass ??= this.FetchParameterType(MassShortName);
 
@@ -208,7 +213,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType orientation;
 
         /// <summary>
-        /// The Mass <see cref="ParameterType"/>
+        /// Gets the Orientation <see cref="ParameterType"/>
         /// </summary>
         public ParameterType Orientation => this.orientation ??= this.FetchParameterType(OrientationShortName);
 
@@ -218,7 +223,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType position;
 
         /// <summary>
-        /// The Mass <see cref="ParameterType"/>
+        /// Gets the Position <see cref="ParameterType"/>
         /// </summary>
         public ParameterType Position => this.position ??= this.FetchParameterType(PositionShortName);
 
@@ -228,7 +233,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType shapeKind;
 
         /// <summary>
-        /// The Shape kind <see cref="ParameterType"/>
+        /// Gets the Shape kind <see cref="ParameterType"/>
         /// </summary>
         public ParameterType ShapeKind => this.shapeKind ??= this.FetchParameterType(ShapeKindShortName);
 
@@ -238,7 +243,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType shapeLength;
 
         /// <summary>
-        /// The Shape length <see cref="ParameterType"/>
+        /// Gets the Shape length <see cref="ParameterType"/>
         /// </summary>
         public ParameterType ShapeLength => this.shapeLength ??= this.FetchParameterType(ShapeLengthShortName);
 
@@ -248,7 +253,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType shapeWidthOrDiameter;
 
         /// <summary>
-        /// The Shape width or diameter <see cref="ParameterType"/>
+        /// Gets the Shape width or diameter <see cref="ParameterType"/>
         /// </summary>
         public ParameterType ShapeWidthOrDiameter => this.shapeWidthOrDiameter ??= this.FetchParameterType(ShapeWidthOrDiameterShortName);
 
@@ -258,7 +263,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType shapeHeight;
 
         /// <summary>
-        /// The Shape height <see cref="ParameterType"/>
+        /// Gets the Shape height <see cref="ParameterType"/>
         /// </summary>
         public ParameterType ShapeHeight => this.shapeHeight ??= this.FetchParameterType(ShapeHeightShortName);
 
@@ -268,7 +273,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType shapeSupportLength;
 
         /// <summary>
-        /// The Shape support length <see cref="ParameterType"/>
+        /// Gets the Shape support length <see cref="ParameterType"/>
         /// </summary>
         public ParameterType ShapeSupportLength => this.shapeSupportLength ??= this.FetchParameterType(ShapeSupportLengthShortName);
 
@@ -278,7 +283,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType shapeAngle;
 
         /// <summary>
-        /// The Shape angle <see cref="ParameterType"/>
+        /// Gets the Shape angle <see cref="ParameterType"/>
         /// </summary>
         public ParameterType ShapeAngle => this.shapeAngle ??= this.FetchParameterType(ShapeAngleShortName);
 
@@ -288,7 +293,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType shapeSupportAngle;
 
         /// <summary>
-        /// The Shape support angle <see cref="ParameterType"/>
+        /// Gets the Shape support angle <see cref="ParameterType"/>
         /// </summary>
         public ParameterType ShapeSupportAngle => this.shapeSupportAngle ??= this.FetchParameterType(ShapeSupportAngleShortName);
 
@@ -298,7 +303,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType shapeThickness;
 
         /// <summary>
-        /// The Shape thickness <see cref="ParameterType"/>
+        /// Gets the Shape thickness <see cref="ParameterType"/>
         /// </summary>
         public ParameterType ShapeThickness => this.shapeThickness ??= this.FetchParameterType(ShapeThicknessShortName);
 
@@ -308,7 +313,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType shapeArea;
 
         /// <summary>
-        /// The Shape area <see cref="ParameterType"/>
+        /// Gets the Shape area <see cref="ParameterType"/>
         /// </summary>
         public ParameterType ShapeArea => this.shapeArea ??= this.FetchParameterType(ShapeAreaShortName);
 
@@ -318,7 +323,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType shapeDensity;
 
         /// <summary>
-        /// The Shape density <see cref="ParameterType"/>
+        /// Gets the Shape density <see cref="ParameterType"/>
         /// </summary>
         public ParameterType ShapeDensity => this.shapeDensity ??= this.FetchParameterType(ShapeDensityShortName);
 
@@ -328,7 +333,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType shapeMassMargin;
 
         /// <summary>
-        /// The Shape mass margin <see cref="ParameterType"/>
+        /// Gets the Shape mass margin <see cref="ParameterType"/>
         /// </summary>
         public ParameterType ShapeMassMargin => this.shapeMassMargin ??= this.FetchParameterType(ShapeMassMarginShortName);
 
@@ -338,7 +343,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType shapeMassWithMargin;
 
         /// <summary>
-        /// The Shape mass with all margin <see cref="ParameterType"/>
+        /// Gets the Shape mass with all margin <see cref="ParameterType"/>
         /// </summary>
         public ParameterType ShapeMassWithMargin => this.shapeMassWithMargin ??= this.FetchParameterType(ShapeMassWithMarginShortName);
 
@@ -348,7 +353,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType shapeSysMassMargin;
 
         /// <summary>
-        /// The Shape sys mass margin <see cref="ParameterType"/>
+        /// Gets the Shape sys mass margin <see cref="ParameterType"/>
         /// </summary>
         public ParameterType ShapeSysMassMargin => this.shapeSysMassMargin ??= this.FetchParameterType(ShapeSysMassMarginShortName);
 
@@ -358,7 +363,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType externalShape;
 
         /// <summary>
-        /// The Shape external shape <see cref="ParameterType"/>
+        /// Gets the Shape external shape <see cref="ParameterType"/>
         /// </summary>
         public ParameterType ExternalShape => this.externalShape ??= this.FetchParameterType(ExternalShapeShortName);
 
@@ -437,11 +442,24 @@ namespace DEHCATIA.Services.ParameterTypeService
             {
                 return parameterType;
             }
-            else
-            {
-                this.logger.Info($"No ParameterType found with the shortname: {parameterTypeShortName}");
-                return null;
-            }
+
+            this.logger.Info($"No ParameterType found with the shortname: {parameterTypeShortName}");
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the collection of <see cref="SampledFunctionParameterType"/> that can hold Material information
+        /// </summary>
+        /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="SampledFunctionParameterType"/></returns>
+        public IEnumerable<SampledFunctionParameterType> GetEligibleParameterTypeForMaterial()
+        {
+            return this.parameterTypes
+                .Where(x => x is SampledFunctionParameterType sampledFunctionParameterType
+                            && sampledFunctionParameterType.IndependentParameterType.Count == 1
+                            && sampledFunctionParameterType.DependentParameterType.Count == 1
+                            && sampledFunctionParameterType.IndependentParameterType[0].ParameterType is TextParameterType
+                            && sampledFunctionParameterType.DependentParameterType[0].ParameterType is TextParameterType)
+                .Cast<SampledFunctionParameterType>();
         }
     }
 }

@@ -47,6 +47,8 @@ namespace DEHCATIA.Tests.MappingRules
     using DEHPCommon;
     using DEHPCommon.HubController.Interfaces;
 
+    using MECMOD;
+
     using Moq;
 
     using NUnit.Framework;
@@ -103,6 +105,7 @@ namespace DEHCATIA.Tests.MappingRules
 
             this.dstController = new Mock<IDstController>();
             this.parameterTypeService = new Mock<IParameterTypeService>();
+            this.parameterTypeService.Setup(x => x.Material).Returns(new SampledFunctionParameterType());
 
             this.parameterTypeService.Setup(x => x.MomentOfInertia).Returns(new CompoundParameterType()
             {
@@ -126,7 +129,6 @@ namespace DEHCATIA.Tests.MappingRules
             this.product1.Setup(x => x.get_DescriptionRef()).Returns(string.Empty);
             this.product1.Setup(x => x.get_PartNumber()).Returns(string.Empty);
             this.product1.Setup(x => x.get_Name()).Returns(string.Empty);
-
             this.rule = new CatiaProductToElementRule();
         }
 
@@ -147,7 +149,7 @@ namespace DEHCATIA.Tests.MappingRules
                 }
             };
             
-            var usageRowViewModel = new UsageRowViewModel(this.product1.Object, string.Empty)
+            var usageRowViewModel0 = new UsageRowViewModel(this.product1.Object, string.Empty)
             {
                 Name = "UsageRow",
                 CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
@@ -159,10 +161,27 @@ namespace DEHCATIA.Tests.MappingRules
                     PositionOrientation = new CatiaShapePositionOrientationViewModel(
                         new[] { .1, 0, 0, 0, 1, 0, 0, 0, 1 }, new[] { .0, 0, 0 })
                 },
+                ShouldMapMaterial = true,
                 Parent = rootElement
             };
 
-            var definitionRowViewModel = new DefinitionRowViewModel(this.product1.Object, string.Empty)
+            var usageRowViewModel1 = new UsageRowViewModel(this.product1.Object, string.Empty)
+            {
+                Name = "UsageRow",
+                CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
+                Volume = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleParameterViewModel(string.Empty,  new DoubleWithUnitValueViewModel(42)),
+                MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
+                Shape = new CatiaShapeViewModel()
+                {
+                    PositionOrientation = new CatiaShapePositionOrientationViewModel(
+                        new[] { .1, 0, 0, 0, 1, 0, 0, 0, 1 }, new[] { .0, 0, 0 })
+                },
+                ShouldMapMaterial = true,
+                Parent = rootElement
+            };
+
+            var definitionRowViewModel0 = new DefinitionRowViewModel(this.product1.Object, string.Empty)
             {
                 Name = "DefinitionRow",
                 CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
@@ -174,17 +193,39 @@ namespace DEHCATIA.Tests.MappingRules
                     PositionOrientation = new CatiaShapePositionOrientationViewModel(
                         new[] { .1, 0, 0, 0, 1, 0, 0, 0, 1 }, new[] { .0, 0, 0 })
                 },
-                Parent = usageRowViewModel
+                Parent = usageRowViewModel0,
+                ShouldMapMaterial = false
             };
-            
-            usageRowViewModel.Children.Add(definitionRowViewModel);
-            rootElement.Children.Add(usageRowViewModel);
+
+            var body = new Mock<Body>();
+            body.Setup(x => x.get_Name()).Returns("body.0");
+
+            var definitionRowViewModel1 = new DefinitionRowViewModel(this.product1.Object, string.Empty)
+            {
+                Name = "DefinitionRow",
+                CenterOfGravity = new CenterOfGravityParameterViewModel((0, 1, 1)),
+                Volume = new DoubleParameterViewModel(string.Empty, new DoubleWithUnitValueViewModel(.2)),
+                Mass = new DoubleParameterViewModel(string.Empty, new DoubleWithUnitValueViewModel(42)),
+                MomentOfInertia = new MomentOfInertiaParameterViewModel(new MassMomentOfInertiaViewModel()),
+                Shape = new CatiaShapeViewModel()
+                {
+                    PositionOrientation = new CatiaShapePositionOrientationViewModel(
+                        new[] { .1, 0, 0, 0, 1, 0, 0, 0, 1 }, new[] { .0, 0, 0 })
+                },
+                Parent = usageRowViewModel1,
+                Children = { new BodyRowViewModel(body.Object, "") }
+            };
+
+            usageRowViewModel0.Children.Add(definitionRowViewModel0);
+            usageRowViewModel1.Children.Add(definitionRowViewModel1);
+            rootElement.Children.Add(usageRowViewModel0);
+            rootElement.Children.Add(usageRowViewModel1);
             
             var result = new List<(ElementRowViewModel Parent, ElementBase Element)>();
 
             Assert.DoesNotThrow(() => result = this.rule.Transform(rootElement));
             Assert.IsNotNull(result);
-            Assert.AreEqual(4, result.Count);
+            Assert.AreEqual(6, result.Count);
         }
 
         [Test]
@@ -267,7 +308,7 @@ namespace DEHCATIA.Tests.MappingRules
                 .FirstOrDefault()?
                 .Parameter.Count);
 
-            Assert.AreEqual(1, result
+            Assert.AreEqual(2, result
                 .Select(x => x.Element)
                 .OfType<ElementDefinition>()
                 .FirstOrDefault(x => x.ShortName == "DefinitionRow")?

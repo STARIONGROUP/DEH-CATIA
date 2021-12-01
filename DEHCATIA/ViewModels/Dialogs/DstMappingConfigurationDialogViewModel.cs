@@ -31,8 +31,10 @@ namespace DEHCATIA.ViewModels.Dialogs
     using System.Windows.Input;
 
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     using DEHCATIA.DstController;
+    using DEHCATIA.Services.ParameterTypeService;
     using DEHCATIA.ViewModels.Dialogs.Interfaces;
     using DEHCATIA.ViewModels.ProductTree.Rows;
 
@@ -46,6 +48,11 @@ namespace DEHCATIA.ViewModels.Dialogs
     /// </summary>
     public class DstMappingConfigurationDialogViewModel : MappingConfigurationDialogViewModel, IDstMappingConfigurationDialogViewModel
     {
+        /// <summary>
+        /// The <see cref="IParameterTypeService"/>
+        /// </summary>
+        private readonly IParameterTypeService parameterTypeService;
+
         /// <summary>
         /// Backing field for <see cref="SelectedThing"/>
         /// </summary>
@@ -101,31 +108,54 @@ namespace DEHCATIA.ViewModels.Dialogs
             get => this.topElement;
             set => this.RaiseAndSetIfChanged(ref this.topElement, value);
         }
+        
+        /// <summary>
+        /// Backing field for <see cref="TopElement"/>
+        /// </summary>
+        private SampledFunctionParameterType selectedMaterialParameterType;
+
+        /// <summary>
+        /// Gets or sets the top element of the tree
+        /// </summary>
+        public SampledFunctionParameterType SelectedMaterialParameterType
+        {
+            get => this.selectedMaterialParameterType;
+            set
+            {
+                this.parameterTypeService.Material = value;
+                this.RaiseAndSetIfChanged(ref this.selectedMaterialParameterType, value);
+            }
+        }
 
         /// <summary>
         /// Gets the collection of the available <see cref="ElementDefinition"/>s from the connected Hub Model
         /// </summary>
-        public ReactiveList<ElementDefinition> AvailableElementDefinitions { get; } = new ReactiveList<ElementDefinition>();
+        public ReactiveList<ElementDefinition> AvailableElementDefinitions { get; } = new();
 
         /// <summary>
         /// Gets the collection of the available <see cref="ElementDefinition"/>s from the connected Hub Model
         /// </summary>
-        public ReactiveList<ElementUsage> AvailableElementUsages { get; } = new ReactiveList<ElementUsage>();
+        public ReactiveList<ElementUsage> AvailableElementUsages { get; } = new();
 
         /// <summary>
         /// Gets the collection of the available <see cref="ActualFiniteState"/>s depending on the selected <see cref="Parameter"/>
         /// </summary>
-        public ReactiveList<ActualFiniteState> AvailableActualFiniteStates { get; } = new ReactiveList<ActualFiniteState>();
+        public ReactiveList<ActualFiniteState> AvailableActualFiniteStates { get; } = new();
 
         /// <summary>
         /// Gets the collection of the available <see cref="Option"/> from the connected Hub Model
         /// </summary>
-        public ReactiveList<Option> AvailableOptions { get; } = new ReactiveList<Option>();
+        public ReactiveList<Option> AvailableOptions { get; } = new();
 
         /// <summary>
         /// Gets the collection of <see cref="ElementRowViewModel"/>
         /// </summary>
-        public ReactiveList<ElementRowViewModel> Elements { get; } = new ReactiveList<ElementRowViewModel>();
+        public ReactiveList<ElementRowViewModel> Elements { get; } = new();
+
+        /// <summary>
+        /// Gets the collection of available <see cref="SampledFunctionParameterType"/> compatible for Material mapping
+        /// </summary>
+        public ReactiveList<SampledFunctionParameterType> AvailableMaterialParameterType { get; } = new();
 
         /// <summary>
         /// Initializes a new <see cref="DstMappingConfigurationDialogViewModel"/>
@@ -133,9 +163,11 @@ namespace DEHCATIA.ViewModels.Dialogs
         /// <param name="hubController">The <see cref="IHubController"/></param>
         /// <param name="dstController">The <see cref="IDstController"/></param>
         /// <param name="statusBar">The <see cref="IStatusBarControlViewModel"/></param>
+        /// <param name="parameterTypeService">The <see cref="IParameterTypeService"/></param>
         public DstMappingConfigurationDialogViewModel(IHubController hubController, IDstController dstController,
-            IStatusBarControlViewModel statusBar) : base(hubController, dstController, statusBar)
+            IStatusBarControlViewModel statusBar, IParameterTypeService parameterTypeService) : base(hubController, dstController, statusBar)
         {
+            this.parameterTypeService = parameterTypeService;
             this.Initialize();
         }
 
@@ -156,6 +188,8 @@ namespace DEHCATIA.ViewModels.Dialogs
                         this.CheckCanExecute();
                     });
                 });
+
+            this.AvailableMaterialParameterType.AddRange(this.parameterTypeService.GetEligibleParameterTypeForMaterial());
         }
         
         /// <summary>
