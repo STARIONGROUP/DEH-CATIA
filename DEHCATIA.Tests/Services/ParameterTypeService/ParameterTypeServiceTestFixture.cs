@@ -108,7 +108,7 @@ namespace DEHCATIA.Tests.Services.ParameterTypeService
             Assert.IsNull(this.service.ShapeSupportAngle);
             Assert.IsNull(this.service.ShapeArea);
             Assert.IsNull(this.service.ShapeThickness);
-            this.hubController.Verify(x => x.OpenIteration, Times.Exactly(4));
+            this.hubController.Verify(x => x.OpenIteration, Times.Exactly(8));
         }
 
         [Test]

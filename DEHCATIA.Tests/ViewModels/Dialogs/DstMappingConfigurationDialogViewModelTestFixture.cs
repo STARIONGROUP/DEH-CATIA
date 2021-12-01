@@ -36,6 +36,7 @@ namespace DEHCATIA.Tests.ViewModels.Dialogs
     using CDP4Common.SiteDirectoryData;
 
     using DEHCATIA.DstController;
+    using DEHCATIA.Services.ParameterTypeService;
     using DEHCATIA.ViewModels.Dialogs;
     using DEHCATIA.ViewModels.ProductTree.Rows;
 
@@ -59,6 +60,7 @@ namespace DEHCATIA.Tests.ViewModels.Dialogs
         private DomainOfExpertise domain;
         private Mock<ICloseWindowBehavior> closeBehavior;
         private Mock<IStatusBarControlViewModel> statusBar;
+        private Mock<IParameterTypeService> parameterTypeService;
         private ModelReferenceDataLibrary modelReferenceDataLibrary;
         private Mock<Product> product0;
         private Mock<Product> product1;
@@ -121,9 +123,11 @@ namespace DEHCATIA.Tests.ViewModels.Dialogs
             this.dstController.Setup(x => x.Map(It.IsAny<ElementRowViewModel>()));
         
             this.statusBar = new Mock<IStatusBarControlViewModel>();
+            this.parameterTypeService = new Mock<IParameterTypeService>();
 
             this.viewModel = new DstMappingConfigurationDialogViewModel(
-            this.hubController.Object, this.dstController.Object, this.statusBar.Object);
+            this.hubController.Object, this.dstController.Object, this.statusBar.Object,
+            this.parameterTypeService.Object);
 
             this.viewModel.Elements.Add(this.rootElement);
 

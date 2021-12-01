@@ -30,10 +30,12 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Dal.Operations;
 
     using DEHCATIA.Services.MappingConfiguration;
+    using DEHCATIA.Services.ParameterTypeService;
     using DEHCATIA.ViewModels.ProductTree.Rows;
     using DEHCATIA.ViewModels.Rows;
 
@@ -63,13 +65,15 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
         private Mock<Product> product0;
         private Mock<Product> product1;
         private ElementDefinition element1;
+        private Mock<IParameterTypeService> parameterTypeService;
 
         [SetUp]
         public void Setup()
         {
             this.statusBar = new Mock<IStatusBarControlViewModel>();
             this.hubController = new Mock<IHubController>();
-            this.service = new MappingConfigurationService(this.statusBar.Object, this.hubController.Object);
+            this.parameterTypeService = new Mock<IParameterTypeService>();
+            this.service = new MappingConfigurationService(this.statusBar.Object, this.hubController.Object, this.parameterTypeService.Object);
             this.product0 = new Mock<Product>();
             this.product0.Setup(x => x.get_Name()).Returns("product0");
 
@@ -78,8 +82,8 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
 
             this.elements = new List<ElementRowViewModel>()
             {
-                new DefinitionRowViewModel(this.product0.Object, "product0"),
-                new DefinitionRowViewModel(this.product1.Object, "product1"),
+                new DefinitionRowViewModel(this.product0.Object, "product0") { Name = "product0" },
+                new DefinitionRowViewModel(this.product1.Object, "product1") { Name = "product1" }
             };
 
             this.externalIdentifiers = new List<ExternalIdentifier>()
@@ -226,11 +230,12 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
 
             var mappedRows = new List<MappedElementRowViewModel>();
             Assert.DoesNotThrow(() => mappedRows = this.service.LoadMappingFromHubToDst(this.elements));
-            ElementDefinition element = null;
+            ElementBase element = null;
             this.hubController.Setup(x => x.GetThingById(It.IsAny<Guid>(), It.IsAny<Iteration>(), out element));
             Assert.DoesNotThrow(() => mappedRows = this.service.LoadMappingFromHubToDst(this.elements));
-            
-           this.hubController.Setup(x => x.GetThingById(It.IsAny<Guid>(), It.IsAny<Iteration>(), out element)).Returns(true);
+
+            element = this.element0;
+            this.hubController.Setup(x => x.GetThingById(It.IsAny<Guid>(), It.IsAny<Iteration>(), out element)).Returns(true);
            Assert.DoesNotThrow(() => mappedRows = this.service.LoadMappingFromHubToDst(this.elements));
 
            this.hubController.Verify(x => x.GetThingById(It.IsAny<Guid>(), It.IsAny<Iteration>(), out element), Times.Exactly(3)); 
@@ -266,6 +271,9 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
             this.service.ExternalIdentifierMap = this.externalIdentifierMap;
             var transactionMock = new Mock<IThingTransaction>();
             var iteration = new Iteration();
+            var parameterType = new SampledFunctionParameterType();
+            this.hubController.Setup(x => x.GetThingById(It.IsAny<Guid>(), out parameterType)).Returns(true);
+
             Assert.DoesNotThrow(() => this.service.PersistExternalIdentifierMap(transactionMock.Object, iteration));
 
             this.service.ExternalIdentifierMap = new ExternalIdentifierMap()

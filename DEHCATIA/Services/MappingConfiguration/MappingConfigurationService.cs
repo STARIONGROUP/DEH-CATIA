@@ -32,6 +32,7 @@ namespace DEHCATIA.Services.MappingConfiguration
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Dal.Operations;
 
@@ -40,6 +41,7 @@ namespace DEHCATIA.Services.MappingConfiguration
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using DEHCATIA.DstController;
+    using DEHCATIA.Services.ParameterTypeService;
     using DEHCATIA.ViewModels.ProductTree.Rows;
     using DEHCATIA.ViewModels.Rows;
 
@@ -53,6 +55,11 @@ namespace DEHCATIA.Services.MappingConfiguration
     /// </summary>
     public class MappingConfigurationService : IMappingConfigurationService
     {
+        /// <summary>
+        /// The constant identifier for saving/loading the material <see cref="ParameterType"/>
+        /// </summary>
+        private const string MaterialIdentifier = "MaterialParametertypeMappingIdentifier";
+
         /// <summary>
         /// Gets the current class logger
         /// </summary>
@@ -87,21 +94,28 @@ namespace DEHCATIA.Services.MappingConfiguration
         private readonly IHubController hubController;
 
         /// <summary>
+        /// The <see cref="IParameterTypeService"/>
+        /// </summary>
+        private readonly IParameterTypeService parameterTypeService;
+
+        /// <summary>
         /// The collection of id correspondence as tuple
         /// (<see cref="Guid"/> InternalId, <see cref="ExternalIdentifier"/> externalIdentifier, <see cref="Guid"/> Iid)
         /// including the deserialized external identifier
         /// </summary>
         private readonly List<(Guid InternalId, ExternalIdentifier ExternalIdentifier, Guid Iid)> correspondences = new();
-        
+
         /// <summary>
         /// Initializes a new <see cref="MappingConfigurationService"/>
         /// </summary>
         /// <param name="statusBarControl">The <see cref="IStatusBarControlViewModel"/></param>
         /// <param name="hubController">The <see cref="IHubController"/></param>
-        public MappingConfigurationService(IStatusBarControlViewModel statusBarControl, IHubController hubController)
+        /// <param name="parameterTypeService">The <see cref="IParameterTypeService"/></param>
+        public MappingConfigurationService(IStatusBarControlViewModel statusBarControl, IHubController hubController, IParameterTypeService parameterTypeService)
         {
             this.statusBar = statusBarControl;
             this.hubController = hubController;
+            this.parameterTypeService = parameterTypeService;
         }
         
         /// <summary>
@@ -119,8 +133,23 @@ namespace DEHCATIA.Services.MappingConfiguration
                 x.InternalThing, JsonConvert.DeserializeObject<ExternalIdentifier>(x.ExternalId ?? string.Empty), x.Iid
             )));
 
+            this.LoadMaterialParameterType();
+
             stopwatch.Stop();
             this.logger.Debug($"{this.correspondences.Count} ExternalIdentifiers deserialized in {stopwatch.ElapsedMilliseconds} ms");
+        }
+
+        /// <summary>
+        /// Loads the Material <see cref="ParameterType"/> if present in the configuration
+        /// </summary>
+        private void LoadMaterialParameterType()
+        {
+            if (this.correspondences.FirstOrDefault(
+                x => x.ExternalIdentifier?.Identifier.Equals(MaterialIdentifier) is true) is { } correspondence
+                && this.hubController.GetThingById(correspondence.InternalId, out SampledFunctionParameterType parameterType))
+            {
+                this.parameterTypeService.Material = parameterType;
+            }
         }
 
         /// <summary>
@@ -173,35 +202,59 @@ namespace DEHCATIA.Services.MappingConfiguration
                 this.correspondences.Where(x => x.ExternalIdentifier.MappingDirection == MappingDirection.FromHubToDst)
                     .GroupBy(x => x.ExternalIdentifier.Identifier))
             {
-                if (elementRowViewModels.FirstOrDefault(rowViewModel =>
-                    rowViewModel.Name.Equals(idCorrespondences.Key)) is not { } element)
+                if (!this.TryFindDstElement(elementRowViewModels, idCorrespondences.Key, out var element))
                 {
                     continue;
                 }
                 
                 foreach (var (internalId, _, _) in idCorrespondences)
                 {
-                    if (!this.hubController.GetThingById(internalId, this.hubController.OpenIteration, out ElementDefinition elementDefinition))
+                    if (!this.hubController.GetThingById(internalId, this.hubController.OpenIteration, out ElementBase hubElement))
                     {
                         continue;
                     }
-                    
+              
                     var mappedElement = new MappedElementRowViewModel()
                     {
                         CatiaElement = element,
-                        HubElement = elementDefinition
+                        HubElement = hubElement
                     };
 
                     mappedVariables.Add(mappedElement);
                 }
-
-                if (element.Children.Any())
-                {
-                    mappedVariables.AddRange(this.MapElementsFromTheExternalIdentifierMapToDst(element.Children));
-                }
             }
 
             return mappedVariables;
+        }
+
+        /// <summary>
+        /// Tries to find recursivly the mapped <see cref="ElementRowViewModel"/> 
+        /// </summary>
+        /// <param name="elementRowViewModels">The current collection of <see cref="ElementRowViewModel"/></param>
+        /// <param name="externalIdentifier">The external identifier that should match the name of the searched element</param>
+        /// <param name="elementRowViewModel">The found element</param>
+        /// <returns>A value indicating whether the dst element was found</returns>
+        private bool TryFindDstElement(IList<ElementRowViewModel> elementRowViewModels, object externalIdentifier, out ElementRowViewModel elementRowViewModel)
+        {
+            elementRowViewModel = null;
+            
+            if (elementRowViewModels.FirstOrDefault(rowViewModel =>
+                rowViewModel.Name.Equals(externalIdentifier)) is {} element)
+            {
+                elementRowViewModel = element;
+                return true;
+            }
+
+            foreach (var rowViewModel in elementRowViewModels)
+            {
+                if (rowViewModel.Children.Any(x => x is not BodyRowViewModel)
+                        && this.TryFindDstElement(rowViewModel.Children, externalIdentifier, out elementRowViewModel))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -255,7 +308,7 @@ namespace DEHCATIA.Services.MappingConfiguration
                     _ => null
                 };
 
-                Application.Current.Dispatcher.Invoke(() => action?.Invoke());
+                Application.Current?.Dispatcher.Invoke(() => action?.Invoke());
             }
         }
         
@@ -297,6 +350,20 @@ namespace DEHCATIA.Services.MappingConfiguration
                 ExternalModelName = newName,
                 Owner = this.hubController.CurrentDomainOfExpertise
             };
+        }
+
+        /// <summary>
+        /// Saves the specified <see cref="ParameterType"/> as the one used for mapping material in the current loaded configuration
+        /// </summary>
+        /// <param name="materialParameterType">The material <see cref="ParameterType"/></param>
+        public void SaveMaterialParameterType(ParameterType materialParameterType)
+        {
+            if (materialParameterType == null)
+            {
+                return;
+            }
+            
+            this.AddToExternalIdentifierMap(materialParameterType.Iid, MaterialIdentifier, MappingDirection.FromHubToDst);
         }
 
         /// <summary>
@@ -353,7 +420,7 @@ namespace DEHCATIA.Services.MappingConfiguration
         /// <param name="elementRowViewModel">The <see cref="ElementRowViewModel"/> that holds mapping information</param>
         public void AddToExternalIdentifierMap(ElementRowViewModel elementRowViewModel)
         {
-            this.AddToExternalIdentifierMap(elementRowViewModel.ElementDefinition.Iid, elementRowViewModel.Product.get_Name(), MappingDirection.FromDstToHub);
+            this.AddToExternalIdentifierMap(elementRowViewModel.ElementDefinition.Iid, elementRowViewModel.Element.get_Name(), MappingDirection.FromDstToHub);
         }
 
         /// <summary>
@@ -362,7 +429,7 @@ namespace DEHCATIA.Services.MappingConfiguration
         /// <param name="usageRowViewModel">The <see cref="UsageRowViewModel"/> that holds mapping information</param>
         public void AddToExternalIdentifierMap(UsageRowViewModel usageRowViewModel)
         {
-            this.AddToExternalIdentifierMap(usageRowViewModel.ElementUsage.Iid, usageRowViewModel.Product.get_Name(), MappingDirection.FromDstToHub);
+            this.AddToExternalIdentifierMap(usageRowViewModel.ElementUsage.Iid, usageRowViewModel.Element.get_Name(), MappingDirection.FromDstToHub);
         }
 
         /// <summary>

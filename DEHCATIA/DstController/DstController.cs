@@ -30,12 +30,14 @@ namespace DEHCATIA.DstController
     using System.Reactive.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Windows;
 
     using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
     using CDP4Dal;
+    using CDP4Dal.Events;
     using CDP4Dal.Operations;
 
     using DEHCATIA.Events;
@@ -119,18 +121,23 @@ namespace DEHCATIA.DstController
         private ElementRowViewModel productTree;
 
         /// <summary>
-        /// Backing field for <see cref="ReadyToMapTopElement"/>.
+        /// Backing field for <see cref="ReadyToMapDstTopElement"/>.
         /// </summary>
-        private ElementRowViewModel readyToMapTopElement;
+        private ElementRowViewModel readyToMapDstTopElement;
 
         /// <summary>
         /// Gets or sets the ready to map <see cref="ElementRowViewModel"/> resulting of the automapping done by the <see cref="LoadMapping"/>
         /// </summary>
-        public ElementRowViewModel ReadyToMapTopElement
+        public ElementRowViewModel ReadyToMapDstTopElement
         {
-            get => this.readyToMapTopElement;
-            set => this.RaiseAndSetIfChanged(ref this.readyToMapTopElement, value);
+            get => this.readyToMapDstTopElement;
+            set => this.RaiseAndSetIfChanged(ref this.readyToMapDstTopElement, value);
         }
+
+        /// <summary>
+        /// The <see cref="ReactiveList{T}"/> of <see cref="MappedElementRowViewModel"/> resulting of the automapping done by the <see cref="LoadMapping"/>
+        /// </summary>
+        private readonly ReactiveList<MappedElementRowViewModel> readyToMapHubElements = new();
 
         /// <summary>
         /// Gets or sets value the catia ProductTree
@@ -210,15 +217,30 @@ namespace DEHCATIA.DstController
             this.WhenAnyValue(x => x.catiaComService.IsCatiaConnected)
                 .Subscribe(x => this.IsCatiaConnected = x);
 
-            this.WhenAnyValue(x => x.ReadyToMapTopElement)
+            this.WhenAnyValue(x => x.ReadyToMapDstTopElement)
                 .Where(x => x != null)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ =>
                 {
                     this.RefreshMappedThings();
-                    this.Map(this.ReadyToMapTopElement);
-                    this.ReadyToMapTopElement = null;
+                    this.Map(this.ReadyToMapDstTopElement);
+                    this.ReadyToMapDstTopElement = null;
                 });
+            
+            this.readyToMapHubElements
+                .ItemsAdded
+                .Where(x => this.readyToMapHubElements.Any())
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ =>
+                {
+                    this.Map(this.readyToMapHubElements.ToList());
+                    this.readyToMapHubElements.Clear();
+                });
+
+            CDPMessageBus.Current.Listen<SessionEvent>()
+                .Where(x => x.Status == SessionStatus.EndUpdate 
+                            && this.catiaComService.ActiveDocument != null)
+                .Subscribe(_ => this.LoadMapping());
         }
 
         /// <summary>
@@ -252,7 +274,7 @@ namespace DEHCATIA.DstController
         /// <param name="elements">The collection of <see cref="ElementRowViewModel"/></param>
         public void RefreshMappedThings(IEnumerable<ElementRowViewModel> elements = null)
         {
-            elements ??= new []{ this.ReadyToMapTopElement };
+            elements ??= new []{ this.ReadyToMapDstTopElement };
 
             foreach (var element in elements)
             {
@@ -283,16 +305,25 @@ namespace DEHCATIA.DstController
         {
             this.statusBar.Append($"Loading the mapping configuration in progress"); 
             _ = this.mappingConfigurationService.LoadMappingFromDstToHub(new List<ElementRowViewModel>() { this.ProductTree });
-            var mappedElement = this.mappingConfigurationService.LoadMappingFromHubToDst(new List<ElementRowViewModel>() { this.ProductTree });
 
-            if (this.FindTheTopElementMapped() is not { } topElement)
+            var mappingFound = false;
+
+            if (this.FindTheTopElementMapped() is { } topElement)
+            {
+                this.ReadyToMapDstTopElement = topElement;
+                mappingFound = true;
+            }
+
+            var mappedElementRowViewModels = this.mappingConfigurationService.LoadMappingFromHubToDst(new List<ElementRowViewModel>() { this.ProductTree });
+            mappingFound |= mappedElementRowViewModels.Any();
+            this.readyToMapHubElements.AddRange(mappedElementRowViewModels);
+            
+            if (!mappingFound)
             {
                 this.statusBar.Append($"No applicable mapping has been found in the selected mapping configuration", StatusBarMessageSeverity.Warning);
                 return;
             }
 
-            this.ReadyToMapTopElement = topElement;
-            this.Map(mappedElement);
             this.statusBar.Append($"The mapping configuration has been loaded");
         }
         
@@ -376,6 +407,8 @@ namespace DEHCATIA.DstController
             {
                 this.HubMapResult.Clear();
                 this.HubMapResult.AddRange(mappedElements);
+                this.SelectedHubMapResultToTransfer.Clear();
+                this.SelectedHubMapResultToTransfer.AddRange(mappedElements);
             }
 
             CDPMessageBus.Current.SendMessage(new UpdateDstElementTreeEvent());

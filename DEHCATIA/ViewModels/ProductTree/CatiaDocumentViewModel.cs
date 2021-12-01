@@ -34,7 +34,7 @@ namespace DEHCATIA.ViewModels.ProductTree
     /// <summary>
     /// Represents an instance of a CATIA document.
     /// </summary>
-    public class CatiaDocumentViewModel : CatiaViewModelBase
+    public class CatiaDocumentViewModel : CatiaRowViewModelBase
     {
         /// <summary>
         /// Backing field for <see cref="Path"/>

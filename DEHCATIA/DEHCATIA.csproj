@@ -9,8 +9,8 @@
 		<Product>DEHCATIA</Product>
 		<Description>DEHCATIA desktop application</Description>
 		<Copyright>Copyright © RHEA System S.A.</Copyright>
-		<AssemblyVersion>1.1.0.0</AssemblyVersion>
-		<FileVersion>1.1.0.0</FileVersion>
+		<AssemblyVersion>1.2.0</AssemblyVersion>
+		<FileVersion>1.2.0</FileVersion>
 		<LangVersion>latest</LangVersion>
 		<StartupObject>DEHCATIA.App</StartupObject>
 		<ApplicationIcon>icon.ico</ApplicationIcon>
@@ -139,7 +139,7 @@
     <None Update="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_CylindricalSegment.CATPart">
+    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_CylinderSegment.CATPart">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_DiscSegment.CATPart">
@@ -151,7 +151,7 @@
     <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_PlanarQuadrilateral.CATPart">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_Rectange.CATPart">
+    <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_Rectangle.CATPart">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_SphericalSegment.CATPart">
@@ -220,6 +220,11 @@
 	  <Page Update="Views\DstProductTree.xaml">
 	    <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 	  </Page>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Services\MaterialService\" />
+	  <Folder Include="ViewModels\ProductTree\Rows\Interfaces\" />
 	</ItemGroup>
 
 </Project>

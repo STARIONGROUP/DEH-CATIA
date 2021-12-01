@@ -27,8 +27,11 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
     using System;
     using System.Reactive.Linq;
 
+    using CATMat;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Dal;
 
@@ -37,6 +40,10 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
     using DEHCATIA.ViewModels.ProductTree.Parameters;
     using DEHCATIA.ViewModels.ProductTree.Shapes;
 
+    using DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows;
+
+    using INFITF;
+
     using ProductStructureTypeLib;
 
     using ReactiveUI;
@@ -44,18 +51,13 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
     /// <summary>
     /// Represents an element in a CATIA product or specification tree.
     /// </summary>
-    public class ElementRowViewModel : ReactiveObject
+    public class ElementRowViewModel : CatiaRowViewModelBase
     {
         /// <summary>
-        /// Backing field for <see cref="Product"/>
+        /// Backing field for <see cref="Element"/>
         /// </summary>
-        private Product product;
-
-        /// <summary>
-        /// Backing field for <see cref="Name"/>
-        /// </summary>
-        private string name;
-
+        private AnyObject element;
+        
         /// <summary>
         /// Backing field for <see cref="PartNumber"/>
         /// </summary>
@@ -148,26 +150,21 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// <summary>
         /// Gets or sets the reference to the actual Catia <see cref="ProductStructureTypeLib.Product"/>.
         /// </summary>
-        public Product Product
+        public AnyObject Element
         {
-            get => this.product;
+            get => this.element;
             set
             {
-                this.PartNumber = value.get_PartNumber();
-                this.Description = value.get_DescriptionRef();
-                this.RaiseAndSetIfChanged(ref this.product, value);
+                if(value is Product product)
+                {
+                    this.PartNumber = product.get_PartNumber();
+                    this.Description = product.get_DescriptionRef();
+                }
+               
+                this.RaiseAndSetIfChanged(ref this.element, value);
             }
         }
-
-        /// <summary>
-        /// Gets or sets the element name.
-        /// </summary>
-        public string Name
-        {
-            get => this.name;
-            set => this.RaiseAndSetIfChanged(ref this.name, value);
-        }
-
+        
         /// <summary>
         /// Gets or sets the element part number.
         /// </summary>
@@ -288,12 +285,12 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// <summary>
         /// Gets or sets the child elements of this element.
         /// </summary>
-        public ReactiveList<ElementRowViewModel> Children { get; set; } = new ReactiveList<ElementRowViewModel>();
+        public ReactiveList<ElementRowViewModel> Children { get; set; } = new();
 
         /// <summary>
         /// Gets or sets the <see cref="IDstParameterViewModel"/> this element contains
         /// </summary>
-        public ReactiveList<IDstParameterViewModel> Parameters { get; set; } = new ReactiveList<IDstParameterViewModel>();
+        public ReactiveList<IDstParameterViewModel> Parameters { get; set; } = new();
         
         /// <summary>
         /// Gets or sets the shape
@@ -314,13 +311,41 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         }
 
         /// <summary>
+        /// Backing field for <see cref="MaterialName"/>
+        /// </summary>
+        private string materialName;
+
+        /// <summary>
+        /// Gets or sets the <see cref="Material"/> name associated with this represented product or part
+        /// </summary>
+        public string MaterialName
+        {
+            get => this.materialName;
+            set => this.RaiseAndSetIfChanged(ref this.materialName, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="ShouldMapMaterial"/>
+        /// </summary>
+        private bool shouldMapMaterial = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the material should transfered
+        /// </summary>
+        public bool ShouldMapMaterial
+        {
+            get => this.shouldMapMaterial;
+            set => this.RaiseAndSetIfChanged(ref this.shouldMapMaterial, value);
+        }
+
+        /// <summary>
         /// Initializes a new <see cref="ElementRowViewModel"/>
         /// </summary>
-        /// <param name="product">The <see cref="Product"/> this view model represents</param>
-        /// <param name="fileName">The file name of the <paramref name="product"/></param>
-        public ElementRowViewModel(Product product, string fileName) : this(product.get_Name(), fileName)
+        /// <param name="element">The <see cref="AnyObject"/> this view model represents</param>
+        /// <param name="fileName">The file name of the <paramref name="element"/></param>
+        public ElementRowViewModel(AnyObject element, string fileName) : this(element.get_Name(), fileName)
         {
-            this.Product = product;
+            this.Element = element;
         }
 
         /// <summary>
@@ -347,6 +372,20 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
                 .Where(x => (string)x.TargetThingId == this.Name)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => this.IsHighlighted = x.ShouldHighlight);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="Element"/> as <see cref="Product"/> if it is one
+        /// </summary>
+        /// <returns></returns>
+        public Product GetProduct()
+        {
+            if (this.Element is Product product)
+            {
+                return product;
+            }
+
+            return null;
         }
     }
 }

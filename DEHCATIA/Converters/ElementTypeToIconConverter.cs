@@ -49,7 +49,7 @@ namespace DEHCATIA.Converters
         /// <returns><see cref="Visibility.Visible"/> if the value is true.</returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (!(value is ElementType elementType))
+            if (value is not ElementType elementType)
             {
                 return new DXImageExtension("SvgImages/XAF/ModelEditor_Class_Object.svg").ImagePath.MakeUri();
             }
@@ -60,6 +60,7 @@ namespace DEHCATIA.Converters
                 ElementType.CatPart => new DXImageExtension("SvgImages/RichEdit/DocumentProperties.svg").ImagePath.MakeUri(),
                 ElementType.Component => new DXImageExtension("SvgImages/RichEdit/Copy.svg").ImagePath.MakeUri(),
                 ElementType.CatDefinition => new DXImageExtension("SvgImages/RichEdit/New.svg").ImagePath.MakeUri(),
+                ElementType.CatBody => new DXImageExtension("SvgImages/XAF/ModelEditor_Settings.svg").ImagePath.MakeUri(),
                 _ => new DXImageExtension("SvgImages/XAF/ModelEditor_Class_Object.svg").ImagePath.MakeUri()
             };
 

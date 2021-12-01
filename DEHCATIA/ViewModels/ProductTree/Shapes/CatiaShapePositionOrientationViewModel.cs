@@ -33,7 +33,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
     /// <summary>
     /// The <see cref="CatiaShapePositionOrientationViewModel"/> represents the position and orientation of a shape in the coordinate system
     /// </summary>
-    public class CatiaShapePositionOrientationViewModel : CatiaViewModelBase
+    public class CatiaShapePositionOrientationViewModel : CatiaRowViewModelBase
     {
         /// <summary>
         /// Backing field for <see cref="Orientation"/>

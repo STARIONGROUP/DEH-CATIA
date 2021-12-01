@@ -84,6 +84,7 @@ namespace DEHCATIA.Tests.DstController
         private ActualFiniteState state;
         private ElementRowViewModel elementRow;
         private Mock<IMappingConfigurationService> mappingConfigurationService;
+        private List<MappedElementRowViewModel> mappedElements;
 
         [SetUp]
         public void Setup()
@@ -137,6 +138,11 @@ namespace DEHCATIA.Tests.DstController
             this.state = new ActualFiniteState(Guid.NewGuid(), null, null);
 
             this.mappingConfigurationService = new Mock<IMappingConfigurationService>();
+
+            this.mappedElements = new List<MappedElementRowViewModel>();
+
+            this.mappingConfigurationService.Setup(x => x.LoadMappingFromHubToDst(
+                It.IsAny<List<ElementRowViewModel>>())).Returns(this.mappedElements);
 
             this.controller = new DstController(this.comService.Object, this.statusBar.Object, this.mappingEngine.Object,
                 this.exchangeHistory.Object, this.hubController.Object, this.navigationService.Object, this.mappingConfigurationService.Object);
