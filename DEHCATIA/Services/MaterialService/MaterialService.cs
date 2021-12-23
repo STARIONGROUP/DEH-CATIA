@@ -84,8 +84,11 @@ namespace DEHCATIA.Services.MaterialService
         /// <param name="product">The <see cref="Product"/> used to retrive the <see cref="CATMat.MaterialManager"/></param>
         public void Init(Application catiaApplication, Product product)
         {
-            this.SetAvailableMaterials(catiaApplication);
-            this.SetMaterialManager(product);
+            if (this.MaterialManager is null)
+            {
+                this.SetAvailableMaterials(catiaApplication);
+                this.SetMaterialManager(product);
+            }
         }
 
         /// <summary>

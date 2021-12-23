@@ -253,11 +253,7 @@ namespace DEHCATIA.ViewModels.Dialogs
         /// </summary>
         private void CheckCanExecute()
         {
-            this.CanContinue = this.TopElement?.ElementDefinition != null
-                               && (!this.AvailableActualFiniteStates.Any() 
-                                   || this.TopElement.SelectedActualFiniteState != null && this.AvailableActualFiniteStates.Any())
-                               && (!this.AvailableOptions.Any() 
-                                   || this.TopElement.SelectedOption != null && this.AvailableOptions.Any());
+            this.CanContinue = this.TopElement?.ElementDefinition != null;
         }
         
         /// <summary>

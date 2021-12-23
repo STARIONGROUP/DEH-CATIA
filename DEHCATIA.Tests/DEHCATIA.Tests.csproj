@@ -110,4 +110,8 @@
     <Folder Include="Services\MaterialService\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+
 </Project>

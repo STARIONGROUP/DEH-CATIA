@@ -28,6 +28,7 @@ namespace DEHCATIA.MappingRules
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.ExceptionServices;
+    using System.Windows.Media.Converters;
 
     using Autofac;
 
@@ -43,6 +44,8 @@ namespace DEHCATIA.MappingRules
     using DEHPCommon;
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.MappingRules.Core;
+
+    using DevExpress.CodeParser;
 
     using NLog;
 
@@ -163,7 +166,8 @@ namespace DEHCATIA.MappingRules
         /// <returns>The <see cref="ElementDefinition"/> mapped to the <see cref="ElementRowViewModel"/></returns>
         private ElementDefinition MapDefinitionRowViewModel(DefinitionRowViewModel elementRowViewModel)
         {
-            if (this.ruleOutput.FirstOrDefault(x => x.Element.ShortName == elementRowViewModel.Name).Element is ElementDefinition elementDefinition)
+            if (this.ruleOutput.FirstOrDefault(x => x.Element.ShortName == elementRowViewModel.Name).Element 
+                is ElementDefinition elementDefinition)
             {
                 elementRowViewModel.ElementDefinition = elementDefinition;
             }
@@ -467,19 +471,12 @@ namespace DEHCATIA.MappingRules
                 {
                     ParameterType = parameterType,
                     Owner = this.owner,
-                    ValueSet =
-                    {
-                        new ParameterValueSet(Guid.Empty, this.hubController.Session.Assembler.Cache, new Uri(this.hubController.Session.DataSourceUri))
-                        {
-                            Computed = new ValueArray<string>(),
-                            Formula = new ValueArray<string>(initializationCollection),
-                            Manual = new ValueArray<string>(initializationCollection),
-                            Reference = new ValueArray<string>(initializationCollection),
-                            Published = new ValueArray<string>(initializationCollection)
-                        }
-                    }
+                    IsOptionDependent = this.selectedOption != null,
+                    StateDependence = this.selectedActualFiniteState?.GetContainerOfType<ActualFiniteStateList>()
                 };
 
+                parameter.ValueSet.AddRange(this.CreateValueSets<ParameterValueSet>(parameter, initializationCollection));
+                
                 if (parameterType is QuantityKind quantityKind)
                 {
                     parameter.Scale = quantityKind.DefaultScale;
@@ -560,28 +557,110 @@ namespace DEHCATIA.MappingRules
 
                 var parameterToOverride = this.GetParameter(parameterType, parameterType.ShortName, elementDefinition, valueLength);
 
+                parameterToOverride = parameterToOverride.Original != null ? (Parameter)parameterToOverride.Original : parameterToOverride;
+
                 parameter = new ParameterOverride(Guid.Empty, this.hubController.Session.Assembler.Cache, new Uri(this.hubController.Session.DataSourceUri))
                 {
                     Owner = this.owner,
-                    Parameter = parameterToOverride,
-                    ValueSet =
-                    {
-                        new ParameterOverrideValueSet(Guid.Empty, this.hubController.Session.Assembler.Cache, new Uri(this.hubController.Session.DataSourceUri))
-                        {
-                            ParameterValueSet = (ParameterValueSet)parameterToOverride?.QueryParameterBaseValueSet(this.selectedOption, this.selectedActualFiniteState),
-                            Computed = new ValueArray<string>(),
-                            Formula = new ValueArray<string>(initializationCollection),
-                            Manual = new ValueArray<string>(initializationCollection),
-                            Reference = new ValueArray<string>(initializationCollection),
-                            Published = new ValueArray<string>(initializationCollection)
-                        }
-                    }
+                    Parameter = parameterToOverride
                 };
+
+                parameter.ValueSet.AddRange(this.CreateValueSets<ParameterOverrideValueSet>(parameterToOverride, initializationCollection));
 
                 elementUsage.ParameterOverride.Add(parameter);
             }
 
             return parameter;
+        }
+
+        private IEnumerable<TValueSet> CreateValueSets<TValueSet>(Parameter parameterToOverride, IList<string> initializationCollection) where TValueSet : ParameterValueSetBase, new()
+        {
+            var valueSets = new List<TValueSet>();
+
+            if (parameterToOverride.IsOptionDependent && this.selectedOption != null)
+            {
+                foreach (Option option in this.hubController.OpenIteration.Option)
+                {
+                    if (parameterToOverride.StateDependence != null)
+                    {
+                        valueSets.AddRange(parameterToOverride
+                            .StateDependence.ActualState
+                            .Select(actualFiniteState => 
+                                this.CreateValueSet<TValueSet>(parameterToOverride, initializationCollection, option, actualFiniteState)));
+                    }
+                    else
+                    {
+                        valueSets.Add(this.CreateValueSet<TValueSet>(parameterToOverride, initializationCollection, option));
+                    }
+                }
+            }
+            else if (parameterToOverride.StateDependence != null && this.selectedActualFiniteState != null)
+            {
+                valueSets.AddRange(parameterToOverride
+                    .StateDependence.ActualState
+                    .Select(actualFiniteState =>
+                        this.CreateValueSet<TValueSet>(parameterToOverride, initializationCollection, null, actualFiniteState)));
+            }
+            else
+            {
+                valueSets.Add(this.CreateValueSet<TValueSet>(parameterToOverride, initializationCollection));
+            }
+
+            return valueSets;
+        }
+
+        private TValueSet CreateValueSet<TValueSet>(Parameter parameter, IList<string> initializationCollection, Option option = null,
+            ActualFiniteState actualFiniteState = null) 
+            where TValueSet : ParameterValueSetBase
+        {
+            if (typeof(TValueSet) == typeof(ParameterValueSet))
+            {
+                return this.CreateParameterValueSet(initializationCollection, option, actualFiniteState) as TValueSet;
+            }
+            else if (typeof(TValueSet) == typeof(ParameterOverrideValueSet))
+            {
+                return this.CreateParameterOverrideValueSet(parameter, initializationCollection, option, actualFiniteState) as TValueSet;
+            }
+
+            return default(TValueSet);
+        }
+
+        /// <summary>
+        /// Creates a <see cref="ParameterOverrideValueSet"/> based on the 
+        /// </summary>
+        /// <param name="parameterToOverride"></param>
+        /// <param name="initializationCollection"></param>
+        /// <param name="option"></param>
+        /// <param name="actualFiniteState"></param>
+        /// <returns></returns>
+        private ParameterOverrideValueSet CreateParameterOverrideValueSet(Parameter parameterToOverride,
+            IList<string> initializationCollection, Option option = null, ActualFiniteState actualFiniteState = null)
+        {
+            return new (Guid.Empty, this.hubController.Session.Assembler.Cache, new Uri(this.hubController.Session.DataSourceUri))
+            {
+                ParameterValueSet = (ParameterValueSet)parameterToOverride?.QueryParameterBaseValueSet(option, actualFiniteState),
+                Computed = new ValueArray<string>(initializationCollection),
+                Formula = new ValueArray<string>(initializationCollection),
+                Manual = new ValueArray<string>(initializationCollection),
+                Reference = new ValueArray<string>(initializationCollection),
+                Published = new ValueArray<string>(initializationCollection)
+            };
+        }
+
+
+        private ParameterValueSet CreateParameterValueSet(IList<string> initializationCollection, Option option = null,
+            ActualFiniteState actualFiniteState = null)
+        {
+            return new(Guid.Empty, this.hubController.Session.Assembler.Cache, new Uri(this.hubController.Session.DataSourceUri))
+            {
+                ActualState = actualFiniteState,
+                ActualOption = option,
+                Computed = new ValueArray<string>(initializationCollection),
+                Formula = new ValueArray<string>(initializationCollection),
+                Manual = new ValueArray<string>(initializationCollection),
+                Reference = new ValueArray<string>(initializationCollection),
+                Published = new ValueArray<string>(initializationCollection)
+            };
         }
 
         /// <summary>
@@ -618,7 +697,34 @@ namespace DEHCATIA.MappingRules
         /// <param name="values">The collection of string to assign to the <paramref name="parameter"/></param>
         private void UpdateValueSet(ParameterBase parameter, IEnumerable<string> values)
         {
-            var valueSet = parameter.QueryParameterBaseValueSet(this.selectedOption, this.selectedActualFiniteState);
+            var option = default(Option);
+            var actualFiniteState = default(ActualFiniteState);
+
+            if (parameter.IsOptionDependent)
+            {
+                if (this.selectedOption != null)
+                {
+                    option = this.selectedOption;
+                }
+                else
+                {
+                    Logger.Warn($"Unable to update the option dependent parameter {parameter.ModelCode()} when no option has been selected");
+                    return;
+                }
+            }
+
+            if (parameter.StateDependence != null)
+            {
+                if (this.selectedActualFiniteState == null || parameter.StateDependence.ActualState.All(x => x.Iid != this.selectedActualFiniteState.Iid))
+                {
+                    Logger.Warn($"Unable to update the state dependent parameter {parameter.ModelCode()} with the actual finite state {this.selectedActualFiniteState} selected");
+                    return;
+                }
+            }
+            
+            actualFiniteState = this.selectedActualFiniteState;
+            
+            var valueSet = parameter.QueryParameterBaseValueSet(option, actualFiniteState);
 
             ((ParameterValueSetBase)valueSet).Computed = new ValueArray<string>(values);
 
