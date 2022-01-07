@@ -321,6 +321,7 @@ namespace DEHCATIA.DstController
                 mappingFound = true;
                 this.readyToMapHubElements.AddRange(mappedElementRowViewModels);
             }
+
             if (!mappingFound)
             {
                 this.statusBar.Append($"No applicable mapping has been found in the selected mapping configuration", StatusBarMessageSeverity.Warning);
