@@ -573,42 +573,65 @@ namespace DEHCATIA.MappingRules
             return parameter;
         }
 
-        private IEnumerable<TValueSet> CreateValueSets<TValueSet>(Parameter parameterToOverride, IList<string> initializationCollection) where TValueSet : ParameterValueSetBase, new()
+        /// <summary>
+        /// Creates all the <typeparamref name="TValueSet"/>s from the <paramref name="initializationCollection"/> for the given <paramref name="parameter"/>
+        /// taking care of respecting the parameter option dependencies and the state dependencies of the <paramref name="parameter"/>
+        /// </summary>
+        /// <typeparam name="TValueSet">The type of value set to create</typeparam>
+        /// <param name="parameter">The <see cref="Parameter"/>, if the <typeparamref name="TValueSet"/> is <see cref="ParameterOverrideValueSet"/>
+        /// then the <paramref name="parameter"/> is used to retrieve the <see cref="IValueSet"/> to override</param>
+        /// <param name="initializationCollection">The collection of default value where the count of value
+        /// matches the number of value of the <see cref="ParameterType"/></param>
+        /// <returns>A collection of <typeparamref name="TValueSet"/></returns>
+        private IEnumerable<TValueSet> CreateValueSets<TValueSet>(Parameter parameter, IList<string> initializationCollection) 
+            where TValueSet : ParameterValueSetBase, new()
         {
             var valueSets = new List<TValueSet>();
 
-            if (parameterToOverride.IsOptionDependent && this.selectedOption != null)
+            if (parameter.IsOptionDependent && this.selectedOption != null)
             {
                 foreach (Option option in this.hubController.OpenIteration.Option)
                 {
-                    if (parameterToOverride.StateDependence != null)
+                    if (parameter.StateDependence != null)
                     {
-                        valueSets.AddRange(parameterToOverride
+                        valueSets.AddRange(parameter
                             .StateDependence.ActualState
                             .Select(actualFiniteState => 
-                                this.CreateValueSet<TValueSet>(parameterToOverride, initializationCollection, option, actualFiniteState)));
+                                this.CreateValueSet<TValueSet>(parameter, initializationCollection, option, actualFiniteState)));
                     }
                     else
                     {
-                        valueSets.Add(this.CreateValueSet<TValueSet>(parameterToOverride, initializationCollection, option));
+                        valueSets.Add(this.CreateValueSet<TValueSet>(parameter, initializationCollection, option));
                     }
                 }
             }
-            else if (parameterToOverride.StateDependence != null && this.selectedActualFiniteState != null)
+            else if (parameter.StateDependence != null && this.selectedActualFiniteState != null)
             {
-                valueSets.AddRange(parameterToOverride
+                valueSets.AddRange(parameter
                     .StateDependence.ActualState
                     .Select(actualFiniteState =>
-                        this.CreateValueSet<TValueSet>(parameterToOverride, initializationCollection, null, actualFiniteState)));
+                        this.CreateValueSet<TValueSet>(parameter, initializationCollection, null, actualFiniteState)));
             }
             else
             {
-                valueSets.Add(this.CreateValueSet<TValueSet>(parameterToOverride, initializationCollection));
+                valueSets.Add(this.CreateValueSet<TValueSet>(parameter, initializationCollection));
             }
 
             return valueSets;
         }
 
+        /// <summary>
+        /// Creates a new <typeparamref name="TValueSet"/> from the <paramref name="initializationCollection"/> for the given <paramref name="option"/>
+        /// and <paramref name="actualFiniteState"/>
+        /// </summary>
+        /// <typeparam name="TValueSet">The type of value set to create</typeparam>
+        /// <param name="parameter">The <see cref="Parameter"/>, if the <typeparamref name="TValueSet"/> is <see cref="ParameterOverrideValueSet"/>
+        /// then the <paramref name="parameter"/> is used to retrieve the <see cref="IValueSet"/> to override</param>
+        /// <param name="initializationCollection">The collection of default value where the count of value
+        /// matches the number of value of the <see cref="ParameterType"/></param>
+        /// <param name="option">The optional <see cref="Option"/> if the target <see cref="ParameterOverride"/> is option dependent</param>
+        /// <param name="actualFiniteState">The optional <see cref="ActualFiniteState"/> if the target <see cref="ParameterOverride"/> is state dependent</param>
+        /// <returns>A new <typeparamref name="TValueSet"/></returns>
         private TValueSet CreateValueSet<TValueSet>(Parameter parameter, IList<string> initializationCollection, Option option = null,
             ActualFiniteState actualFiniteState = null) 
             where TValueSet : ParameterValueSetBase
@@ -622,17 +645,19 @@ namespace DEHCATIA.MappingRules
                 return this.CreateParameterOverrideValueSet(parameter, initializationCollection, option, actualFiniteState) as TValueSet;
             }
 
-            return default(TValueSet);
+            return default;
         }
 
         /// <summary>
-        /// Creates a <see cref="ParameterOverrideValueSet"/> based on the 
+        /// Creates a new <see cref="ParameterOverrideValueSet"/> from the <paramref name="initializationCollection"/> for the given <paramref name="option"/>
+        /// and <paramref name="actualFiniteState"/>
         /// </summary>
-        /// <param name="parameterToOverride"></param>
-        /// <param name="initializationCollection"></param>
-        /// <param name="option"></param>
-        /// <param name="actualFiniteState"></param>
-        /// <returns></returns>
+        /// <param name="parameterToOverride">The overriden <see cref="Parameter"/> to get the overriden <see cref="ParameterValueSet"/></param>
+        /// <param name="initializationCollection">The collection of default value where the count of value
+        /// matches the number of value of the <see cref="ParameterType"/></param>
+        /// <param name="option">The optional <see cref="Option"/> if the target <see cref="ParameterOverride"/> is option dependent</param>
+        /// <param name="actualFiniteState">The optional <see cref="ActualFiniteState"/> if the target <see cref="ParameterOverride"/> is state dependent</param>
+        /// <returns>A <see cref="ParameterOverrideValueSet"/></returns>
         private ParameterOverrideValueSet CreateParameterOverrideValueSet(Parameter parameterToOverride,
             IList<string> initializationCollection, Option option = null, ActualFiniteState actualFiniteState = null)
         {
@@ -647,7 +672,15 @@ namespace DEHCATIA.MappingRules
             };
         }
 
-
+        /// <summary>
+        /// Creates a new <see cref="ParameterValueSet"/> from the <paramref name="initializationCollection"/> for the given <paramref name="option"/>
+        /// and <paramref name="actualFiniteState"/>
+        /// </summary>
+        /// <param name="initializationCollection">The collection of default value where the count of value
+        /// matches the number of value of the <see cref="ParameterType"/></param>
+        /// <param name="option">The optional <see cref="Option"/> if the target <see cref="Parameter"/> is option dependent</param>
+        /// <param name="actualFiniteState">The optional <see cref="ActualFiniteState"/> if the target <see cref="Parameter"/> is state dependent</param>
+        /// <returns>A <see cref="ParameterValueSet"/></returns>
         private ParameterValueSet CreateParameterValueSet(IList<string> initializationCollection, Option option = null,
             ActualFiniteState actualFiniteState = null)
         {

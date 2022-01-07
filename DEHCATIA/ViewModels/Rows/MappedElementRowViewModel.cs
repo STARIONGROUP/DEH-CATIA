@@ -179,7 +179,6 @@ namespace DEHCATIA.ViewModels.Rows
 
         /// <summary>
         /// Updates the <see cref="HasHubElementAnyOptionDependentParameter"/> and the <see cref="HasHubElementAnyStateDependentParameter"/> properties
-        /// based on the type of the dependencies of the provided <paramref name="element"/>
         /// </summary>
         private void UpadateActualFiniteStatesAndOptionsAvailability()
         {
@@ -192,17 +191,6 @@ namespace DEHCATIA.ViewModels.Rows
             {
                 this.HasHubElementAnyOptionDependentParameter = element.HasAnyDependencyOnOption();
                 this.HasHubElementAnyStateDependentParameter = element.HasAnyDependencyOnActualFiniteState();
-
-                //(this.HasHubElementAnyOptionDependentParameter, this.HasHubElementAnyStateDependentParameter) = element switch
-                //{
-                //    ElementDefinition elementDefinition => ((this.CatiaElement != null || this.CatiaParent != null)
-                //        && elementDefinition.Parameter.Any(x => x.IsOptionDependent), elementDefinition.Parameter.Any(x => x.StateDependence != null)),
-
-                //    ElementUsage elementUsage => ((this.CatiaElement != null || this.CatiaParent != null)
-                //        && elementUsage.ParameterOverride.Any(x => x.IsOptionDependent), elementUsage.ParameterOverride.Any(x => x.StateDependence != null)),
-
-                //    _ => throw new ArgumentOutOfRangeException(nameof(element), element, $"{nameof(element)} is of type {element.GetType().Name} wich is not handled at this point")
-                //};
             }
         }
 
