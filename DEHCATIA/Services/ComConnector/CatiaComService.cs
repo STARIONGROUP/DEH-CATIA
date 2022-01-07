@@ -585,7 +585,7 @@ namespace DEHCATIA.Services.ComConnector
         /// </summary>
         /// <param name="analyzeOrInertia">the object where to receive data from</param>
         /// <returns>The moments of inertia</returns>
-        private MomentOfInertiaParameterViewModel GetMomentOfInertia(AnyObject analyzeOrInertia)
+        public MomentOfInertiaParameterViewModel GetMomentOfInertia(AnyObject analyzeOrInertia)
         {
             var array = new dynamic[9];
             var values = new double[9];
@@ -727,7 +727,7 @@ namespace DEHCATIA.Services.ComConnector
         /// Attempts to update the material property
         /// </summary>
         /// <param name="mappedElement">The <see cref="MappedElementRowViewModel"/></param>
-        private void UpdateMaterial(MappedElementRowViewModel mappedElement)
+        public void UpdateMaterial(MappedElementRowViewModel mappedElement)
         {
             this.UpdateMaterial(mappedElement.CatiaElement.MaterialName, 
                 () => this.materialService.TryRemoveMaterial(mappedElement.CatiaElement.GetProduct()),

@@ -62,7 +62,7 @@
         </Grid>
     </dx:LoadingDecorator>
     <dx:DXDialogWindow.FooterButtons>
-        <dx:DialogButton ToolTip="Connect to the running Catia instance" Content="Proceed"
+        <dx:DialogButton ToolTip="Connect to the running Catia instance" Content="Proceed" IsDefault="True"
                          Command="{Binding ConnectCommand}" MinWidth="65" DialogResult="OK"/>
         <dx:DialogButton ToolTip="Cancel connection to Catia" IsDefault="True" Content="Cancel" IsCancel="True" MinWidth="65" DialogResult="Cancel"/>
     </dx:DXDialogWindow.FooterButtons>

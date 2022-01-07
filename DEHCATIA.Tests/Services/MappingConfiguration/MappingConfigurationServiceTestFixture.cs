@@ -230,7 +230,7 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
 
             var mappedRows = new List<MappedElementRowViewModel>();
             Assert.DoesNotThrow(() => mappedRows = this.service.LoadMappingFromHubToDst(this.elements));
-            ElementBase element = null;
+            Thing element = null;
             this.hubController.Setup(x => x.GetThingById(It.IsAny<Guid>(), It.IsAny<Iteration>(), out element));
             Assert.DoesNotThrow(() => mappedRows = this.service.LoadMappingFromHubToDst(this.elements));
 
@@ -283,7 +283,7 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
 
             Assert.DoesNotThrow(() => this.service.PersistExternalIdentifierMap(transactionMock.Object, iteration));
 
-            Assert.AreEqual(1, iteration.ExternalIdentifierMap.Count);
+            Assert.AreEqual(2, iteration.ExternalIdentifierMap.Count);
             transactionMock.Verify(x => x.CreateOrUpdate(It.IsAny<Thing>()), Times.Exactly(6));
         }
     }

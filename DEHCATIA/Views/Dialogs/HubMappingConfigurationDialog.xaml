@@ -262,10 +262,28 @@
                                                         <Grid.RowDefinitions>
                                                             <RowDefinition Height="Auto" />
                                                             <RowDefinition Height="Auto" />
-                                                            <RowDefinition Height="Auto" />
                                                         </Grid.RowDefinitions>
-                                                        <TextBlock Grid.Row="0" Height="Auto" Margin="3" FontSize="10" FontWeight="Normal" Text="Element: " />
-                                                        <TextBlock Grid.Row="1" Height="Auto" Margin="3" FontSize="10" Text="{Binding HubElement.Name}"  TextTrimming="CharacterEllipsis"/>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                                            <ColumnDefinition Width="auto"></ColumnDefinition>
+                                                            <ColumnDefinition Width="auto"></ColumnDefinition>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" Height="Auto" Margin="3" FontSize="10" FontWeight="Normal" Text="Element: " />
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" Height="Auto" Margin="3" FontSize="10" Text="{Binding HubElement.Name}" TextTrimming="CharacterEllipsis"/>
+                                                        <dxdo:LabelItem  Visibility="{Binding HasHubElementAnyOptionDependentParameter, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                                         Grid.Row="0" Grid.Column="1"  FontSize="10" HorizontalAlignment="Center">Option</dxdo:LabelItem>
+                                                        <dxe:ComboBoxEdit Visibility="{Binding HasHubElementAnyOptionDependentParameter, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                                          ItemsSource="{Binding ElementName=Mapping, Path=DataContext.AvailableOptions}" 
+                                                                          SelectedItem="{Binding CatiaElement.SelectedOption}" Margin="5"
+                                                                          DisplayMember="Name" MinWidth="150" Grid.Row="1" Grid.Column="1" AllowNullInput="False"
+                                                                          ToolTip="Select an Option to use for any contained parameter that is option dependent"></dxe:ComboBoxEdit>
+                                                        <dxdo:LabelItem  Visibility="{Binding HasHubElementAnyStateDependentParameter, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                                         Grid.Row="0" Grid.Column="2"  FontSize="10" HorizontalAlignment="Center">Actual Finite State</dxdo:LabelItem>
+                                                        <dxe:ComboBoxEdit  Visibility="{Binding HasHubElementAnyStateDependentParameter, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                                           ItemsSource="{Binding AvailableActualFiniteStates}" 
+                                                                           SelectedItem="{Binding CatiaElement.SelectedActualFiniteState}" Margin="5"
+                                                                           DisplayMember="Name" MinWidth="150" Grid.Row="1" Grid.Column="2" AllowNullInput="False"
+                                                                           ToolTip="Select an Actual Finite State to use for any contained parameter that is state dependent"></dxe:ComboBoxEdit>
                                                     </Grid>
                                                 </Border>
                                                 <Path Grid.Column="1" MaxHeight="15" HorizontalAlignment="Stretch" Data="M 0,110 110,110 110,90 120,120 110,150 110,130 0,130 Z" RenderTransformOrigin=".5,.5" Stretch="Fill" Style="{StaticResource PathArrowStyle}" />
