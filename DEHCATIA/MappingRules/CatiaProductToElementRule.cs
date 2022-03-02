@@ -554,7 +554,6 @@ namespace DEHCATIA.MappingRules
             else
             {
                 var initializationCollection = this.CreateValueArrayInitializationCollection(valueLength);
-
                 var parameterToOverride = this.GetParameter(parameterType, parameterType.ShortName, elementDefinition, valueLength);
 
                 parameterToOverride = parameterToOverride.Original != null ? (Parameter)parameterToOverride.Original : parameterToOverride;

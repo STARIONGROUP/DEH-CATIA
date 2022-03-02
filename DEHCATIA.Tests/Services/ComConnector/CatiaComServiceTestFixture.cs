@@ -64,7 +64,7 @@ namespace DEHCATIA.Tests.Services.ComConnector
     using ProductStructureTypeLib;
 
     using SPATypeLib;
-
+  
     using File = System.IO.File;
     using Parameter = KnowledgewareTypeLib.Parameter;
 
@@ -256,7 +256,7 @@ namespace DEHCATIA.Tests.Services.ComConnector
 
             mockedTemplateService.Setup(x =>
                 x.TryInstallTemplate(It.IsAny<MappedElementRowViewModel>(), It.IsAny<string>())).Returns(true);
-            
+
             Task.WhenAll(
                 Task.Run(() => Assert.DoesNotThrow(() => this.service.AddOrUpdateElement(element1))),
                 Task.Run(async () =>

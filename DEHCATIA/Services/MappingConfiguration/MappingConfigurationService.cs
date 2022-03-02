@@ -33,6 +33,7 @@ namespace DEHCATIA.Services.MappingConfiguration
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Common.Types;
 
     using CDP4Dal.Operations;
@@ -42,6 +43,7 @@ namespace DEHCATIA.Services.MappingConfiguration
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using DEHCATIA.DstController;
+
     using DEHCATIA.Extensions;
     using DEHCATIA.Services.ParameterTypeService;
     using DEHCATIA.ViewModels.ProductTree.Rows;

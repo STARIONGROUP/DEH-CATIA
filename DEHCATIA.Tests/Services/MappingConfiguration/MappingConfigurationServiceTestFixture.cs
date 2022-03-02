@@ -230,6 +230,7 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
 
             var mappedRows = new List<MappedElementRowViewModel>();
             Assert.DoesNotThrow(() => mappedRows = this.service.LoadMappingFromHubToDst(this.elements));
+
             Thing element = null;
             this.hubController.Setup(x => x.GetThingById(It.IsAny<Guid>(), It.IsAny<Iteration>(), out element));
             Assert.DoesNotThrow(() => mappedRows = this.service.LoadMappingFromHubToDst(this.elements));
