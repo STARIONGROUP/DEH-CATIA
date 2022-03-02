@@ -303,7 +303,7 @@ namespace DEHCATIA.DstController
         /// </summary>
         public void LoadMapping()
         {
-            this.statusBar.Append($"Loading the mapping configuration in progress"); 
+            this.statusBar.Append($"Loading the mapping configuration in progress");
             _ = this.mappingConfigurationService.LoadMappingFromDstToHub(new List<ElementRowViewModel>() { this.ProductTree });
 
             var mappingFound = false;
@@ -315,9 +315,12 @@ namespace DEHCATIA.DstController
             }
 
             var mappedElementRowViewModels = this.mappingConfigurationService.LoadMappingFromHubToDst(new List<ElementRowViewModel>() { this.ProductTree });
-            mappingFound |= mappedElementRowViewModels.Any();
-            this.readyToMapHubElements.AddRange(mappedElementRowViewModels);
-            
+
+            if (mappedElementRowViewModels?.Any() == true)
+            {
+                mappingFound = true;
+                this.readyToMapHubElements.AddRange(mappedElementRowViewModels);
+            }
             if (!mappingFound)
             {
                 this.statusBar.Append($"No applicable mapping has been found in the selected mapping configuration", StatusBarMessageSeverity.Warning);
@@ -591,18 +594,25 @@ namespace DEHCATIA.DstController
         {
             foreach (var parameter in parameters)
             {
-                this.hubController.GetThingById(parameter.Iid, this.hubController.OpenIteration, out Parameter newParameter);
-
-                var newParameterCloned = newParameter.Clone(false);
-
-                for (var index = 0; index < parameter.ValueSet.Count; index++)
+                try
                 {
-                    var clone = newParameterCloned.ValueSet[index].Clone(false);
-                    this.UpdateValueSet(clone, parameter.ValueSet[index]);
-                    transaction.CreateOrUpdate(clone);
-                }
+                    this.hubController.GetThingById(parameter.Iid, this.hubController.OpenIteration, out Parameter newParameter);
 
-                transaction.CreateOrUpdate(newParameterCloned);
+                    var newParameterCloned = newParameter.Clone(false);
+
+                    for (var index = 0; index < parameter.ValueSet.Count; index++)
+                    {
+                        var clone = newParameterCloned.ValueSet[index].Clone(false);
+                        this.UpdateValueSet(clone, parameter.ValueSet[index]);
+                        transaction.CreateOrUpdate(clone);
+                    }
+
+                    transaction.CreateOrUpdate(newParameterCloned);
+                }
+                catch (Exception e)
+                {
+                    this.logger.Error(e);
+                }
             }
         }
 

@@ -53,8 +53,8 @@ namespace DEHCATIA.Tests.Services.CatiaTemplateService
         [SetUp]
         public void Setup()
         {
-            this.templateDirectory = CatiaTemplateService.TemplateDirectory;
-
+            this.templateDirectory = CatiaTemplateService.TemplateDirectory;//new DirectoryInfo(TestContext.CurrentContext.TestDirectory);
+            
             this.enumerationParameterType = new EnumerationParameterType(Guid.NewGuid(), null, null)
             {
                 ValueDefinition =
@@ -82,7 +82,7 @@ namespace DEHCATIA.Tests.Services.CatiaTemplateService
 
             this.service = new CatiaTemplateService();
         }
-
+        
         [TearDown]
         public void Teardown()
         {
@@ -122,7 +122,7 @@ namespace DEHCATIA.Tests.Services.CatiaTemplateService
         [Test]
         public void VerifyAreAllTemplatesAvailable()
         {
-            Assert.IsFalse(this.service.AreAllTemplatesAvailable());
+            Assert.IsTrue(this.service.AreAllTemplatesAvailable());
 
             this.templateDirectory.Create();
             var sortedTemplateDirectory = this.templateDirectory.CreateSubdirectory("3dTemplates");

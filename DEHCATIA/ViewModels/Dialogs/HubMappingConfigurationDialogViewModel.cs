@@ -130,7 +130,12 @@ namespace DEHCATIA.ViewModels.Dialogs
         /// <summary>
         /// The collection of mapped <see cref="ElementBase"/> with the target <see cref="ElementRowViewModel"/>
         /// </summary>
-        public ReactiveList<MappedElementRowViewModel> MappedElements { get; } = new ReactiveList<MappedElementRowViewModel>();
+        public ReactiveList<MappedElementRowViewModel> MappedElements { get; } = new ();
+
+        /// <summary>
+        /// Gets the collection of available <see cref="Option"/>
+        /// </summary>
+        public ReactiveList<Option> AvailableOptions => new (this.HubController.OpenIteration.Option);
 
         /// <summary>
         /// Initializes a new <see cref="MappingConfigurationDialogViewModel"/>
@@ -160,11 +165,23 @@ namespace DEHCATIA.ViewModels.Dialogs
                     var mappedElement = this.MappedElements.Where(x => x.IsValid is true).ToList();
                     
                     this.DstController.Map(mappedElement);
-                    this.StatusBar.Append($"Mapping in progress of {mappedElement.Count()} element(s)...");
+                    this.StatusBar.Append($"Mapping in progress of {mappedElement.Count} element(s)...");
                 }));
 
             this.WhenAnyValue(x => x.SelectedDstElement)
-                .Subscribe(x => this.SelectedMappedElement?.UpdateTheCatiaElement(x));
+                .Subscribe(elementRowViewModel =>
+                {
+                    this.SelectedMappedElement?.UpdateTheCatiaElement(elementRowViewModel);
+
+                    if (elementRowViewModel != null)
+                    {
+                        elementRowViewModel.SelectedActualFiniteState ??= this.SelectedMappedElement?.AvailableActualFiniteStates.FirstOrDefault(x => x.IsDefault)
+                                                                          ?? this.SelectedMappedElement?.AvailableActualFiniteStates.FirstOrDefault();
+
+                        elementRowViewModel.SelectedOption ??= this.AvailableOptions.FirstOrDefault(x => x.IsDefault) 
+                                                               ?? this.AvailableOptions.FirstOrDefault();
+                    }
+                });
 
             this.WhenAnyValue(x => x.SelectedHubThing)
                 .Subscribe(_ => this.WhenTheSelectedHubElementChanges());
@@ -175,19 +192,6 @@ namespace DEHCATIA.ViewModels.Dialogs
                 .Subscribe(this.DeleteMappedRowCommandExecute);
 
             this.MappedElements.ItemChanged.Subscribe(x => this.CheckCanContinue());
-        }
-
-        /// <summary>
-        /// Verifies validity for all <see cref="MappedElements"/>
-        /// </summary>
-        private void VerifyValidityOfAllRow()
-        {
-            foreach (var mappedElementRowViewModel in this.MappedElements)
-            {
-                mappedElementRowViewModel.VerifyValidity(this.MappedElements.Count(x => x.CatiaElement != null
-                                                                                        && mappedElementRowViewModel.CatiaElement != null
-                                                                                        && x.CatiaElement == mappedElementRowViewModel.CatiaElement));
-            }
         }
 
         /// <summary>
@@ -203,8 +207,7 @@ namespace DEHCATIA.ViewModels.Dialogs
                 this.logger.Info($"No MappedElement has been found with the Iid: {iid}");
                 return;
             }
-
-            CDPMessageBus.Current.SendMessage(new SelectEvent(mappedElement.HubElement, true));
+            
             this.MappedElements.Remove(mappedElement);
             this.CheckCanContinue();
         }
@@ -258,8 +261,7 @@ namespace DEHCATIA.ViewModels.Dialogs
         /// </summary>
         private void CheckCanContinue()
         {
-            this.VerifyValidityOfAllRow();
-            this.CanContinue = this.MappedElements.All(x => x.IsValid is true);
+            this.CanContinue = this.MappedElements.Any() && this.MappedElements.All(x => x.IsValid is true);
         }
     }
 }

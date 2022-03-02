@@ -25,16 +25,24 @@
 namespace DEHCATIA.ViewModels.Rows
 {
     using System;
+    using System.Collections;
+    using System.Linq;
 
     using CDP4Common.EngineeringModelData;
 
     using CDP4Dal;
 
+    using DEHCATIA.Extensions;
     using DEHCATIA.ViewModels.ProductTree.Rows;
 
     using DEHPCommon.Events;
+    using DEHPCommon.Mvvm;
+
+    using DevExpress.Xpo.Logger;
 
     using ReactiveUI;
+
+    using LogManager = NLog.LogManager;
 
     /// <summary>
     /// Represents a collection of <see cref="ParameterOrOverrideBase"/> from the Hub source and a <see cref="HubElement"/> to update
@@ -54,7 +62,47 @@ namespace DEHCATIA.ViewModels.Rows
             get => this.hubElement;
             set => this.RaiseAndSetIfChanged(ref this.hubElement, value);
         }
-        
+
+        /// <summary>
+        /// Backing field for <see cref="HasHubElementAnyOptionDependentParameter"/>
+        /// </summary>
+        private bool hasHubElementAnyOptionDependentParameter;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the <see cref="HubElement"/> has any <see cref="Option"/> dependency <see cref="Parameter"/>
+        /// </summary>
+        public bool HasHubElementAnyOptionDependentParameter
+        {
+            get => this.hasHubElementAnyOptionDependentParameter;
+            set => this.RaiseAndSetIfChanged(ref this.hasHubElementAnyOptionDependentParameter, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="HasHubElementAnyStateDependentParameter"/>
+        /// </summary>
+        private bool hasHubElementAnyStateDependentParameter;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the <see cref="HubElement"/> has any <see cref="ActualFiniteState"/> dependency <see cref="Parameter"/>
+        /// </summary>
+        public bool HasHubElementAnyStateDependentParameter
+        {
+            get => this.hasHubElementAnyStateDependentParameter;
+            set => this.RaiseAndSetIfChanged(ref this.hasHubElementAnyStateDependentParameter, value);
+        }
+
+        /// <summary>
+        /// Gets the collection of available <see cref="ActualFiniteState"/>
+        /// </summary>
+        public ReactiveList<ActualFiniteState> AvailableActualFiniteStates => this.HubElement switch
+        {
+            ElementDefinition elementDefinition => new ReactiveList<ActualFiniteState>(elementDefinition.Parameter.Where(x => x.StateDependence != null)
+                .SelectMany(x => x.StateDependence?.ActualState).Distinct()),
+            ElementUsage elementUsage => new ReactiveList<ActualFiniteState>(elementUsage.ParameterOverride.Where(x => x.StateDependence != null)
+                .SelectMany(x => x.StateDependence?.ActualState).Distinct()),
+            _ => new ReactiveList<ActualFiniteState>()
+        };
+
         /// <summary>
         /// Backing field for <see cref="HubElement"/>
         /// </summary>
@@ -120,9 +168,30 @@ namespace DEHCATIA.ViewModels.Rows
                     x => x.CatiaElement, 
                     x => x.CatiaParent)
                 .Subscribe(_ => this.VerifyValidity());
+            
+            _ = this.WhenAnyValue(x => x.CatiaElement,
+                    x => x.CatiaParent)
+                .Subscribe(_ => this.UpadateActualFiniteStatesAndOptionsAvailability());
 
             this.WhenAnyValue(x => x.ShouldCreateNewElement)
                 .Subscribe(_ => this.UpdateTheCatiaElement(this.CatiaElement ?? this.CatiaParent));
+        }
+
+        /// <summary>
+        /// Updates the <see cref="HasHubElementAnyOptionDependentParameter"/> and the <see cref="HasHubElementAnyStateDependentParameter"/> properties
+        /// </summary>
+        private void UpadateActualFiniteStatesAndOptionsAvailability()
+        {
+            if (this.HubElement is not { } element || !(this.CatiaElement != null || this.CatiaParent != null))
+            {
+                this.HasHubElementAnyOptionDependentParameter = false;
+                this.HasHubElementAnyStateDependentParameter = false;
+            }
+            else
+            {
+                this.HasHubElementAnyOptionDependentParameter = element.HasAnyDependencyOnOption();
+                this.HasHubElementAnyStateDependentParameter = element.HasAnyDependencyOnActualFiniteState();
+            }
         }
 
         /// <summary>
@@ -131,41 +200,47 @@ namespace DEHCATIA.ViewModels.Rows
         /// <param name="element">The <see cref="ElementRowViewModel"/></param>
         public void UpdateTheCatiaElement(ElementRowViewModel element)
         {
-            if (this.ShouldCreateNewElement)
+            try
             {
-                this.CatiaParent = element;
-                this.CatiaElement = null;
-            }
-            else
-            {
-                if (element is UsageRowViewModel && this.HubElement is ElementUsage
-                    || element is DefinitionRowViewModel && this.HubElement is ElementDefinition)
+                if (this.ShouldCreateNewElement)
                 {
-                    this.CatiaParent = null;
-                    this.CatiaElement = element;
+                    this.CatiaParent = element;
+                    this.CatiaElement = null;
                 }
+                else
+                {
+                    if (element is UsageRowViewModel && this.HubElement is ElementUsage
+                        || element is DefinitionRowViewModel && this.HubElement is ElementDefinition)
+                    {
+                        this.CatiaParent = null;
+                        this.CatiaElement = element;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                LogManager.GetCurrentClassLogger().Error(e);
             }
         }
 
         /// <summary>
         /// Verify validity of the this <see cref="MappedElementRowViewModel"/>
         /// </summary>
-        /// <param name="countOfExisting">Optionally the number of existing mapped element to the same <see cref="CatiaElement"/></param>
-        public void VerifyValidity(int countOfExisting = 0)
+        public void VerifyValidity()
         {
-            this.IsValid = countOfExisting < 2 
-                           && this.HubElement != null 
+            this.IsValid = this.HubElement != null 
                            && (!this.ShouldCreateNewElement && this.CatiaElement != null 
                                || this.ShouldCreateNewElement && this.CatiaParent != null);
+            
+            this.IsValid &= !this.HasHubElementAnyStateDependentParameter ||
+                            this.HasHubElementAnyStateDependentParameter && (this.catiaElement ?? this.CatiaParent)?.SelectedActualFiniteState != null;
+
+            this.IsValid &= !this.HasHubElementAnyOptionDependentParameter ||
+                            this.HasHubElementAnyOptionDependentParameter && (this.catiaElement ?? this.CatiaParent)?.SelectedOption != null;
 
             if (this.CatiaElement is null && this.CatiaParent is null)
             {
                 this.IsValid = null;
-            }
-
-            if (this.HubElement != null)
-            {
-                CDPMessageBus.Current.SendMessage(new SelectEvent(this.HubElement, this.IsValid != true));
             }
         }
     }

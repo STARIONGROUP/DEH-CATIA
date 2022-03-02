@@ -28,6 +28,7 @@ namespace DEHCATIA.Tests.Services.ComConnector
     using System.Collections;
     using System.IO;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -47,6 +48,7 @@ namespace DEHCATIA.Tests.Services.ComConnector
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using DevExpress.CodeParser.VB;
+    using DevExpress.DirectX.Common;
     using DevExpress.Mvvm.Native;
 
     using INFITF;
@@ -61,6 +63,8 @@ namespace DEHCATIA.Tests.Services.ComConnector
 
     using ProductStructureTypeLib;
 
+    using SPATypeLib;
+  
     using File = System.IO.File;
     using Parameter = KnowledgewareTypeLib.Parameter;
 
@@ -253,8 +257,6 @@ namespace DEHCATIA.Tests.Services.ComConnector
             mockedTemplateService.Setup(x =>
                 x.TryInstallTemplate(It.IsAny<MappedElementRowViewModel>(), It.IsAny<string>())).Returns(true);
 
-
-
             Task.WhenAll(
                 Task.Run(() => Assert.DoesNotThrow(() => this.service.AddOrUpdateElement(element1))),
                 Task.Run(async () =>
@@ -413,6 +415,71 @@ namespace DEHCATIA.Tests.Services.ComConnector
             Assert.DoesNotThrow(() => this.service.CreateParameter(parameters.Object, shapeKindParameter));
 
             this.exchangeHistory.Verify(x => x.Append(It.IsAny<string>()), Times.Exactly(4));
+        }
+
+        [Test]
+        public void VerifyUpdateMaterial()
+        {
+            this.element.CatiaElement = new UsageRowViewModel(new Mock<Product>().Object, "")
+            {
+                Name = "product.0", MaterialName = "-"
+            };
+
+            Assert.DoesNotThrow(() => this.service.UpdateMaterial(this.element));
+            this.element.CatiaElement.MaterialName = "Grass";
+            Assert.DoesNotThrow(() => this.service.UpdateMaterial(this.element));
+            this.element.CatiaElement.Children.Add(new BodyRowViewModel(new Mock<Body>().Object, "Grass") { Name = "body.0" });
+            Assert.DoesNotThrow(() => this.service.UpdateMaterial(this.element));
+
+            var definitionRowViewModel = new DefinitionRowViewModel(new Mock<Product>().Object, "")
+            {
+                Name = "part.1", MaterialName = "Granite"
+            };
+            
+            Assert.DoesNotThrow(() => this.service.UpdateMaterial(new MappedElementRowViewModel(){ CatiaElement = definitionRowViewModel }));
+
+            this.materialService.Verify(x => x.TryApplyMaterial(It.IsAny<Product>(), It.IsAny<string>()), Times.Exactly(2));
+            this.materialService.Verify(x => x.TryApplyMaterial(It.IsAny<Body>(), It.IsAny<string>()), Times.Exactly(1));
+            this.materialService.Verify(x => x.TryRemoveMaterial(It.IsAny<Product>()), Times.Exactly(1));
+            this.materialService.Verify(x => x.TryRemoveMaterial(It.IsAny<Body>()), Times.Exactly(1));
+        }
+
+        [Test]
+        public void VerifyGetMomentOfInertia()
+        {
+            var analyse = new Mock<Analyze>();
+            var inertia = new Mock<Inertia>();
+
+            var values = new double[] { 1, 0, 4, 9, 5, 6, 2, 52, 3 };
+            var matcher = new dynamic[] {null, null, null, null, null, null, null, null, null};
+
+            analyse.Setup(x => x.GetInertia(matcher)).Callback<dynamic>(x => Array.Copy(values, x, values.Length));
+            inertia.Setup(x => x.GetInertiaMatrix(matcher)).Callback<dynamic>(x => Array.Copy(values, x, values.Length));
+
+            var moi = default(MomentOfInertiaParameterViewModel);
+            
+            Assert.DoesNotThrow(() => moi = this.service.GetMomentOfInertia(analyse.Object));
+
+            Assert.IsTrue(values.Select(x => x * 0.000001).SequenceEqual(moi.Value.Values));
+            
+            analyse.Setup(x => x.GetInertia(matcher)).Throws(new COMException());
+            Assert.DoesNotThrow(() => moi = this.service.GetMomentOfInertia(analyse.Object));
+            Assert.IsNull(moi);
+
+            Assert.DoesNotThrow(() => moi = this.service.GetMomentOfInertia(inertia.Object));
+
+            Assert.IsTrue(values.Select(x => x * 1000d).SequenceEqual(moi.Value.Values));
+
+            inertia.Setup(x => x.GetInertiaMatrix(matcher)).Throws(new COMException());
+            Assert.DoesNotThrow(() => moi = this.service.GetMomentOfInertia(inertia.Object));
+            Assert.IsTrue(new double[] { 0,0,0,0,0,0,0,0,0 }.SequenceEqual(moi.Value.Values));
+
+            Assert.IsNull(this.service.GetMomentOfInertia(new Mock<Product>().Object));
+
+            analyse.Verify(x => x.GetInertia(matcher), Times.Once);
+            analyse.Verify(x => x.GetInertia(values), Times.Once);
+            inertia.Verify(x => x.GetInertiaMatrix(matcher), Times.Once);
+            inertia.Verify(x => x.GetInertiaMatrix(values), Times.Once);
         }
     }
 }

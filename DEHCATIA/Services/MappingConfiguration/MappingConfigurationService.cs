@@ -34,6 +34,8 @@ namespace DEHCATIA.Services.MappingConfiguration
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Common.Types;
+
     using CDP4Dal.Operations;
 
     using DEHPCommon.Enumerators;
@@ -41,6 +43,8 @@ namespace DEHCATIA.Services.MappingConfiguration
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using DEHCATIA.DstController;
+
+    using DEHCATIA.Extensions;
     using DEHCATIA.Services.ParameterTypeService;
     using DEHCATIA.ViewModels.ProductTree.Rows;
     using DEHCATIA.ViewModels.Rows;
@@ -130,7 +134,7 @@ namespace DEHCATIA.Services.MappingConfiguration
 
             this.correspondences.AddRange(this.ExternalIdentifierMap.Correspondence.Select(x =>
             (
-                x.InternalThing, JsonConvert.DeserializeObject<ExternalIdentifier>(x.ExternalId ?? string.Empty), x.Iid
+                x.InternalThing, this.DeserializeExternalIdentifier(x), x.Iid
             )));
 
             this.LoadMaterialParameterType();
@@ -206,20 +210,35 @@ namespace DEHCATIA.Services.MappingConfiguration
                 {
                     continue;
                 }
-                
+
+                var mappedElement = new MappedElementRowViewModel()
+                {
+                    CatiaElement = element
+                };
+
                 foreach (var (internalId, _, _) in idCorrespondences)
                 {
-                    if (!this.hubController.GetThingById(internalId, this.hubController.OpenIteration, out ElementBase hubElement))
+                    if (!this.hubController.GetThingById(internalId, this.hubController.OpenIteration, out Thing hubElement))
                     {
                         continue;
                     }
-              
-                    var mappedElement = new MappedElementRowViewModel()
-                    {
-                        CatiaElement = element,
-                        HubElement = hubElement
-                    };
 
+                    if (hubElement is ElementBase elementBase)
+                    {
+                        mappedElement.HubElement = elementBase;
+                    }
+                    else if (hubElement is Option option && mappedElement.HubElement.HasAnyDependencyOnOption())
+                    {
+                        Application.Current.Dispatcher.Invoke(() => mappedElement.CatiaElement.SelectedOption = option);
+                    }
+                    else if (hubElement is ActualFiniteState actualFiniteState && mappedElement.HubElement.HasAnyDependencyOnActualFiniteState(actualFiniteState))
+                    {
+                        Application.Current.Dispatcher.Invoke(() => mappedElement.CatiaElement.SelectedActualFiniteState = actualFiniteState);
+                    }
+                }
+                
+                if (mappedElement.CatiaElement != null && mappedElement.HubElement != null)
+                {
                     mappedVariables.Add(mappedElement);
                 }
             }
@@ -320,7 +339,7 @@ namespace DEHCATIA.Services.MappingConfiguration
         /// <param name="iterationClone">The <see cref="Iteration"/> clone</param>
         public void PersistExternalIdentifierMap(IThingTransaction transaction, Iteration iterationClone)
         {
-            if (this.ExternalIdentifierMap.Iid == Guid.Empty)
+            if (iterationClone.ExternalIdentifierMap.All(x => x.Iid != this.ExternalIdentifierMap.Iid))
             {
                 this.ExternalIdentifierMap = this.ExternalIdentifierMap.Clone(true);
                 iterationClone.ExternalIdentifierMap.Add(this.ExternalIdentifierMap);
@@ -348,7 +367,8 @@ namespace DEHCATIA.Services.MappingConfiguration
                 Name = newName,
                 ExternalToolName = DstController.ThisToolName,
                 ExternalModelName = newName,
-                Owner = this.hubController.CurrentDomainOfExpertise
+                Owner = this.hubController.CurrentDomainOfExpertise,
+                Iid = Guid.NewGuid()
             };
         }
 
@@ -377,6 +397,28 @@ namespace DEHCATIA.Services.MappingConfiguration
                 Identifier = mappedElement.CatiaElement.Name,
                 MappingDirection = MappingDirection.FromHubToDst
             });
+
+            var selectedActualFiniteState = (mappedElement.CatiaElement ?? mappedElement.CatiaParent).SelectedActualFiniteState;
+
+            if (selectedActualFiniteState != null)
+            {
+                this.AddToExternalIdentifierMap(selectedActualFiniteState.Iid, new ExternalIdentifier
+                {
+                    Identifier = mappedElement.CatiaElement.Name,
+                    MappingDirection = MappingDirection.FromHubToDst
+                });
+            }
+            
+            var selectedOption = (mappedElement.CatiaElement ?? mappedElement.CatiaParent).SelectedOption;
+
+            if (selectedOption != null)
+            {
+                this.AddToExternalIdentifierMap(selectedOption.Iid, new ExternalIdentifier
+                {
+                    Identifier = mappedElement.CatiaElement.Name,
+                    MappingDirection = MappingDirection.FromHubToDst
+                });
+            }
         }
 
         /// <summary>
@@ -438,6 +480,7 @@ namespace DEHCATIA.Services.MappingConfiguration
         /// </summary>
         /// <param name="internalId">The thing that <paramref name="externalIdentifier"/> corresponds to</param>
         /// <param name="externalIdentifier">The external thing that <see cref="internalId"/> corresponds to</param>
+        /// <param name="correspondence">The out <see cref="IdCorrespondence"/></param>
         private bool TryGetExistingCorrespondence(Guid internalId, ExternalIdentifier externalIdentifier, out IdCorrespondence correspondence)
         {
             var (_, _, correspondenceIid) = this.correspondences.FirstOrDefault(x =>
@@ -455,9 +498,9 @@ namespace DEHCATIA.Services.MappingConfiguration
 
             if (this.ExternalIdentifierMap.Correspondence.FirstOrDefault(x => x.InternalThing == internalId) is { } existingCorrespondence)
             {
-                var existingExternalIdentifier = JsonConvert.DeserializeObject<ExternalIdentifier>(existingCorrespondence.ExternalId ?? string.Empty);
+                var existingExternalIdentifier = this.DeserializeExternalIdentifier(existingCorrespondence);
 
-                if (existingExternalIdentifier.Identifier.Equals(externalIdentifier.Identifier)
+                if (existingExternalIdentifier?.Identifier.Equals(externalIdentifier.Identifier) == true
                     && existingExternalIdentifier.MappingDirection == externalIdentifier.MappingDirection)
                 {
                     correspondence = existingCorrespondence;
@@ -467,6 +510,24 @@ namespace DEHCATIA.Services.MappingConfiguration
 
             correspondence = null;
             return false;
+        }
+
+        /// <summary>
+        /// Deserializes the provided <see cref="IdCorrespondence.ExternalId"/> 
+        /// </summary>
+        /// <param name="correspondence">The <see cref="IdCorrespondence"/> from which the external Id need to bge deserialized</param>
+        /// <returns>An <see cref="ExternalIdentifier"/></returns>
+        private ExternalIdentifier DeserializeExternalIdentifier(IdCorrespondence correspondence)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<ExternalIdentifier>(correspondence.ExternalId ?? string.Empty);
+            }
+            catch (Exception)
+            {
+                this.logger.Warn($"Trying to deserialize an non Json {nameof(ExternalIdentifier)} returning default");
+                return new ExternalIdentifier() { Identifier = correspondence.ExternalId ?? string.Empty, MappingDirection = (MappingDirection)2 };
+            }
         }
 
         /// <summary>
