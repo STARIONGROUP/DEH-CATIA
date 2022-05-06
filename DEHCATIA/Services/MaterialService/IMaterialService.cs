@@ -24,10 +24,11 @@
 
 namespace DEHCATIA.Services.MaterialService
 {
+    using System;
     using System.Collections.Generic;
-
+    using System.Windows.Media;
     using CATMat;
-
+    using DEHCATIA.ViewModels.Rows;
     using INFITF;
 
     using MECMOD;
@@ -104,5 +105,28 @@ namespace DEHCATIA.Services.MaterialService
         /// <param name="body">The <see cref="Body"/> from which to remove any material</param>
         /// <returns>An value indicating whether the material was removed</returns>
         bool TryRemoveMaterial(Body body);
+
+        /// <summary>
+        /// Applies the specified color to the specified anyObject
+        /// </summary>
+        /// <param name="document">The <see cref="Document"/> from where the provided <see cref="AnyObject"/> is from</param>
+        /// <param name="anyObject">The <see cref="AnyObject"/> from which to retrieve the color</param>
+        /// <param name="color">The <see cref="Color"/> to apply</param>
+        void ApplyColor(Document document, AnyObject anyObject, Color color);
+
+        /// <summary>
+        /// Applies the specified color to the anyObject represented by the provided <see cref="MappedElementRowViewModel"/>
+        /// </summary>
+        /// <param name="document">The <see cref="Document"/> from where the provided <see cref="AnyObject"/> is from</param>
+        /// <param name="mappedElement">The <see cref="MappedElementRowViewModel"/> that contains the reference to the original catia element and the color to assign</param>
+        void ApplyColor(Document document, MappedElementRowViewModel mappedElement);
+
+        /// <summary>
+        /// Get the color of the specified anyObject
+        /// </summary>
+        /// <param name="document">The <see cref="Document"/> from where the provided <see cref="AnyObject"/> is from</param>
+        /// <param name="anyObject">The <see cref="AnyObject"/> from which to retrieve the color</param>
+        /// <returns>a <see cref="Color"/></returns>
+        Color GetColor(Document document, AnyObject anyObject);
     }
 }

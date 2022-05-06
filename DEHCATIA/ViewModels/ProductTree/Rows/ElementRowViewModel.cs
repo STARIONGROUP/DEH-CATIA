@@ -26,7 +26,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
 {
     using System;
     using System.Reactive.Linq;
-
+    using System.Windows.Media;
     using CATMat;
 
     using CDP4Common.CommonData;
@@ -39,8 +39,6 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
     using DEHCATIA.Events;
     using DEHCATIA.ViewModels.ProductTree.Parameters;
     using DEHCATIA.ViewModels.ProductTree.Shapes;
-
-    using DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows;
 
     using INFITF;
 
@@ -336,6 +334,20 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         {
             get => this.shouldMapMaterial;
             set => this.RaiseAndSetIfChanged(ref this.shouldMapMaterial, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="Color"/>
+        /// </summary>
+        private Color color;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the material should transfered
+        /// </summary>
+        public Color Color
+        {
+            get => this.color;
+            set => this.RaiseAndSetIfChanged(ref this.color, value);
         }
 
         /// <summary>

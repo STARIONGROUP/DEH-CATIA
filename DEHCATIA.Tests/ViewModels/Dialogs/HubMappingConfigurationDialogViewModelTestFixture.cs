@@ -95,7 +95,7 @@ namespace DEHCATIA.Tests.ViewModels.Dialogs
             this.hubController.Setup(x => x.OpenIteration).Returns(this.iteration);
             this.hubController.Setup(x => x.CurrentDomainOfExpertise).Returns(this.domain);
             this.hubController.Setup(x => x.GetSiteDirectory()).Returns(new SiteDirectory());
-            
+
             this.dstController = new Mock<IDstController>();
             this.dstController.Setup(x => x.ProductTree).Returns(new ElementRowViewModel(new Mock<Product>().Object, ""));
 
@@ -121,12 +121,12 @@ namespace DEHCATIA.Tests.ViewModels.Dialogs
         public void VerifyContinueCommand()
         {
             Assert.IsFalse(this.viewModel.ContinueCommand.CanExecute(null));
-            this.viewModel.MappedElements.Add(new MappedElementRowViewModel(){IsValid = true});
+            this.viewModel.MappedElements.Add(new MappedElementRowViewModel() { IsValid = true });
             this.viewModel.CanContinue = true;
             Assert.IsTrue(this.viewModel.ContinueCommand.CanExecute(null));
             Assert.DoesNotThrow(() => this.viewModel.ContinueCommand.Execute(null));
 
-            this.dstController.Verify(x => 
+            this.dstController.Verify(x =>
                 x.Map(It.IsAny<List<MappedElementRowViewModel>>()), Times.Once);
         }
 

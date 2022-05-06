@@ -61,6 +61,8 @@ namespace DEHCATIA.Converters
                 ElementType.Component => new DXImageExtension("SvgImages/RichEdit/Copy.svg").ImagePath.MakeUri(),
                 ElementType.CatDefinition => new DXImageExtension("SvgImages/RichEdit/New.svg").ImagePath.MakeUri(),
                 ElementType.CatBody => new DXImageExtension("SvgImages/XAF/ModelEditor_Settings.svg").ImagePath.MakeUri(),
+                ElementType.Face => new DXImageExtension("SvgImages/XAF/Action_Debug_Stop.svg").ImagePath.MakeUri(),
+                ElementType.Edge => new DXImageExtension("SvgImages/Icon Builder/Actions_Arrow3Left.svg").ImagePath.MakeUri(),
                 _ => new DXImageExtension("SvgImages/XAF/ModelEditor_Class_Object.svg").ImagePath.MakeUri()
             };
 

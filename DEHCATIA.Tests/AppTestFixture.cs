@@ -41,7 +41,7 @@ namespace DEHCATIA.Tests
         {
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterType<List<byte>>().As<IList>();
-            Assert.IsNotNull(new App(containerBuilder));
+            Assert.IsNotNull(new App(containerBuilder, false));
             Assert.IsNotNull(AppContainer.Container.Resolve<IList>());
         }
     }

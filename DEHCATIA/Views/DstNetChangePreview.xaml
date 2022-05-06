@@ -25,6 +25,7 @@
                 <Setter Property="HorizontalAlignment" Value="Center" />
             </Style>
             <converters:ElementTypeToIconConverter x:Key="ElementTypeToIconConverter" />
+            <converters:ColorToBrushConverter x:Key="ColorConverter" />
             <HierarchicalDataTemplate DataType="{x:Type rows:ElementRowViewModel}" ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
@@ -88,6 +89,15 @@
                         <dxg:TreeListColumn FieldName="Name" Fixed="Left"/>
                         <dxg:TreeListColumn FieldName="PartNumber" Header="Part Number"/>
                         <dxg:TreeListColumn FieldName="MaterialName" Header="Material" />
+                        <dxg:TreeListColumn FieldName="Color" Header="Color">
+                            <dxg:TreeListColumn.CellDisplayTemplate>
+                                <DataTemplate>
+                                    <Border Margin="1" CornerRadius="9" BorderThickness="0"
+                                            Background="{Binding Path=RowData.Row.Color, Converter={StaticResource ColorConverter}}"
+                                            HorizontalAlignment="Center" Width="18" VerticalAlignment="Stretch"/>
+                                </DataTemplate>
+                            </dxg:TreeListColumn.CellDisplayTemplate>
+                        </dxg:TreeListColumn>
                         <dxg:TreeListColumn FieldName="ElementType" Header="Element Type"/>
                     </dxg:TreeListControl.Columns>
                 </dxg:TreeListControl>

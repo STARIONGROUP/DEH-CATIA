@@ -319,6 +319,7 @@ namespace DEHCATIA.DstController
             if (mappedElementRowViewModels?.Any() == true)
             {
                 mappingFound = true;
+                this.readyToMapHubElements.Clear();
                 this.readyToMapHubElements.AddRange(mappedElementRowViewModels);
             }
 

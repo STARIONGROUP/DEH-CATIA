@@ -72,13 +72,18 @@ namespace DEHCATIA
         /// Initializes a new <see cref="App"/>
         /// </summary>
         /// <param name="containerBuilder">An optional <see cref="Container"/></param>
-        public App(ContainerBuilder containerBuilder = null)
+        /// <param name="showSplashScreenOnStartup">A value indicating whether the app should show the splashscreen</param>
+        public App(ContainerBuilder containerBuilder = null, bool showSplashScreenOnStartup = true)
         {
             this.LogAppStart();
 
             AppDomain.CurrentDomain.UnhandledException += this.CurrentDomainUnhandledException;
             var splashScreenViewModel = new DXSplashScreenViewModel() { Title = "DEH-CATIA Adapter", Logo = new Uri("pack://application:,,,/Resources/logo.png") };
-            SplashScreenManager.Create(() => new SplashScreen(), splashScreenViewModel).ShowOnStartup();
+
+            if (showSplashScreenOnStartup)
+            {
+                SplashScreenManager.Create(() => new SplashScreen(), splashScreenViewModel).ShowOnStartup();
+            }
 
             containerBuilder ??= new ContainerBuilder();
             RegisterTypes(containerBuilder);

@@ -116,7 +116,7 @@ namespace DEHCATIA.ViewModels
                 .Subscribe(this.UpdateCanTransfer);
 
             this.dstController.SelectedDstMapResultToTransfer.CountChanged.Subscribe(_ => this.UpdateNumberOfThingsToTransfer());
-            this.dstController.HubMapResult.CountChanged.Subscribe(_ => this.UpdateNumberOfThingsToTransfer());
+            this.dstController.SelectedHubMapResultToTransfer.CountChanged.Subscribe(_ => this.UpdateNumberOfThingsToTransfer());
 
             this.WhenAnyValue(x => x.dstController.MappingDirection)
                 .Subscribe(x => this.UpdateNumberOfThingsToTransfer());
@@ -147,7 +147,7 @@ namespace DEHCATIA.ViewModels
         {
             this.NumberOfThing = this.dstController.MappingDirection switch
             {
-                MappingDirection.FromHubToDst => this.dstController.HubMapResult.Count,
+                MappingDirection.FromHubToDst => this.dstController.SelectedHubMapResultToTransfer.Count,
                 MappingDirection.FromDstToHub => this.dstController.SelectedDstMapResultToTransfer.DistinctBy(x => x.ShortName).Count(),
                 _ => throw new ArgumentOutOfRangeException(nameof(this.dstController.MappingDirection), 
                     this.dstController.MappingDirection, $"Use of forbidden value of {nameof(this.dstController.MappingDirection)}")

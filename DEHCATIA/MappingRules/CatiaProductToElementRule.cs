@@ -28,6 +28,7 @@ namespace DEHCATIA.MappingRules
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.ExceptionServices;
+    using System.Windows.Media;
     using System.Windows.Media.Converters;
 
     using Autofac;
@@ -109,6 +110,7 @@ namespace DEHCATIA.MappingRules
                 this.Map(new List<ElementRowViewModel>{input});
 
                 this.mappingConfigurationService.SaveMaterialParameterType(this.parameterTypeService.Material);
+                this.mappingConfigurationService.SaveColorParameterType(this.parameterTypeService.MultiColor);
 
                 return this.ruleOutput;
             }
@@ -339,6 +341,10 @@ namespace DEHCATIA.MappingRules
                 this.MapParameterOverride(this.parameterTypeService.Material,
                     this.parameterTypeService.Material?.ShortName, usageRow.ElementUsage, usageRow.ElementDefinition, usageRow.Name, usageRow.MaterialName ?? "-");
             }
+
+            this.MapParameterOverride(this.parameterTypeService.Color,
+                this.parameterTypeService.Color.ShortName, usageRow.ElementUsage, usageRow.ElementDefinition,
+                $"#{usageRow.Color.R:X2}{usageRow.Color.G:X2}{usageRow.Color.B:X2}");
         }
 
         /// <summary>
@@ -365,13 +371,18 @@ namespace DEHCATIA.MappingRules
             this.MapParameter(this.parameterTypeService.Position,
                 ParameterTypeService.PositionShortName, elementRow, elementRow.Shape.PositionOrientation.Position.Values);
 
-            if (!elementRow.ShouldMapMaterial)
-            {
-                return;
-            }
+            this.MapBodyParameters(elementRow);
 
-            var values = new List<string>();
+            this.MapParameter(this.parameterTypeService.Color,
+               this.parameterTypeService.Color?.ShortName, elementRow, "-");
+        }
 
+        /// <summary>
+        /// Maps the color and material parameter for the specified <see cref="ElementRowViewModel"/>
+        /// </summary>
+        /// <param name="elementRow">The <see cref="ElementRowViewModel"/></param>
+        private void MapBodyParameters(ElementRowViewModel elementRow)
+        {
             var bodyRowViewModels = elementRow.Children.OfType<BodyRowViewModel>().ToList();
 
             if (!bodyRowViewModels.Any())
@@ -379,14 +390,29 @@ namespace DEHCATIA.MappingRules
                 return;
             }
 
+            var materialValues = new List<string>();
+            var colorValues = new List<string>();
+
             foreach (var bodyRowViewModel in bodyRowViewModels)
             {
-                values.Add(bodyRowViewModel.Name);
-                values.Add(bodyRowViewModel.MaterialName ?? "-");
+                materialValues.Add(bodyRowViewModel.Name);
+                materialValues.Add(bodyRowViewModel.MaterialName ?? "-");
+
+                colorValues.Add(bodyRowViewModel.Name);
+                colorValues.Add($"#{bodyRowViewModel.Color.R:X2}{bodyRowViewModel.Color.G:X2}{bodyRowViewModel.Color.B:X2}");
+
+                foreach (var boundary in bodyRowViewModel.Children.OfType<BoundaryRowViewModel>())
+                {
+                    colorValues.Add(boundary.Name);
+                    colorValues.Add($"#{boundary.Color.R:X2}{boundary.Color.G:X2}{boundary.Color.B:X2}");
+                }
             }
 
             this.MapParameter(this.parameterTypeService.Material,
-                this.parameterTypeService.Material?.ShortName, elementRow, values.ToArray());
+                this.parameterTypeService.Material?.ShortName, elementRow, materialValues.ToArray());
+
+            this.MapParameter(this.parameterTypeService.MultiColor,
+               this.parameterTypeService.MultiColor?.ShortName, elementRow, colorValues.ToArray());
         }
 
         /// <summary>
