@@ -30,6 +30,7 @@ namespace DEHCATIA.Tests.Services.MaterialService
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
+    using System.Windows.Media;
 
     using CATMat;
 
@@ -110,10 +111,10 @@ namespace DEHCATIA.Tests.Services.MaterialService
             var path = "";
             documents.Setup(x => x.Read(ref path)).Returns(default(Document));
             this.catiaApplication.Setup(x => x.Documents).Returns(documents.Object);
-            this.WatchEnumerator(materialsEnumerator, familiesEnumerator);
             Assert.DoesNotThrow(() => this.service.GetMaterialsFromLibrary(this.catiaApplication.Object, path));
             documents.Setup(x => x.Read(ref path)).Returns(document.Object);
             this.catiaApplication.Setup(x => x.Documents).Returns(documents.Object);
+            this.WatchEnumerator(materialsEnumerator, familiesEnumerator);
             Assert.DoesNotThrow(() => this.service.GetMaterialsFromLibrary(this.catiaApplication.Object, path));
         }
 
@@ -178,6 +179,42 @@ namespace DEHCATIA.Tests.Services.MaterialService
             Assert.IsFalse(this.service.TryApplyMaterial(new Mock<Product>().Object, "noname"));
             Assert.IsTrue(this.service.TryRemoveMaterial(new Mock<Body>().Object));
             Assert.IsTrue(this.service.TryRemoveMaterial(new Mock<Product>().Object));
+        }
+
+        [Test]
+        public void VerifyGetColor()
+        {
+            var document = new Mock<Document>();
+            var selection = new Mock<Selection>();
+            var visProperty = new Mock<VisPropertySet>();
+
+            var red = It.IsAny<int>();
+            var green = It.IsAny<int>();
+            var blue = It.IsAny<int>();
+
+            visProperty.Setup(x => x.GetRealColor(out red, out green, out blue)).Returns(CatVisPropertyStatus.catVisPropertyDefined);
+            visProperty.Setup(x => x.GetVisibleColor(out red, out green, out blue)).Returns(CatVisPropertyStatus.catVisPropertyDefined);
+            selection.Setup(x => x.VisProperties).Returns(visProperty.Object);
+            document.Setup(x => x.Selection).Returns(selection.Object);
+
+            Assert.That(this.service.GetColor(document.Object, new Mock<Body>().Object).ToString() != default(Color).ToString());
+            visProperty.Setup(x => x.GetRealColor(out red, out green, out blue)).Returns(CatVisPropertyStatus.catVisPropertyUnDefined);
+            Assert.That(this.service.GetColor(document.Object, new Mock<Body>().Object).ToString() != default(Color).ToString());
+            visProperty.Setup(x => x.GetVisibleColor(out red, out green, out blue)).Returns(CatVisPropertyStatus.catVisPropertyUnDefined);
+            Assert.That(this.service.GetColor(document.Object, new Mock<Body>().Object).A == .0);
+        }
+
+        [Test]
+        public void VerifyApplyColor()
+        {
+            var document = new Mock<Document>();
+            var selection = new Mock<Selection>();
+            var visProperty = new Mock<VisPropertySet>();
+
+            selection.Setup(x => x.VisProperties).Returns(visProperty.Object);
+            document.Setup(x => x.Selection).Returns(selection.Object);
+
+            Assert.DoesNotThrow(() => this.service.ApplyColor(document.Object, new Mock<Body>().Object, Color.FromRgb(50,0,10)));
         }
     }
 }

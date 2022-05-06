@@ -27,11 +27,11 @@ namespace DEHCATIA.Services.MaterialService
     using System;
     using System.Collections.Generic;
     using System.IO;
-
+    using System.Windows.Media;
     using CATMat;
 
     using DEHCATIA.Services.ComConnector;
-
+    using DEHCATIA.ViewModels.Rows;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
     using INFITF;
@@ -280,6 +280,72 @@ namespace DEHCATIA.Services.MaterialService
                 this.logger.Error(exception, "An error occured while trying to apply some material");
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Applies the specified color to the anyObject represented by the provided <see cref="MappedElementRowViewModel"/>
+        /// </summary>
+        /// <param name="document">The <see cref="Document"/> from where the provided <see cref="AnyObject"/> is from</param>
+        /// <param name="mappedElement">The <see cref="MappedElementRowViewModel"/> that contains the reference to the original catia element and the color to assign</param>
+        public void ApplyColor(Document document, MappedElementRowViewModel mappedElement)
+        {
+            this.ApplyColor(document, mappedElement.CatiaElement.Element, mappedElement.CatiaElement.Color);
+        }
+
+        /// <summary>
+        /// Applies the specified color to the specified anyObject
+        /// </summary>
+        /// <param name="document">The <see cref="Document"/> from where the provided <see cref="AnyObject"/> is from</param>
+        /// <param name="anyObject">The <see cref="AnyObject"/> from which to retrieve the color</param>
+        /// <param name="color">The <see cref="Color"/> to apply</param>
+        public void ApplyColor(Document document, AnyObject anyObject, Color color)
+        {
+            this.GetVisProperty(document, anyObject)
+                .SetRealColor(Convert.ToInt32(color.R), Convert.ToInt32(color.G), Convert.ToInt32(color.B), 1);
+        }
+
+        /// <summary>
+        /// Get the color of the specified anyObject
+        /// </summary>
+        /// <param name="document">The <see cref="Document"/> from where the provided <see cref="AnyObject"/> is from</param>
+        /// <param name="anyObject">The <see cref="AnyObject"/> from which to retrieve the color</param>
+        /// <returns>a <see cref="Color"/></returns>
+        public Color GetColor(Document document, AnyObject anyObject)
+        {
+            var visProperty = this.GetVisProperty(document, anyObject);
+
+            var status = visProperty.GetRealColor(out var red, out var green, out var blue);
+
+            if (status == CatVisPropertyStatus.catVisPropertyDefined)
+            {
+                return Color.FromRgb(Convert.ToByte(red), Convert.ToByte(green), Convert.ToByte(blue));
+            }
+            else
+            {
+                status = visProperty.GetVisibleColor(out red, out green, out blue);
+
+                if (status == CatVisPropertyStatus.catVisPropertyDefined)
+                {
+                    return Color.FromRgb(Convert.ToByte(red), Convert.ToByte(green), Convert.ToByte(blue));
+                }
+            }
+
+            var color = default(Color);
+            color.A = 0;
+            return color;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="VisPropertySet"/> from the specified <see cref="AnyObject"/>
+        /// </summary>
+        /// <param name="document">The <see cref="Document"/> from where the provided <see cref="AnyObject"/> is from</param>
+        /// <param name="anyObject">The <see cref="AnyObject"/> from which to retrieve the <see cref="VisPropertySet"/></param>
+        /// <returns>a <see cref="VisPropertySet"/></returns>
+        private VisPropertySet GetVisProperty(Document document, AnyObject anyObject)
+        {
+            document.Selection.Clear();
+            document.Selection.Add(anyObject);
+            return document.Selection.VisProperties;
         }
     }
 }

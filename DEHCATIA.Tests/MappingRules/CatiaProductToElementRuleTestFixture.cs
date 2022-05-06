@@ -105,6 +105,7 @@ namespace DEHCATIA.Tests.MappingRules
 
             this.dstController = new Mock<IDstController>();
             this.parameterTypeService = new Mock<IParameterTypeService>();
+            this.parameterTypeService.Setup(x => x.Color).Returns(new TextParameterType());
             this.parameterTypeService.Setup(x => x.Material).Returns(new SampledFunctionParameterType());
 
             this.parameterTypeService.Setup(x => x.MomentOfInertia).Returns(new CompoundParameterType()
@@ -302,7 +303,7 @@ namespace DEHCATIA.Tests.MappingRules
             Assert.IsNotNull(result);
             Assert.AreEqual(4, result.Count);
 
-            Assert.AreEqual(1, result
+            Assert.AreEqual(2, result
                 .Select(x => x.Element)
                 .OfType<ElementDefinition>()
                 .FirstOrDefault()?

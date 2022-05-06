@@ -28,13 +28,13 @@ namespace DEHCATIA.Services.ParameterTypeService
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
-
+    using System.Threading.Tasks;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Dal;
     using CDP4Dal.Events;
-
+    using CDP4Dal.Operations;
     using DEHPCommon.HubController.Interfaces;
 
     using NLog;
@@ -47,6 +47,11 @@ namespace DEHCATIA.Services.ParameterTypeService
     /// </summary>
     public class ParameterTypeService : IParameterTypeService
     {
+        /// <summary>
+        /// The color <see cref="ParameterType"/> short name
+        /// </summary>
+        public const string ColorShortName = "color";
+
         /// <summary>
         /// The Moment of inertia <see cref="ParameterType"/> short name
         /// </summary>
@@ -146,7 +151,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         /// The Shape area <see cref="ParameterType"/> short name
         /// </summary>
         public const string ExternalShapeShortName = "external_shape";
-        
+
         /// <summary>
         /// The NLog <see cref="Logger"/>
         /// </summary>
@@ -165,7 +170,12 @@ namespace DEHCATIA.Services.ParameterTypeService
         /// <summary>
         /// Gets the Material <see cref="ParameterType"/>
         /// </summary>
-        public ParameterType Material { get; set; }
+        public SampledFunctionParameterType Material { get; set; }
+
+        /// <summary>
+        /// Gets the Color <see cref="ParameterType"/>
+        /// </summary>
+        public SampledFunctionParameterType MultiColor { get; set; }
 
         /// <summary>
         /// Backing field for <see cref="MomentOfInertia"/>
@@ -368,6 +378,16 @@ namespace DEHCATIA.Services.ParameterTypeService
         public ParameterType ExternalShape => this.externalShape ??= this.FetchParameterType(ExternalShapeShortName);
 
         /// <summary>
+        /// Backing field for <see cref="Color"/>
+        /// </summary>
+        private ParameterType color;
+
+        /// <summary>
+        /// Gets the color <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType Color => this.color ??= this.FetchParameterType(ColorShortName) ?? this.CreateTextParameterType(ColorShortName);
+
+        /// <summary>
         /// Initializes a new <see cref="ParameterTypeService"/>
         /// </summary>
         /// <param name="hubController">The <see cref="IHubController"/></param>
@@ -382,6 +402,45 @@ namespace DEHCATIA.Services.ParameterTypeService
             this.WhenAny(x => x.hubController.OpenIteration,
                     x => x.Value is { })
                 .Subscribe(_ => this.RefreshParameterType());
+        }
+
+        /// <summary>
+        /// Creates a <typeparamref name="TParameterType"/>
+        /// </summary>
+        /// <param name="parameterTypeName">The string name</param>
+        /// <returns>A <see cref="ParameterType"/></returns>
+        private ParameterType CreateTextParameterType(string parameterTypeName)
+        {
+            var textParameterType = new TextParameterType(Guid.NewGuid(), null, null)
+            {
+                Name = parameterTypeName,
+                ShortName = parameterTypeName
+            };
+
+            return this.CreateParameterType(textParameterType).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Creates a <typeparamref name="TParameterType"/>
+        /// </summary>
+        /// <typeparam name="TParameterType"></typeparam> The type of <see cref="ParameterType"/> to create
+        /// <param name="parameterType">The <typeparamref name="TParameterType"/></param>
+        /// <returns>A <typeparamref name="TParameterType"/></returns>
+        private async Task<TParameterType> CreateParameterType<TParameterType>(TParameterType parameterType) where TParameterType : ParameterType
+        {
+            var referenceDataLibrary = this.hubController.GetDehpOrModelReferenceDataLibrary();
+            var clonedReferenceDataLibrary = referenceDataLibrary.Clone(false);
+            clonedReferenceDataLibrary.ParameterType.Add(parameterType);
+            var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(clonedReferenceDataLibrary), clonedReferenceDataLibrary);
+            transaction.CreateOrUpdate(parameterType);
+            transaction.CreateOrUpdate(clonedReferenceDataLibrary);
+            await this.hubController.Write(transaction);
+            await this.hubController.RefreshReferenceDataLibrary(referenceDataLibrary);
+
+            return this.hubController.OpenIteration.GetContainerOfType<EngineeringModel>().RequiredRdls
+                .SelectMany(x => x.ParameterType)
+                .OfType<TParameterType>()
+                .FirstOrDefault(x => x.Iid == parameterType.Iid);
         }
 
         /// <summary>
@@ -428,6 +487,7 @@ namespace DEHCATIA.Services.ParameterTypeService
             this.shapeMassWithMargin = null;
             this.shapeDensity = null;
             this.externalShape = null;
+            this.color = null;
         }
 
         /// <summary>
@@ -448,10 +508,10 @@ namespace DEHCATIA.Services.ParameterTypeService
         }
 
         /// <summary>
-        /// Gets the collection of <see cref="SampledFunctionParameterType"/> that can hold Material information
+        /// Gets the collection of <see cref="SampledFunctionParameterType"/> that can hold Material or Color information
         /// </summary>
         /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="SampledFunctionParameterType"/></returns>
-        public IEnumerable<SampledFunctionParameterType> GetEligibleParameterTypeForMaterial()
+        public IEnumerable<SampledFunctionParameterType> GetEligibleParameterTypeForMaterialOrMultiColor()
         {
             return this.parameterTypes
                 .Where(x => x is SampledFunctionParameterType sampledFunctionParameterType

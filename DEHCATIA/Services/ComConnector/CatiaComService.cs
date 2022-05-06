@@ -411,6 +411,8 @@ namespace DEHCATIA.Services.ComConnector
                 this.logger.Info(exception);
             }
 
+            element.Color = this.materialService.GetColor(this.ActiveDocument.Document, product);
+
             element.Shape = new CatiaShapeViewModel()
             {
                 Name = name,
@@ -499,10 +501,19 @@ namespace DEHCATIA.Services.ComConnector
             }
 
             var mainBody = partDocument.Part.MainBody;
-            
+
+            element.Color = this.materialService.GetColor(this.ActiveDocument.Document, partDocument.Part);
+
             foreach (Body body in partDocument.Part.Bodies)
             {
-                element.Children.Add(new BodyRowViewModel(body, this.materialService.GetMaterialName(body)));
+                BodyRowViewModel bodyRowViewModel = new BodyRowViewModel(body, this.materialService.GetMaterialName(body))
+                {
+                    Color = this.materialService.GetColor(this.ActiveDocument.Document, body)
+                };
+
+                bodyRowViewModel.Children.AddRange(this.GetFacesAndEdges(body));
+
+                element.Children.Add(bodyRowViewModel);
             }
 
             element.Parameters.AddRange(this.ParseParameters(partDocument.Part.Parameters));
@@ -511,6 +522,56 @@ namespace DEHCATIA.Services.ComConnector
             shape.PositionOrientation = this.GetPositionAndOrientation(partDocument.Product);
             element.MaterialName = this.materialService.GetMaterialName(partDocument.Part);
             element.Shape = shape;
+        }
+
+        /// <summary>
+        /// Gets the faces and edges from the provided <see cref="Body"/>
+        /// </summary>
+        /// <param name="body">The <see cref="Body"/></param>
+        /// <returns>A collection of <see cref="ElementRowViewModel"/></returns>
+        private IEnumerable<ElementRowViewModel> GetFacesAndEdges(Body body)
+        {
+            Document document = this.ActiveDocument.Document;
+            var facesAndEdges = new List<ElementRowViewModel>();
+
+            document.Selection.Clear();
+            document.Selection.Add(body);
+
+            this.GetFacesAndEdges<Face>(document, facesAndEdges, ElementType.Face);
+            this.GetFacesAndEdges<Edge>(document, facesAndEdges, ElementType.Edge);
+
+            facesAndEdges.ForEach(x => x.Color = this.materialService.GetColor(document, x.Element));
+            return facesAndEdges;
+        }
+
+        /// <summary>
+        /// Gets the faces and edges from the provided <see cref="Selection"/>
+        /// </summary>
+        /// <typeparam name="TBoundary">The type of <see cref="Boundary"/> to get either <see cref="Face"/> or <see cref="Edge"/></typeparam>
+        /// <param name="document">The <see cref="Document"/> that knows about the current selection</param>
+        /// <param name="facesAndEdges">The collection of faces and edges</param>
+        /// <param name="elementType">The <see cref="ElementType"/> to get</param>
+        private void GetFacesAndEdges<TBoundary>(Document document, List<ElementRowViewModel> facesAndEdges, ElementType elementType) where TBoundary : Boundary
+        {
+            string searchPattern = $"Topology.{elementType},sel";
+            document.Selection.Search(searchPattern);
+
+            for (int i = 1; i < document.Selection.Count; i++)
+            {
+                try
+                {
+                    var selectedItem = document.Selection.Item(i);
+
+                    if (selectedItem.Value is TBoundary boundary)
+                    {
+                        facesAndEdges.Add(new BoundaryRowViewModel(boundary, elementType));
+                    }
+                }
+                catch (Exception exception)
+                {
+                    this.logger.Error(exception);
+                }
+            }
         }
 
         /// <summary>
@@ -719,10 +780,30 @@ namespace DEHCATIA.Services.ComConnector
             this.UpdatePositionAndOrientation(mappedElement.CatiaElement);
             this.UpdateParameters(mappedElement);
             this.UpdateMaterial(mappedElement);
+            this.UpdateColor(mappedElement);
 
             this.exchangeHistoryService.Append(exchangeHistoryEntry);
         }
 
+        /// <summary>
+        /// Attempts to update the color property
+        /// </summary>
+        /// <param name="mappedElement">The <see cref="MappedElementRowViewModel"/></param>
+        public void UpdateColor(MappedElementRowViewModel mappedElement)
+        {
+            this.materialService.ApplyColor(this.ActiveDocument.Document, mappedElement);
+
+            foreach (var bodyRowViewModel in mappedElement.CatiaElement.Children.OfType<BodyRowViewModel>())
+            {
+                this.materialService.ApplyColor(this.ActiveDocument.Document, bodyRowViewModel.Element, bodyRowViewModel.Color);
+
+                foreach (var boundaryRowViewModel in mappedElement.CatiaElement.Children.OfType<BoundaryRowViewModel>())
+                {
+                    this.materialService.ApplyColor(this.ActiveDocument.Document, boundaryRowViewModel.Element, boundaryRowViewModel.Color);
+                }
+            }
+        }
+        
         /// <summary>
         /// Attempts to update the material property
         /// </summary>

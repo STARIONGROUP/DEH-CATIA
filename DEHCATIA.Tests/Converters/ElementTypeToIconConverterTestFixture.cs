@@ -56,7 +56,13 @@ namespace DEHCATIA.Tests.Converters
             
             Assert.AreEqual(new DXImageExtension("SvgImages/RichEdit/New.svg").ImagePath.MakeUri(),
                 this.converter.Convert(ElementType.CatDefinition, null, null, CultureInfo.InvariantCulture));
-            
+
+            Assert.AreEqual(new DXImageExtension("SvgImages/XAF/Action_Debug_Stop.svg").ImagePath.MakeUri(),
+                this.converter.Convert(ElementType.Face, null, null, CultureInfo.InvariantCulture));
+
+            Assert.AreEqual(new DXImageExtension("SvgImages/Icon Builder/Actions_Arrow3Left.svg").ImagePath.MakeUri(),
+                this.converter.Convert(ElementType.Edge, null, null, CultureInfo.InvariantCulture));
+
             Assert.AreEqual(new DXImageExtension("SvgImages/XAF/ModelEditor_Class_Object.svg").ImagePath.MakeUri(),
                 this.converter.Convert(198, null, null, CultureInfo.InvariantCulture));
         }

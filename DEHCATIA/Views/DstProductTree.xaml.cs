@@ -24,6 +24,7 @@
 
 namespace DEHCATIA.Views
 {
+    using System.Drawing;
     using System.Windows.Controls;
 
     /// <summary>

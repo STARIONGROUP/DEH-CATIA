@@ -36,7 +36,12 @@ namespace DEHCATIA.Services.ParameterTypeService
         /// <summary>
         /// Gets the Material <see cref="ParameterType"/>
         /// </summary>
-        ParameterType Material { get; set; }
+        SampledFunctionParameterType Material { get; set; }
+
+        /// <summary>
+        /// Gets the Color <see cref="ParameterType"/>
+        /// </summary>
+        SampledFunctionParameterType MultiColor { get; set; }
 
         /// <summary>
         /// Gets the Moment of Inertia <see cref="ParameterType"/>
@@ -139,6 +144,11 @@ namespace DEHCATIA.Services.ParameterTypeService
         ParameterType ExternalShape { get; }
 
         /// <summary>
+        /// Gets the color <see cref="ParameterType"/>
+        /// </summary>
+        ParameterType Color { get; }
+
+        /// <summary>
         /// Refreshes the defined <see cref="ParameterType"/>
         /// </summary>
         void RefreshParameterType();
@@ -147,6 +157,6 @@ namespace DEHCATIA.Services.ParameterTypeService
         /// Gets the collection of <see cref="SampledFunctionParameterType"/> that can hold Material information
         /// </summary>
         /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="SampledFunctionParameterType"/></returns>
-        IEnumerable<SampledFunctionParameterType> GetEligibleParameterTypeForMaterial();
+        IEnumerable<SampledFunctionParameterType> GetEligibleParameterTypeForMaterialOrMultiColor();
     }
 }
