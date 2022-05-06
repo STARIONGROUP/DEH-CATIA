@@ -184,6 +184,36 @@ namespace DEHCATIA.Tests.MappingRules
                                 ValueSwitch = ParameterSwitchKind.MANUAL
                             }
                         }
+                    },
+                    new Parameter()
+                    {
+                        ParameterType = new SampledFunctionParameterType(),
+                        ValueSet =
+                        {
+                            new ParameterValueSet()
+                            {
+                                Manual = new ValueArray<string>(new List<string>()
+                                {
+                                    "body.0", "yellow", "pad.0", "green", "^pad.1", "pink", "body.1", "blue"
+                                }),
+                                ValueSwitch = ParameterSwitchKind.MANUAL
+                            }
+                        }
+                    },
+                    new Parameter()
+                    {
+                        ParameterType = new TextParameterType(),
+                        ValueSet =
+                        {
+                            new ParameterValueSet()
+                            {
+                                Manual = new ValueArray<string>(new List<string>()
+                                {
+                                    "yellow"
+                                }),
+                                ValueSwitch = ParameterSwitchKind.MANUAL
+                            }
+                        }
                     }
                 }
             };
@@ -233,6 +263,8 @@ namespace DEHCATIA.Tests.MappingRules
 
             this.parameterTypeService.Setup(x => x.ShapeKind).Returns(this.enumerationParameterType);
             this.parameterTypeService.Setup(x => x.ShapeAngle).Returns(this.quantityParameterType);
+            this.parameterTypeService.Setup(x => x.Color).Returns(new TextParameterType());
+            this.parameterTypeService.Setup(x => x.MultiColor).Returns(new SampledFunctionParameterType());
             
             var elementUsage = new ElementUsage()
             {
@@ -268,7 +300,15 @@ namespace DEHCATIA.Tests.MappingRules
                     {
                         Children =
                         {
-                            new BodyRowViewModel(body0.Object, "") { Name = "body.0" },
+                            new BodyRowViewModel(body0.Object, "")
+                            {
+                                Name = "body.0",
+                                Children =
+                                {
+                                    new BoundaryRowViewModel(new Mock<Boundary>().Object, ElementType.Face),
+                                    new BoundaryRowViewModel(new Mock<Boundary>().Object, ElementType.Edge)
+                                }
+                            },
                             new BodyRowViewModel(body1.Object, "material.5") { Name = "body.1" },
                             new BodyRowViewModel(body2.Object, "") { Name = "body.2" },
                             new BodyRowViewModel(body3.Object, "material.6") { Name = "body.3" },

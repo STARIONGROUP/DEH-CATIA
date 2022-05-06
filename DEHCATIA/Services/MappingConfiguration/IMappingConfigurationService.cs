@@ -121,5 +121,11 @@ namespace DEHCATIA.Services.MappingConfiguration
         /// </summary>
         /// <param name="materialParameterType">The material <see cref="ParameterType"/></param>
         void SaveMaterialParameterType(ParameterType materialParameterType);
+
+        /// <summary>
+        /// Saves the specified <see cref="ParameterType"/> as the one used for mapping color in the current loaded configuration
+        /// </summary>
+        /// <param name="colorParameterType">The color <see cref="ParameterType"/></param>
+        void SaveColorParameterType(ParameterType colorParameterType);
     }
 }

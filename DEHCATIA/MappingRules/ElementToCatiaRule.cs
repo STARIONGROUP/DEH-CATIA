@@ -29,7 +29,7 @@ namespace DEHCATIA.MappingRules
     using System.Globalization;
     using System.Linq;
     using System.Runtime.ExceptionServices;
-
+    using System.Windows.Media;
     using Autofac;
 
     using CDP4Common.EngineeringModelData;
@@ -125,6 +125,8 @@ namespace DEHCATIA.MappingRules
                 this.MapPosition(mappedElementRowViewModel);
                 this.MapOrientation(mappedElementRowViewModel);
                 this.MapMaterial(mappedElementRowViewModel);
+                this.MapMultiColor(mappedElementRowViewModel);
+                this.MapColor(mappedElementRowViewModel);
 
                 this.mappingConfigurationService.AddToExternalIdentifierMap(mappedElementRowViewModel);
             }
@@ -465,6 +467,88 @@ namespace DEHCATIA.MappingRules
         }
 
         /// <summary>
+        /// Maps the color Parameter
+        /// </summary>
+        /// <param name="mappedElementRowViewModel">The <see cref="MappedElementRowViewModel"/></param>
+        private void MapColor(MappedElementRowViewModel mappedElementRowViewModel)
+        {
+            var valueSet = this.GetParameterOrOverrideBase(mappedElementRowViewModel.HubElement, this.parameterTypeService.Color)?
+                .QueryParameterBaseValueSet(mappedElementRowViewModel.CatiaElement.SelectedOption,
+                    mappedElementRowViewModel.CatiaElement.SelectedActualFiniteState);
+
+            if (mappedElementRowViewModel.CatiaElement is UsageRowViewModel
+                    && this.TryConvertToColor(valueSet.ActualValue.FirstOrDefault(), out var color))
+            {
+                mappedElementRowViewModel.CatiaElement.Color = color;
+            }
+        }
+
+        /// <summary>
+        /// Maps the color Parameter
+        /// </summary>
+        /// <param name="mappedElementRowViewModel">The <see cref="MappedElementRowViewModel"/></param>
+        private void MapMultiColor(MappedElementRowViewModel mappedElementRowViewModel)
+        {
+            var valueSet = this.GetParameterOrOverrideBase(mappedElementRowViewModel.HubElement, this.parameterTypeService.MultiColor)?
+                .QueryParameterBaseValueSet(mappedElementRowViewModel.CatiaElement.SelectedOption,
+                    mappedElementRowViewModel.CatiaElement.SelectedActualFiniteState);
+
+            if (valueSet != null && valueSet.ActualValue.Count > 1)
+            {
+                if (mappedElementRowViewModel.CatiaElement is DefinitionRowViewModel definitionRow
+                    && definitionRow.Children.OfType<BodyRowViewModel>().Any())
+                {
+                    foreach (var (bodyOrBoundary, value) in this.GetPairsOfElementNameValue(valueSet))
+                    {
+                        if (definitionRow.Children.OfType<BodyRowViewModel>()
+                            .FirstOrDefault(x => x.Name == bodyOrBoundary) is { } bodyRowViewModel
+                            && this.TryConvertToColor(value, out var bodyColor))
+                        {
+                            bodyRowViewModel.Color = bodyColor;
+                        }
+
+                        if (definitionRow.Children.OfType<BodyRowViewModel>()
+                            .SelectMany(x => x.Children.OfType<BoundaryRowViewModel>())
+                            .FirstOrDefault(x => bodyOrBoundary.Contains(x.Name ?? string.Empty)) is { } boundaryRowViewModel
+                            && this.TryConvertToColor(value, out var boundaryColor))
+                        {
+                            boundaryRowViewModel.Color = boundaryColor;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                this.mappingErrors.Add($"The color parameter was found but could not be mapped for the element {mappedElementRowViewModel.HubElement.Name}");
+            }
+        }
+
+        /// <summary>
+        /// tries to converts a string into a <see cref="Color"/>
+        /// </summary>
+        /// <param name="colorValue">the string containing the color value or name</param>
+        /// <returns>A assert</returns>
+        private bool TryConvertToColor(string colorValue, out Color color)
+        {
+            color = default;
+
+            try
+            {
+                if (ColorConverter.ConvertFromString(colorValue) is Color result)
+                {
+                    color = result;
+                    return true;
+                }
+            }
+            catch (Exception exception)
+            {
+                this.logger.Error(exception);
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Maps the material Parameter
         /// </summary>
         /// <param name="mappedElementRowViewModel">The <see cref="MappedElementRowViewModel"/></param>
@@ -479,7 +563,7 @@ namespace DEHCATIA.MappingRules
                 if (mappedElementRowViewModel.CatiaElement is DefinitionRowViewModel definitionRow
                     && definitionRow.Children.OfType<BodyRowViewModel>().Any())
                 {
-                    foreach (var (body, material) in this.GetPairsOfElementNameMaterial(valueSet))
+                    foreach (var (body, material) in this.GetPairsOfElementNameValue(valueSet))
                     {
                         if (definitionRow.Children.OfType<BodyRowViewModel>()
                             .FirstOrDefault(x => x.Name == body) is { } bodyRowViewModel)
@@ -490,7 +574,7 @@ namespace DEHCATIA.MappingRules
                 }
                 else if(mappedElementRowViewModel.CatiaElement is UsageRowViewModel && valueSet.ActualValue.Count == 2)
                 {
-                    mappedElementRowViewModel.CatiaElement.MaterialName = this.GetPairsOfElementNameMaterial(valueSet).FirstOrDefault().materialName;
+                    mappedElementRowViewModel.CatiaElement.MaterialName = this.GetPairsOfElementNameValue(valueSet).FirstOrDefault().value;
                 }
             }
             else
@@ -500,11 +584,11 @@ namespace DEHCATIA.MappingRules
         }
 
         /// <summary>
-        /// Gets the pairs of body name associated with material names
+        /// Gets the pairs of body name associated value
         /// </summary>
         /// <param name="valueSet">The <see cref="IValueSet"/> that contains the values</param>
         /// <returns>An <see cref="IEnumerable{T}"/> of <code>(string, string)</code></returns>
-        private IEnumerable<(string bodyName, string materialName)> GetPairsOfElementNameMaterial(IValueSet valueSet)
+        private IEnumerable<(string bodyName, string value)> GetPairsOfElementNameValue(IValueSet valueSet)
         {
             using var enumerator = valueSet.ActualValue.GetEnumerator();
 

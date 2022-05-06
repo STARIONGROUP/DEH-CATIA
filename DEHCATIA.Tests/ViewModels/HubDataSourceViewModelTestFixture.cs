@@ -25,8 +25,18 @@
 namespace DEHCATIA.Tests.ViewModels
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Reactive.Concurrency;
     using System.Threading;
+
+    using Autofac;
+
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
+
+    using CDP4Dal;
 
     using DEHCATIA.DstController;
 
@@ -40,7 +50,13 @@ namespace DEHCATIA.Tests.ViewModels
 
 
     using DEHCATIA.ViewModels;
+    using DEHCATIA.ViewModels.Dialogs;
+    using DEHCATIA.ViewModels.Dialogs.Interfaces;
     using DEHCATIA.ViewModels.Interfaces;
+
+    using DEHPCommon;
+    using DEHPCommon.Enumerators;
+    using DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows;
 
     using Moq;
 
@@ -114,6 +130,58 @@ namespace DEHCATIA.Tests.ViewModels
 
             this.hubController.Verify(x => x.Close(), Times.Once);
             this.navigationService.Verify(x => x.ShowDialog<Login>(), Times.Once);
+        }
+        
+        [Test]
+        public void VerifyMapCommand()
+        {
+            this.dstController.Setup(x => x.MappingDirection).Returns(MappingDirection.FromDstToHub);
+            Assert.That(this.viewModel.ObjectBrowser.MapCommand.CanExecute(null) is true);
+            this.dstController.Setup(x => x.IsCatiaConnected).Returns(true);
+            this.dstController.Setup(x => x.MappingDirection).Returns(MappingDirection.FromHubToDst);
+            Assert.That(this.viewModel.ObjectBrowser.MapCommand.CanExecute(null) is true);
+
+            var containerBuilder = new ContainerBuilder();
+            var dialogViewModel = new Mock<IHubMappingConfigurationDialogViewModel>();
+            var hubElements = new ReactiveList<ElementDefinitionRowViewModel>();
+            dialogViewModel.Setup(x => x.HubElements).Returns(hubElements);
+            containerBuilder.RegisterInstance(dialogViewModel.Object).As<IHubMappingConfigurationDialogViewModel>().SingleInstance();
+            AppContainer.Container = containerBuilder.Build();
+
+            var parameter = new Parameter()
+            {
+                ParameterType = new TextParameterType()
+                {
+                    Name = "parameterType0"
+                },
+                ValueSet =
+                {
+                    new ParameterValueSet()
+                    {
+                        ValueSwitch = ParameterSwitchKind.COMPUTED,
+                        Computed = new ValueArray<string>(new List<string>(){"0"}),
+                        Manual = new ValueArray<string>(new List<string>(){"0"}),
+                        Reference = new ValueArray<string>(new List<string>(){"0"}),
+                    }
+                }
+            };
+
+            var elementDefinition = new ElementDefinition()
+            {
+                Name = "elementDefinition0", ShortName = "ed0",
+                Parameter =
+                {
+                    parameter
+                }
+            };
+
+            var elementDefinitionRowViewModel = new ElementDefinitionRowViewModel(elementDefinition, new DomainOfExpertise() {Name = "d", ShortName = "d"}, new Mock<ISession>().Object, null);
+
+            this.viewModel.ObjectBrowser.SelectedThings.Add(elementDefinitionRowViewModel);
+            this.viewModel.ObjectBrowser.SelectedThings.Add(elementDefinitionRowViewModel.ContainedRows.FirstOrDefault());
+
+            Assert.DoesNotThrow(() => this.viewModel.ObjectBrowser.MapCommand.Execute(null));
+            Assert.That(AppContainer.Container.Resolve<IHubMappingConfigurationDialogViewModel>().HubElements.Count == 1);
         }
     }
 }

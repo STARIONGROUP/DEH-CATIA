@@ -51,6 +51,7 @@ namespace DEHCATIA.ViewModels
     using DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows;
 
     using ReactiveUI;
+    using System.Collections.Generic;
 
     /// <summary>
     /// View model that represents a data source panel which holds a tree like browser, a informational header and
@@ -171,9 +172,24 @@ namespace DEHCATIA.ViewModels
         {
             var viewModel = AppContainer.Container.Resolve<IHubMappingConfigurationDialogViewModel>();
 
-            viewModel.HubElements.AddRange(this.ObjectBrowser
-                .SelectedThings
-                .OfType<ElementDefinitionRowViewModel>()
+            HashSet<ElementDefinitionRowViewModel> rows = new();
+
+            foreach (var selectedThing in this.ObjectBrowser.SelectedThings)
+            {
+                switch (selectedThing)
+                {
+                    case ElementDefinitionRowViewModel elementDefinitionRowViewModel:
+                        rows.Add(elementDefinitionRowViewModel);
+                        break;
+                    case IHaveContainerViewModel haveContainer when haveContainer.ContainerViewModel is ElementDefinitionRowViewModel elementDefinitionParent:
+                        rows.Add(elementDefinitionParent);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            viewModel.HubElements.AddRange(rows
                 .Select(x =>
                 {
                     x.Thing.Clone(true);

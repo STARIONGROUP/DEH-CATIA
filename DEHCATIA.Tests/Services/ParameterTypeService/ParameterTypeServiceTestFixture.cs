@@ -29,6 +29,7 @@ namespace DEHCATIA.Tests.Services.ParameterTypeService
 
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
 
     using DEHCATIA.Services.ParameterTypeService;
 
@@ -88,6 +89,9 @@ namespace DEHCATIA.Tests.Services.ParameterTypeService
                 EngineeringModelSetup = this.engineeringSetup,
                 Iteration = { this.iteration }
             };
+
+            this.hubController.Setup(x => x.GetDehpOrModelReferenceDataLibrary()).Returns(this.mrdl);
+            this.hubController.Setup(x => x.OpenIteration).Returns(this.iteration);
         }
 
         [Test]
@@ -108,7 +112,9 @@ namespace DEHCATIA.Tests.Services.ParameterTypeService
             Assert.IsNull(this.service.ShapeSupportAngle);
             Assert.IsNull(this.service.ShapeArea);
             Assert.IsNull(this.service.ShapeThickness);
-            this.hubController.Verify(x => x.OpenIteration, Times.Exactly(8));
+            Assert.IsNull(this.service.Color);
+            Assert.IsNull(this.service.MultiColor);
+            this.hubController.Verify(x => x.OpenIteration, Times.Exactly(9));
         }
 
         [Test]
@@ -119,6 +125,18 @@ namespace DEHCATIA.Tests.Services.ParameterTypeService
 
             Assert.DoesNotThrow(() => CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.BeginUpdate)));
             Assert.DoesNotThrow(() => CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.EndUpdate)));
+
+            Assert.DoesNotThrow(() => this.service.RefreshParameterType());
+        }
+
+        [Test]
+        public void VerifyGetEligibleParameterTypeForMaterialOrMultiColor()
+        {
+            this.hubController.Setup(x => x.IsSessionOpen).Returns(true);
+            this.hubController.Setup(x => x.OpenIteration).Returns(this.iteration);
+            this.service.RefreshParameterType();
+
+            Assert.IsEmpty(this.service.GetEligibleParameterTypeForMaterialOrMultiColor());
         }
     }
 }

@@ -61,6 +61,16 @@ namespace DEHCATIA.Enumerations
         CatBody,
 
         /// <summary>
+        /// Represents a face contained inside a <see cref="CatBody"/>
+        /// </summary>
+        Face,
+
+        /// <summary>
+        /// Represents a edge contained inside a <see cref="Edge"/>
+        /// </summary>
+        Edge,
+
+        /// <summary>
         /// A Component refers an Assembly or a Part file and contains position information
         /// </summary>
         Component,

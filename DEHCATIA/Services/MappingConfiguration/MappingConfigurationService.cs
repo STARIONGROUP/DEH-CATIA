@@ -35,8 +35,6 @@ namespace DEHCATIA.Services.MappingConfiguration
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using CDP4Common.Types;
-
     using CDP4Dal.Operations;
 
     using DEHPCommon.Enumerators;
@@ -64,6 +62,11 @@ namespace DEHCATIA.Services.MappingConfiguration
         /// The constant identifier for saving/loading the material <see cref="ParameterType"/>
         /// </summary>
         private const string MaterialIdentifier = "MaterialParametertypeMappingIdentifier";
+
+        /// <summary>
+        /// The constant identifier for saving/loading the material <see cref="ParameterType"/>
+        /// </summary>
+        private const string ColorIdentifier = "ColorParametertypeMappingIdentifier";
 
         /// <summary>
         /// Gets the current class logger
@@ -139,6 +142,7 @@ namespace DEHCATIA.Services.MappingConfiguration
             )));
 
             this.LoadMaterialParameterType();
+            this.LoadColorParameterType();
 
             stopwatch.Stop();
             this.logger.Debug($"{this.correspondences.Count} ExternalIdentifiers deserialized in {stopwatch.ElapsedMilliseconds} ms");
@@ -154,6 +158,19 @@ namespace DEHCATIA.Services.MappingConfiguration
                 && this.hubController.GetThingById(correspondence.InternalId, out SampledFunctionParameterType parameterType))
             {
                 this.parameterTypeService.Material = parameterType;
+            }
+        }
+
+        /// <summary>
+        /// Loads the color <see cref="ParameterType"/> if present in the configuration
+        /// </summary>
+        private void LoadColorParameterType()
+        {
+            if (this.correspondences.FirstOrDefault(
+                x => x.ExternalIdentifier?.Identifier.Equals(ColorIdentifier) is true) is { } correspondence
+                && this.hubController.GetThingById(correspondence.InternalId, out SampledFunctionParameterType parameterType))
+            {
+                this.parameterTypeService.MultiColor = parameterType;
             }
         }
 
@@ -385,6 +402,20 @@ namespace DEHCATIA.Services.MappingConfiguration
             }
             
             this.AddToExternalIdentifierMap(materialParameterType.Iid, MaterialIdentifier, MappingDirection.FromHubToDst);
+        }
+
+        /// <summary>
+        /// Saves the specified <see cref="ParameterType"/> as the one used for mapping material in the current loaded configuration
+        /// </summary>
+        /// <param name="colorParameterType">The material <see cref="ParameterType"/></param>
+        public void SaveColorParameterType(ParameterType colorParameterType)
+        {
+            if (colorParameterType == null)
+            {
+                return;
+            }
+
+            this.AddToExternalIdentifierMap(colorParameterType.Iid, ColorIdentifier, MappingDirection.FromHubToDst);
         }
 
         /// <summary>

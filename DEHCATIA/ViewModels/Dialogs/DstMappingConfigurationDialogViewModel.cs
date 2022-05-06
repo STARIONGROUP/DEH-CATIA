@@ -108,9 +108,9 @@ namespace DEHCATIA.ViewModels.Dialogs
             get => this.topElement;
             set => this.RaiseAndSetIfChanged(ref this.topElement, value);
         }
-        
+
         /// <summary>
-        /// Backing field for <see cref="TopElement"/>
+        /// Backing field for <see cref="SelectedMaterialParameterType"/>
         /// </summary>
         private SampledFunctionParameterType selectedMaterialParameterType;
 
@@ -123,7 +123,35 @@ namespace DEHCATIA.ViewModels.Dialogs
             set
             {
                 this.parameterTypeService.Material = value;
-                this.RaiseAndSetIfChanged(ref this.selectedMaterialParameterType, value);
+                this.RaiseAndSetIfChanged(ref this.selectedMaterialParameterType, value); 
+                
+                if (value != null && this.SelectedColorParameterType == value)
+                {
+                    this.SelectedColorParameterType = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedColorParameterType"/>
+        /// </summary>
+        private SampledFunctionParameterType selectedColorParameterType;
+
+        /// <summary>
+        /// Gets or sets the top element of the tree
+        /// </summary>
+        public SampledFunctionParameterType SelectedColorParameterType
+        {
+            get => this.selectedColorParameterType;
+            set
+            {
+                this.parameterTypeService.MultiColor = value;
+                this.RaiseAndSetIfChanged(ref selectedColorParameterType, value);
+
+                if (value != null && this.SelectedMaterialParameterType == value)
+                {
+                    this.SelectedMaterialParameterType = null;
+                }
             }
         }
 
@@ -155,7 +183,7 @@ namespace DEHCATIA.ViewModels.Dialogs
         /// <summary>
         /// Gets the collection of available <see cref="SampledFunctionParameterType"/> compatible for Material mapping
         /// </summary>
-        public ReactiveList<SampledFunctionParameterType> AvailableMaterialParameterType { get; } = new();
+        public ReactiveList<SampledFunctionParameterType> AvailableMaterialOrColorParameterType { get; } = new();
 
         /// <summary>
         /// Initializes a new <see cref="DstMappingConfigurationDialogViewModel"/>
@@ -189,7 +217,9 @@ namespace DEHCATIA.ViewModels.Dialogs
                     });
                 });
 
-            this.AvailableMaterialParameterType.AddRange(this.parameterTypeService.GetEligibleParameterTypeForMaterial());
+            this.AvailableMaterialOrColorParameterType.AddRange(this.parameterTypeService.GetEligibleParameterTypeForMaterialOrMultiColor());
+            this.SelectedColorParameterType = this.parameterTypeService.MultiColor;
+            this.SelectedMaterialParameterType = this.parameterTypeService.Material;
         }
         
         /// <summary>

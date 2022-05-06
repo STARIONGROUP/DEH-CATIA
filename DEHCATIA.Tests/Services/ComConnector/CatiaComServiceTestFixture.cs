@@ -438,10 +438,9 @@ namespace DEHCATIA.Tests.Services.ComConnector
             
             Assert.DoesNotThrow(() => this.service.UpdateMaterial(new MappedElementRowViewModel(){ CatiaElement = definitionRowViewModel }));
 
-            this.materialService.Verify(x => x.TryApplyMaterial(It.IsAny<Product>(), It.IsAny<string>()), Times.Exactly(2));
+            this.materialService.Verify(x => x.TryApplyMaterial(It.IsAny<Product>(), It.IsAny<string>()), Times.Exactly(3));
             this.materialService.Verify(x => x.TryApplyMaterial(It.IsAny<Body>(), It.IsAny<string>()), Times.Exactly(1));
             this.materialService.Verify(x => x.TryRemoveMaterial(It.IsAny<Product>()), Times.Exactly(1));
-            this.materialService.Verify(x => x.TryRemoveMaterial(It.IsAny<Body>()), Times.Exactly(1));
         }
 
         [Test]

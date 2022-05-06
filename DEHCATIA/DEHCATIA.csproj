@@ -9,8 +9,8 @@
 		<Product>DEHCATIA</Product>
 		<Description>DEHCATIA desktop application</Description>
 		<Copyright>Copyright © RHEA System S.A.</Copyright>
-		<AssemblyVersion>1.2.1</AssemblyVersion>
-		<FileVersion>1.2.1</FileVersion>
+		<AssemblyVersion>1.3.0</AssemblyVersion>
+		<FileVersion>1.3.0</FileVersion>
 		<LangVersion>latest</LangVersion>
 		<StartupObject>DEHCATIA.App</StartupObject>
 		<ApplicationIcon>icon.ico</ApplicationIcon>
@@ -113,7 +113,7 @@
 	  </COMReference>
 	</ItemGroup>
 	<ItemGroup>
-    <PackageReference Include="DEHPCommon" Version="1.0.242" />
+    <PackageReference Include="DEHPCommon" Version="1.0.254" />
     <PackageReference Include="NLog" Version="4.6.8" />
     <PackageReference Include="NLog.Schema" Version="4.6.8" />
     <PackageReference Include="reactiveui" Version="6.5.0" />
@@ -139,28 +139,28 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_CylinderSegment.CATPart">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_DiscSegment.CATPart">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_ParaboloidSegment.CATPart">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_PlanarQuadrilateral.CATPart">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_Rectangle.CATPart">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_SphericalSegment.CATPart">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\2dTemplates\CATIA_Template_Triangle.CATPart">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Box.CATPart">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Capped_Cone.CATPart">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -169,19 +169,19 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Capsule.CATPart">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Cone.CATPart">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_conical.CATPart">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Cylinder.CATPart">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Dish.CATPart">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Ellipsoid.CATPart">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -190,7 +190,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Paraboloid.CATPart">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Poly_Prism.CATPart">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -202,16 +202,16 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Sphere.CATPart">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Tetrahedron.CATPart">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Tri_Prism.CATPart">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Services\CatiaTemplateService\Templates\3dTemplates\CATIA_Template_Wedge.CATPart">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
