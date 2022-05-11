@@ -41,7 +41,7 @@ namespace DEHCATIA.Tests.Converters
             Assert.Throws<InvalidOperationException>(() =>
                  this.converter.Convert("test", null, null, CultureInfo.InvariantCulture));
             
-            Assert.Throws<InvalidOperationException>(() => this.converter.Convert(null, null, null, CultureInfo.InvariantCulture));
+            Assert.Null(this.converter.Convert(null, null, null, CultureInfo.InvariantCulture));
 
             var color = Color.FromRgb(240, 233, 0);
             Assert.AreEqual(new SolidColorBrush(color).ToString(), this.converter.Convert(color, null, null, CultureInfo.InvariantCulture)?.ToString());

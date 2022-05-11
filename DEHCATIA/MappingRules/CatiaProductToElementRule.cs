@@ -36,7 +36,7 @@ namespace DEHCATIA.MappingRules
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
-    
+    using CDP4Dal.Exceptions;
     using DEHCATIA.Enumerations;
     using DEHCATIA.Services.MappingConfiguration;
     using DEHCATIA.Services.ParameterTypeService;
@@ -299,8 +299,14 @@ namespace DEHCATIA.MappingRules
             this.MapParameterOverride(this.parameterTypeService.Orientation,
                 ParameterTypeService.OrientationShortName, elementUsage, elementRowViewModel.ElementDefinition, elementRowViewModel.Shape.PositionOrientation.Orientation.Values);
 
+            this.MapParameterOverride(this.parameterTypeService.RelativeOrientation,
+                ParameterTypeService.RelativeOrientationShortName, elementUsage, elementRowViewModel.ElementDefinition, elementRowViewModel.Shape.RelativePositionOrientation.Orientation.Values);
+
             this.MapParameterOverride(this.parameterTypeService.Position,
                 ParameterTypeService.PositionShortName, elementUsage, elementRowViewModel.ElementDefinition, elementRowViewModel.Shape.PositionOrientation.Position.Values);
+
+            this.MapParameterOverride(this.parameterTypeService.RelativePosition,
+                ParameterTypeService.RelativePositionShortName, elementUsage, elementRowViewModel.ElementDefinition, elementRowViewModel.Shape.RelativePositionOrientation.Position.Values);
         }
 
         /// <summary>
@@ -336,15 +342,31 @@ namespace DEHCATIA.MappingRules
             this.MapParameterOverride(this.parameterTypeService.Position,
                 ParameterTypeService.PositionShortName, usageRow.ElementUsage, usageRow.ElementDefinition, usageRow.Shape.PositionOrientation.Position.Values);
 
+            this.MapParameterOverride(this.parameterTypeService.RelativeOrientation,
+                ParameterTypeService.RelativeOrientationShortName, usageRow.ElementUsage, usageRow.ElementDefinition, usageRow.Shape.RelativePositionOrientation.Orientation.Values);
+
+            this.MapParameterOverride(this.parameterTypeService.RelativePosition,
+                ParameterTypeService.RelativePositionShortName, usageRow.ElementUsage, usageRow.ElementDefinition, usageRow.Shape.RelativePositionOrientation.Position.Values);
+
             if (usageRow.ShouldMapMaterial && this.parameterTypeService.Material != null)
             {
                 this.MapParameterOverride(this.parameterTypeService.Material,
                     this.parameterTypeService.Material?.ShortName, usageRow.ElementUsage, usageRow.ElementDefinition, usageRow.Name, usageRow.MaterialName ?? "-");
             }
 
-            this.MapParameterOverride(this.parameterTypeService.Color,
-                this.parameterTypeService.Color.ShortName, usageRow.ElementUsage, usageRow.ElementDefinition,
-                $"#{usageRow.Color.R:X2}{usageRow.Color.G:X2}{usageRow.Color.B:X2}");
+            this.MapParameterOverride(parameterTypeService.Color,
+                parameterTypeService.Color.ShortName, usageRow.ElementUsage, usageRow.ElementDefinition,
+                this.ConvertColorToValueSetValue(usageRow));
+        }
+
+        /// <summary>
+        /// Converts the color information to a <see cref="string"/>
+        /// </summary>
+        /// <param name="usageRow">The <see cref="UsageRowViewModel"/></param>
+        /// <returns>a <see cref="string"/></returns>
+        private string ConvertColorToValueSetValue(ElementRowViewModel coloredRow)
+        {
+            return coloredRow.Color.HasValue ? $"#{coloredRow.Color.Value.R:X2}{coloredRow.Color.Value.G:X2}{coloredRow.Color.Value.B:X2}" : "-";
         }
 
         /// <summary>
@@ -370,6 +392,12 @@ namespace DEHCATIA.MappingRules
 
             this.MapParameter(this.parameterTypeService.Position,
                 ParameterTypeService.PositionShortName, elementRow, elementRow.Shape.PositionOrientation.Position.Values);
+
+            this.MapParameter(this.parameterTypeService.RelativeOrientation,
+                ParameterTypeService.RelativeOrientationShortName, elementRow, elementRow.Shape.RelativePositionOrientation.Orientation.Values);
+
+            this.MapParameter(this.parameterTypeService.RelativePosition,
+                ParameterTypeService.RelativePositionShortName, elementRow, elementRow.Shape.RelativePositionOrientation.Position.Values);
 
             this.MapBodyParameters(elementRow);
 
@@ -399,12 +427,12 @@ namespace DEHCATIA.MappingRules
                 materialValues.Add(bodyRowViewModel.MaterialName ?? "-");
 
                 colorValues.Add(bodyRowViewModel.Name);
-                colorValues.Add($"#{bodyRowViewModel.Color.R:X2}{bodyRowViewModel.Color.G:X2}{bodyRowViewModel.Color.B:X2}");
+                colorValues.Add(this.ConvertColorToValueSetValue(bodyRowViewModel));
 
                 foreach (var boundary in bodyRowViewModel.Children.OfType<BoundaryRowViewModel>())
                 {
                     colorValues.Add(boundary.Name);
-                    colorValues.Add($"#{boundary.Color.R:X2}{boundary.Color.G:X2}{boundary.Color.B:X2}");
+                    colorValues.Add(this.ConvertColorToValueSetValue(boundary));
                 }
             }
 

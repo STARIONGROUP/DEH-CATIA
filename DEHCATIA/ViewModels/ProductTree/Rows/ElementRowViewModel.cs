@@ -339,12 +339,12 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         /// <summary>
         /// Backing field for <see cref="Color"/>
         /// </summary>
-        private Color color;
+        private Color? color;
 
         /// <summary>
         /// Gets or sets a value indicating whether the material should transfered
         /// </summary>
-        public Color Color
+        public Color? Color
         {
             get => this.color;
             set => this.RaiseAndSetIfChanged(ref this.color, value);

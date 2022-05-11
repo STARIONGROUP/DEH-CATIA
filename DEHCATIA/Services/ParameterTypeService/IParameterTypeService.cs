@@ -69,9 +69,19 @@ namespace DEHCATIA.Services.ParameterTypeService
         ParameterType Orientation { get; }
 
         /// <summary>
+        /// Gets the relative Orientation <see cref="ParameterType"/>
+        /// </summary>
+        ParameterType RelativeOrientation { get; }
+
+        /// <summary>
         /// Gets the Position <see cref="ParameterType"/>
         /// </summary>
         ParameterType Position { get; }
+
+        /// <summary>
+        /// Gets the relative Position <see cref="ParameterType"/>
+        /// </summary>
+        ParameterType RelativePosition { get; }
 
         /// <summary>
         /// Gets the Shape kind <see cref="ParameterType"/>
