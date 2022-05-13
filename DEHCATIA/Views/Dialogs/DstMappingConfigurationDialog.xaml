@@ -39,7 +39,6 @@
         <behaviors:CloseWindowBehavior />
     </dxmvvm:Interaction.Behaviors>
     <dx:LoadingDecorator BorderEffect="Default" BorderEffectColor="Blue" IsSplashScreenShown="{Binding IsBusy}" OwnerLock="LoadingContent">
-
         <Grid Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -49,16 +48,15 @@
                 <dxdo:DockLayoutManager Margin="5" AutoHideMode="Default" FloatingMode="Window">
                     <dxdo:LayoutGroup AllowSplitters="True" Orientation="Vertical">
                         <dxdo:LayoutPanel AllowClose="False" AllowDock="False" AllowFloat="False" AllowHide="False" AllowMove="True" Caption="Catia Elements" ItemHeight="4*">
-
                             <Grid x:Name="MainContainer" Grid.Row="0" Margin="10">
                                 <dxg:TreeListControl ItemsSource="{Binding Elements}" SelectedItem="{Binding SelectedThing}" SelectionMode="None">
                                     <dxmvvm:Interaction.Behaviors>
                                         <behaviors:ContextMenuBehavior />
                                     </dxmvvm:Interaction.Behaviors>
                                     <dxg:TreeListControl.View>
-                                        <dxg:TreeListView Name="View" AllowEditing="False" AutoWidth="False" ExpandCollapseNodesOnNavigation="True" ExpandStateFieldName="IsExpanded" FixedLineWidth="0" HorizontalScrollbarVisibility="Auto"
-                                                          NavigationStyle="Row" ShowHorizontalLines="False" ShowIndicator="False" ShowNodeImages="False" ShowVerticalLines="False" TreeDerivationMode="HierarchicalDataTemplate"
-                                                          TreeLineStyle="Solid" VerticalScrollbarVisibility="Auto">
+                                        <dxg:TreeListView Name="View" AllowEditing="False" AutoWidth="False" ExpandCollapseNodesOnNavigation="True" ExpandStateFieldName="IsExpanded" FixedLineWidth="0" 
+                                                          HorizontalScrollbarVisibility="Auto" NavigationStyle="Row" ShowHorizontalLines="False" ShowIndicator="False" ShowNodeImages="False" 
+                                                          ShowVerticalLines="False" TreeDerivationMode="HierarchicalDataTemplate" TreeLineStyle="Solid" VerticalScrollbarVisibility="Auto">
                                             <dxg:TreeListView.FocusedRow>
                                                 <dynamic:ExpandoObject />
                                             </dxg:TreeListView.FocusedRow>
@@ -173,19 +171,23 @@
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="237*" />
+                                        <ColumnDefinition Width="47*"/>
                                         <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="115*" />
                                     </Grid.ColumnDefinitions>
-                                    <Label Grid.Row="0" Grid.Column="0" Margin="2" Content="Shape Name:" />
-                                    <Label Grid.Row="1" Grid.Column="2" Margin="2" Content="" />
-                                    <Label Grid.Row="2" Grid.Column="0" Margin="2" VerticalAlignment="Center" Content="Position:" />
-                                    <Label Grid.Row="3" Grid.Column="0" Margin="2" VerticalAlignment="Center" Content="Orientation:" />
-                                    <Label Grid.Row="0" Grid.Column="1" Margin="2" HorizontalAlignment="Left" VerticalAlignment="Center" Content="{Binding SelectedThing.Shape.Name}" FontWeight="Bold" />
-                                    <dxg:GridControl Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" MaxHeight="50" HorizontalAlignment="Left" VerticalAlignment="Stretch" AllowUpdateTwoWayBoundPropertiesOnSynchronization="False"
+                                    <Label Grid.Row="0" Grid.Column="0" Margin="2,2,2,2" Content="Shape Name:" />
+                                    <Label Grid.Row="1" Grid.Column="3" Margin="2,2,2,2" Content="" />
+                                    <Label Grid.Row="2" Grid.Column="0" Margin="2,0,2,0" VerticalAlignment="Center" Content="Position:" />
+                                    <Label Grid.Row="3" Grid.Column="0" Margin="2,0,2,0" VerticalAlignment="Center" Content="Orientation:" />
+                                    <Label Grid.Column="1" Margin="2,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="{Binding SelectedThing.Shape.Name}" FontWeight="Bold" />
+                                    <CheckBox x:Name="DisplayRelativePositionOrientation" IsEnabled="{Binding IsDisplayRelativePositionOrientationCheckboxEnabled}" IsChecked="{Binding IsDisplayRelativePositionOrientationCheckboxChecked}" 
+                                              Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" Margin="2,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                              Content="{Binding DisplayRelativePositionOrientationCheckboxText}"/>
+                                    <dxg:GridControl x:Name="PositionGrid" Grid.Row="2" Grid.ColumnSpan="5" MaxHeight="50" HorizontalAlignment="Left" AllowUpdateTwoWayBoundPropertiesOnSynchronization="False"
                                                      AutoGenerateColumns="None" EnableSmartColumnsGeneration="False"
-                                                     ItemsSource="{Binding SelectedThing.Shape.PositionOrientation.Position.AsRow}"
-                                                     SelectionMode="Row" ToolTip="Center of Gravity">
+                                                     ItemsSource="{Binding SelectedThingPositionOrientation.Position.AsRow}"
+                                                     SelectionMode="Row" ToolTip="Center of Gravity" Margin="84,0,0,76" Grid.RowSpan="2">
                                         <dxg:GridControl.View>
                                             <dxg:TableView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AllowColumnMoving="True" AllowEditing="False" AllowGrouping="True" AutoWidth="true" IndicatorWidth="30"
                                                            IsDetailButtonVisibleBinding="{x:Null}"
@@ -197,10 +199,10 @@
                                             <dxg:GridColumn AllowMoving="False" FieldName="Z" HorizontalHeaderContentAlignment="Center" />
                                         </dxg:GridControl.Columns>
                                     </dxg:GridControl>
-                                    <dxg:GridControl Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" MaxHeight="210" HorizontalAlignment="Left" VerticalAlignment="Stretch" AllowUpdateTwoWayBoundPropertiesOnSynchronization="False"
+                                    <dxg:GridControl x:Name="OrientationGrid" Grid.Row="3" Grid.ColumnSpan="5" MaxHeight="210" HorizontalAlignment="Left" AllowUpdateTwoWayBoundPropertiesOnSynchronization="False"
                                                      AutoGenerateColumns="None" EnableSmartColumnsGeneration="False"
-                                                     ItemsSource="{Binding SelectedThing.Shape.PositionOrientation.Orientation.AsRow}"
-                                                     SelectionMode="Row" ToolTip="Mass Moment of Inertia">
+                                                     ItemsSource="{Binding SelectedThingPositionOrientation.Orientation.AsRow}"
+                                                     SelectionMode="Row" ToolTip="Mass Moment of Inertia" Margin="84,0,0,0">
                                         <dxg:GridControl.View>
                                             <dxg:TableView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AllowColumnMoving="True" AllowEditing="False" AllowGrouping="True" AutoWidth="true" IndicatorWidth="30"
                                                            IsDetailButtonVisibleBinding="{x:Null}"

@@ -298,10 +298,18 @@ namespace DEHCATIA.Services.MaterialService
         /// <param name="document">The <see cref="Document"/> from where the provided <see cref="AnyObject"/> is from</param>
         /// <param name="anyObject">The <see cref="AnyObject"/> from which to retrieve the color</param>
         /// <param name="color">The <see cref="Color"/> to apply</param>
-        public void ApplyColor(Document document, AnyObject anyObject, Color color)
+        public void ApplyColor(Document document, AnyObject anyObject, Color? color)
         {
-            this.GetVisProperty(document, anyObject)
-                .SetRealColor(Convert.ToInt32(color.R), Convert.ToInt32(color.G), Convert.ToInt32(color.B), 1);
+            var visProperties = this.GetVisProperty(document, anyObject);
+
+            if(color.HasValue)
+            {
+                visProperties.SetRealColor(color.Value.R, color.Value.G, color.Value.B, 1);
+            }
+            else
+            {
+                visProperties.SetRealColor(0,0,0,0);
+            }            
         }
 
         /// <summary>
@@ -310,7 +318,7 @@ namespace DEHCATIA.Services.MaterialService
         /// <param name="document">The <see cref="Document"/> from where the provided <see cref="AnyObject"/> is from</param>
         /// <param name="anyObject">The <see cref="AnyObject"/> from which to retrieve the color</param>
         /// <returns>a <see cref="Color"/></returns>
-        public Color GetColor(Document document, AnyObject anyObject)
+        public Color? GetColor(Document document, AnyObject anyObject)
         {
             var visProperty = this.GetVisProperty(document, anyObject);
 
@@ -318,21 +326,17 @@ namespace DEHCATIA.Services.MaterialService
 
             if (status == CatVisPropertyStatus.catVisPropertyDefined)
             {
-                return Color.FromRgb(Convert.ToByte(red), Convert.ToByte(green), Convert.ToByte(blue));
-            }
-            else
-            {
-                status = visProperty.GetVisibleColor(out red, out green, out blue);
+                var color = Color.FromRgb(Convert.ToByte(red), Convert.ToByte(green), Convert.ToByte(blue));
 
-                if (status == CatVisPropertyStatus.catVisPropertyDefined)
+                if(color == Color.FromRgb(255,255,255))
                 {
-                    return Color.FromRgb(Convert.ToByte(red), Convert.ToByte(green), Convert.ToByte(blue));
+                    return default;
                 }
+
+                return color;
             }
 
-            var color = default(Color);
-            color.A = 0;
-            return color;
+            return default;
         }
 
         /// <summary>

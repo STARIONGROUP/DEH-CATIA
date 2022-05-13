@@ -93,5 +93,66 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
             values.AddRange(this.Position.Values);
             return values.Cast<dynamic>().ToArray();
         }
+
+        /// <summary>
+        /// Computes the difference between the provided <see cref="CatiaShapePositionOrientationViewModel"/>
+        /// </summary>
+        /// <param name="actualOrientation">the first <see cref="CatiaShapePositionOrientationViewModel"/></param>
+        /// <param name="referencedOrientation">the second <see cref="CatiaShapePositionOrientationViewModel"/></param>
+        /// <returns>A new <see cref="CatiaShapePositionOrientationViewModel"/></returns>
+        public static CatiaShapePositionOrientationViewModel operator -(CatiaShapePositionOrientationViewModel positionOrientation0, CatiaShapePositionOrientationViewModel positionOrientation1)
+        {
+            var newPositionOrientationViewModel = new CatiaShapePositionOrientationViewModel();
+            newPositionOrientationViewModel.Orientation = positionOrientation0.Orientation - positionOrientation1.Orientation;
+            newPositionOrientationViewModel.Position = positionOrientation0.Position - positionOrientation1.Position;
+            return newPositionOrientationViewModel;
+        }
+
+        /// <summary>
+        /// Sums up the provided two <see cref="CatiaShapePositionOrientationViewModel"/>
+        /// </summary>
+        /// <param name="orientation0">The first <see cref="CatiaShapePositionOrientationViewModel"/></param>
+        /// <param name="orientation1">The second <see cref="CatiaShapePositionOrientationViewModel"/></param>
+        /// <returns>A <see cref="CatiaShapePositionOrientationViewModel"/></returns>
+        public static CatiaShapePositionOrientationViewModel operator +(CatiaShapePositionOrientationViewModel positionOrientation0, CatiaShapePositionOrientationViewModel positionOrientation1)
+        {
+            var newPositionOrientationViewModel = new CatiaShapePositionOrientationViewModel();
+            newPositionOrientationViewModel.Orientation = positionOrientation0.Orientation + positionOrientation1.Orientation;
+            newPositionOrientationViewModel.Position = positionOrientation0.Position + positionOrientation1.Position;
+            return newPositionOrientationViewModel;
+        }
+
+        /// <summary>
+        /// Verifies that the provided two <see cref="CatiaShapePositionOrientationViewModel"/> are equals
+        /// </summary>
+        /// <param name="orientation0">The first <see cref="CatiaShapePositionOrientationViewModel"/></param>
+        /// <param name="orientation1">The second <see cref="CatiaShapePositionOrientationViewModel"/></param>
+        /// <returns>A <see cref="bool"/></returns>
+        public static bool operator ==(CatiaShapePositionOrientationViewModel positionOrientation0, CatiaShapePositionOrientationViewModel positionOrientation1)
+        {
+            return positionOrientation0?.Orientation == positionOrientation1?.Orientation
+                && positionOrientation0?.Position == positionOrientation1?.Position;
+        }
+
+        /// <summary>
+        /// Verifies that the provided two <see cref="CatiaShapePositionOrientationViewModel"/> are different
+        /// </summary>
+        /// <param name="orientation0">The first <see cref="CatiaShapePositionOrientationViewModel"/></param>
+        /// <param name="orientation1">The second <see cref="CatiaShapePositionOrientationViewModel"/></param>
+        /// <returns>A <see cref="bool"/></returns>
+        public static bool operator !=(CatiaShapePositionOrientationViewModel positionOrientation0, CatiaShapePositionOrientationViewModel positionOrientation1)
+        {
+            return  positionOrientation0?.Orientation != positionOrientation1?.Orientation
+                || positionOrientation0?.Position != positionOrientation1?.Position;
+        }
+
+        /// <summary>
+        /// Overrides the <see cref="ToString"/>
+        /// </summary>
+        /// <returns>A <see cref="string"/></returns>
+        public override string ToString()
+        {
+            return $"Position [{this.Position}] - Orientation [{this.Orientation}]";
+        }
     }
 }

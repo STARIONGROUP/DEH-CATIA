@@ -78,9 +78,19 @@ namespace DEHCATIA.Services.ParameterTypeService
         public const string OrientationShortName = "orientation";
 
         /// <summary>
-        /// The Orientation <see cref="ParameterType"/> short name
+        /// The relative Orientation <see cref="ParameterType"/> short name
         /// </summary>
-        public const string PositionShortName = "position";
+        public const string RelativeOrientationShortName = "relative_orientation";
+
+        /// <summary>
+        /// The Position <see cref="ParameterType"/> short name
+        /// </summary>
+        public const string PositionShortName = "coord";
+
+        /// <summary>
+        /// The relative position <see cref="ParameterType"/> short name
+        /// </summary>
+        public const string RelativePositionShortName = "relative_coord";
 
         /// <summary>
         /// The Shape kind <see cref="ParameterType"/> short name
@@ -228,6 +238,16 @@ namespace DEHCATIA.Services.ParameterTypeService
         public ParameterType Orientation => this.orientation ??= this.FetchParameterType(OrientationShortName);
 
         /// <summary>
+        /// Backing field for <see cref="RelativeOrientation"/>
+        /// </summaryrelativeOrientation
+        private ParameterType relativeOrientation;
+
+        /// <summary>
+        /// Gets the relative Orientation <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType RelativeOrientation => this.relativeOrientation ??= this.FetchParameterType(RelativeOrientationShortName);
+
+        /// <summary>
         /// Backing field for <see cref="Position"/>
         /// </summary>
         private ParameterType position;
@@ -236,6 +256,16 @@ namespace DEHCATIA.Services.ParameterTypeService
         /// Gets the Position <see cref="ParameterType"/>
         /// </summary>
         public ParameterType Position => this.position ??= this.FetchParameterType(PositionShortName);
+
+        /// <summary>
+        /// Backing field for <see cref="RelativePosition"/>
+        /// </summary>
+        private ParameterType relativePosition;
+
+        /// <summary>
+        /// Gets the relative Position <see cref="ParameterType"/>
+        /// </summary>
+        public ParameterType RelativePosition => this.relativePosition ??= this.FetchParameterType(RelativePositionShortName);
 
         /// <summary>
         /// Backing field for <see cref="ShapeKind"/>
@@ -472,7 +502,9 @@ namespace DEHCATIA.Services.ParameterTypeService
             this.centerOfGravity = null;
             this.momentOfInertia = null;
             this.orientation = null;
+            this.relativeOrientation = null;
             this.position = null;
+            this.relativePosition = null;
             this.shapeKind = null;
             this.shapeLength = null;
             this.shapeWidthOrDiameter = null;

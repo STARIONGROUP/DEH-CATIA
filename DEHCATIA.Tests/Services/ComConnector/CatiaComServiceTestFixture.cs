@@ -26,11 +26,13 @@ namespace DEHCATIA.Tests.Services.ComConnector
 {
     using System;
     using System.Collections;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Windows.Media;
 
     using CDP4Common.EngineeringModelData;
 
@@ -39,6 +41,7 @@ namespace DEHCATIA.Tests.Services.ComConnector
     using DEHCATIA.Services.CatiaTemplateService;
     using DEHCATIA.Services.ComConnector;
     using DEHCATIA.Services.MaterialService;
+    using DEHCATIA.ViewModels.ProductTree;
     using DEHCATIA.ViewModels.ProductTree.Parameters;
     using DEHCATIA.ViewModels.ProductTree.Rows;
     using DEHCATIA.ViewModels.ProductTree.Shapes;
@@ -60,6 +63,7 @@ namespace DEHCATIA.Tests.Services.ComConnector
     using Moq;
 
     using NUnit.Framework;
+    using NUnit.Framework.Internal;
 
     using ProductStructureTypeLib;
 
@@ -184,6 +188,10 @@ namespace DEHCATIA.Tests.Services.ComConnector
             });
 
             product.Setup(x => x.Position).Returns(position.Object);
+            
+            position.Setup(x => x.GetComponents(It.IsAny<object[]>()))
+                .Callback<Array>(this.GetRandomPositionOrientation);
+            
             this.element.CatiaElement = new UsageRowViewModel(product.Object, "")
             {
                 Children =
@@ -287,26 +295,20 @@ namespace DEHCATIA.Tests.Services.ComConnector
             var product = new Mock<Product>();
             product.Setup(x => x.get_Name()).Returns("product");
             var position = new Mock<Position>();
-
-            position.Setup(x => x.GetComponents(It.IsAny<dynamic[]>())).Callback<Array>(x =>
-            {
-                x.SetValue(1d, 0);
-                x.SetValue(1d, 0);
-                x.SetValue(0d, 1);
-                x.SetValue(0d, 2);
-                x.SetValue(0d, 3);
-                x.SetValue(1d, 4);
-                x.SetValue(0d, 5);
-                x.SetValue(0d, 6);
-                x.SetValue(0d, 7);
-                x.SetValue(1d, 8);
-                x.SetValue(0d, 9);
-                x.SetValue(0d, 10);
-                x.SetValue(0d, 11);
-            });
-
+            position.Setup(x => x.GetComponents(It.IsAny<dynamic[]>())).Callback<Array>(this.GetRandomPositionOrientation);
             product.Setup(x => x.Position).Returns(position.Object);
-            this.element.CatiaElement = new UsageRowViewModel(product.Object, destFileName);
+            var parentProduct = new Mock<Product>();
+            parentProduct.Setup(x => x.get_Name()).Returns("parentProduct");
+            var parentPosition = new Mock<Position>();
+            parentPosition.Setup(x => x.GetComponents(It.IsAny<dynamic[]>())).Callback<Array>(this.GetRandomPositionOrientation);
+            parentProduct.Setup(x => x.Position).Returns(parentPosition.Object);
+
+            this.element.CatiaElement = new UsageRowViewModel(product.Object, destFileName)
+            {
+                Parent = new UsageRowViewModel(parentProduct.Object, ""),
+                Shape = new CatiaShapeViewModel()
+            };
+
             this.element.CatiaElement.Parameters.Clear();
             var shapeKindParameter = new Mock<Parameter>();
             shapeKindParameter.Setup(x => x.get_Name()).Returns("kind");
@@ -442,7 +444,47 @@ namespace DEHCATIA.Tests.Services.ComConnector
             this.materialService.Verify(x => x.TryApplyMaterial(It.IsAny<Body>(), It.IsAny<string>()), Times.Exactly(1));
             this.materialService.Verify(x => x.TryRemoveMaterial(It.IsAny<Product>()), Times.Exactly(1));
         }
+        
+        [Test]
+        public void VerifyUpdateColor()
+        {
+            this.service.ActiveDocument = new CatiaDocumentViewModel(new Mock<Document>().Object, ElementType.CatProduct);
 
+            this.element.CatiaElement = new UsageRowViewModel(new Mock<Product>().Object, "")
+            {
+                Name = "product.0",
+                MaterialName = "-"
+            };
+
+            Assert.DoesNotThrow(() => this.service.UpdateColor(this.element));
+            this.element.CatiaElement.Color = Color.FromRgb(25,85,23);
+            Assert.DoesNotThrow(() => this.service.UpdateColor(this.element));
+            
+            this.element.CatiaElement.Children.Add(
+                new BodyRowViewModel(new Mock<Body>().Object, "Grass")
+                {
+                    Name = "body.0", Children =
+                    {
+                        new BoundaryRowViewModel(new Mock<Boundary>().Object, ElementType.Face) { Color = Color.FromRgb(1, 56, 80) }
+                    }
+                });
+
+            Assert.DoesNotThrow(() => this.service.UpdateColor(this.element));
+
+            var definitionRowViewModel = new DefinitionRowViewModel(new Mock<Product>().Object, "")
+            {
+                Name = "part.1",
+                MaterialName = "Granite"
+            };
+
+            Assert.DoesNotThrow(() => this.service.UpdateColor(new MappedElementRowViewModel() { CatiaElement = definitionRowViewModel }));
+
+            this.materialService.Verify(x => x.ApplyColor(It.IsAny<Document>(), It.IsAny<MappedElementRowViewModel>()), Times.Exactly(4));
+
+            this.materialService.Verify(x => x.ApplyColor(
+                    It.IsAny<Document>(), It.IsAny<AnyObject>(), It.IsAny<Color?>()), Times.Once);
+        }
+        
         [Test]
         public void VerifyGetMomentOfInertia()
         {
@@ -479,6 +521,48 @@ namespace DEHCATIA.Tests.Services.ComConnector
             analyse.Verify(x => x.GetInertia(values), Times.Once);
             inertia.Verify(x => x.GetInertiaMatrix(matcher), Times.Once);
             inertia.Verify(x => x.GetInertiaMatrix(values), Times.Once);
+        }
+
+        [Test]
+        public void VerifyUpdatePositionOrientation()
+        {
+            var parentProduct = new Mock<Product>();
+            var parentPosition = new Mock<Position>();
+
+            var elementProduct = new Mock<Product>();
+            var elementPosition = new Mock<Position>();
+
+            parentPosition.Setup(x => x.GetComponents(It.IsAny<object[]>()))
+                .Callback<Array>(this.GetRandomPositionOrientation);
+
+            elementPosition.Setup(x => x.GetComponents(It.IsAny<object[]>()))
+                .Callback<Array>(this.GetRandomPositionOrientation);
+
+            parentProduct.Setup(x => x.Position).Returns(parentPosition.Object);
+            elementProduct.Setup(x => x.Position).Returns(elementPosition.Object);
+
+            var parent = new ElementRowViewModel(parentProduct.Object, "")
+            {
+                Shape = new CatiaShapeViewModel() { PositionOrientation = this.service.GetPositionAndOrientation(parentProduct.Object) }
+            };
+
+            var elementRowViewModel = new ElementRowViewModel(elementProduct.Object, "")
+            {
+                Parent = parent,
+                Shape = new CatiaShapeViewModel() { PositionOrientation = this.service.GetPositionAndOrientation(elementProduct.Object) }
+            };
+            
+            Assert.DoesNotThrow(() => this.service.UpdatePositionAndOrientation(elementRowViewModel));
+        }
+
+        private void GetRandomPositionOrientation(Array reference)
+        {
+            var random = Randomizer.CreateRandomizer();
+
+            for (var index = 0; index < 12; index++)
+            {
+                reference.SetValue(random.NextDouble(), index);
+            }
         }
     }
 }

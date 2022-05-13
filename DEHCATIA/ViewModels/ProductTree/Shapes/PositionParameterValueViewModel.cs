@@ -25,6 +25,7 @@
 namespace DEHCATIA.ViewModels.ProductTree.Shapes
 {
     using DEHCATIA.ViewModels.ProductTree.Parameters;
+    using System;
 
     /// <summary>
     /// Represents a Position expressable as X,Y,Z
@@ -37,6 +38,68 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// <param name="value">The value</param>
         public PositionParameterValueViewModel((double X, double Y, double Z) value) : base(value)
         {
+        }
+
+        /// <summary>
+        /// Sums up the provided <see cref="PositionParameterValueViewModel"/>
+        /// </summary>
+        /// <param name="actualPosition">the actual <see cref="PositionParameterValueViewModel"/></param>
+        /// <param name="referencedPosition">the reference <see cref="PositionParameterValueViewModel"/></param>
+        /// <returns>A new <see cref="PositionParameterValueViewModel"/></returns>
+        public static PositionParameterValueViewModel operator +(PositionParameterValueViewModel actualPosition, PositionParameterValueViewModel referencedPosition)
+        {
+            return new PositionParameterValueViewModel((actualPosition.Value.X + referencedPosition.Value.X,
+                actualPosition.Value.Y + referencedPosition.Value.Y,
+                actualPosition.Value.Z + referencedPosition.Value.Z));
+        }
+
+        /// <summary>
+        /// Computes the difference between the provided <see cref="PositionParameterValueViewModel"/>
+        /// </summary>
+        /// <param name="actualPosition">the actual <see cref="PositionParameterValueViewModel"/></param>
+        /// <param name="referencedPosition">the reference <see cref="PositionParameterValueViewModel"/></param>
+        /// <returns>A new <see cref="PositionParameterValueViewModel"/></returns>
+        public static PositionParameterValueViewModel operator -(PositionParameterValueViewModel actualPosition, PositionParameterValueViewModel referencedPosition)
+        {
+            return new PositionParameterValueViewModel((actualPosition.Value.X - referencedPosition.Value.X, 
+                actualPosition.Value.Y - referencedPosition.Value.Y, 
+                actualPosition.Value.Z - referencedPosition.Value.Z));
+        }
+
+        /// <summary>
+        /// Verifies that the provided two <see cref="PositionParameterValueViewModel"/> are equals
+        /// </summary>
+        /// <param name="position0">The first <see cref="PositionParameterValueViewModel"/></param>
+        /// <param name="position1">The second <see cref="PositionParameterValueViewModel"/></param>
+        /// <returns>A <see cref="bool"/></returns>
+        public static bool operator ==(PositionParameterValueViewModel position0, PositionParameterValueViewModel position1)
+        {
+            if (position0 is null || position1 is null)
+            {
+                return position0 is null && position1 is null;
+            }
+
+            return Math.Abs(position0.Value.X) == Math.Abs(position1.Value.X) 
+                && Math.Abs(position0.Value.Y) == Math.Abs(position1.Value.Y) 
+                && Math.Abs(position0.Value.Z) == Math.Abs(position1.Value.Z);
+        }
+
+        /// <summary>
+        /// Verifies that the provided two <see cref="PositionParameterValueViewModel"/> are different
+        /// </summary>
+        /// <param name="position0">The first <see cref="PositionParameterValueViewModel"/></param>
+        /// <param name="position1">The second <see cref="PositionParameterValueViewModel"/></param>
+        /// <returns>A <see cref="bool"/></returns>
+        public static bool operator !=(PositionParameterValueViewModel position0, PositionParameterValueViewModel position1)
+        {
+            if (position0 is null || position1 is null)
+            {
+                return position0 is null ^ position1 is null;
+            }
+
+            return Math.Abs(position0.Value.X) != Math.Abs(position1.Value.X)
+                || Math.Abs(position0.Value.Y) != Math.Abs(position1.Value.Y)
+                || Math.Abs(position0.Value.Z) != Math.Abs(position1.Value.Z);
         }
     }
 }

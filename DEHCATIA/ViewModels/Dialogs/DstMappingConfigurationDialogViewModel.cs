@@ -37,7 +37,7 @@ namespace DEHCATIA.ViewModels.Dialogs
     using DEHCATIA.Services.ParameterTypeService;
     using DEHCATIA.ViewModels.Dialogs.Interfaces;
     using DEHCATIA.ViewModels.ProductTree.Rows;
-
+    using DEHCATIA.ViewModels.ProductTree.Shapes;
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
 
@@ -48,6 +48,11 @@ namespace DEHCATIA.ViewModels.Dialogs
     /// </summary>
     public class DstMappingConfigurationDialogViewModel : MappingConfigurationDialogViewModel, IDstMappingConfigurationDialogViewModel
     {
+        /// <summary>
+        /// The default text for the position orientation checkbox
+        /// </summary>
+        private const string defaultLabelForPositionOrientationCheckbox = "Own Position and Orientation";
+
         /// <summary>
         /// The <see cref="IParameterTypeService"/>
         /// </summary>
@@ -93,6 +98,62 @@ namespace DEHCATIA.ViewModels.Dialogs
         {
             get => this.canSetAnElementUsage;
             set => this.RaiseAndSetIfChanged(ref this.canSetAnElementUsage, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="IsDisplayRelativePositionOrientationCheckboxChecked"/>
+        /// </summary>
+        private bool isDisplayRelativePositionOrientationCheckboxChecked = false;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the checkbox is checked
+        /// </summary>
+        public bool IsDisplayRelativePositionOrientationCheckboxChecked
+        {
+            get => this.isDisplayRelativePositionOrientationCheckboxChecked;
+            set => this.RaiseAndSetIfChanged(ref this.isDisplayRelativePositionOrientationCheckboxChecked, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="IsDisplayRelativePositionOrientationCheckboxEnabled"/>
+        /// </summary>
+        private bool isDisplayRelativePositionOrientationCheckboxEnabled;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the checkbox is checked
+        /// </summary>
+        public bool IsDisplayRelativePositionOrientationCheckboxEnabled
+        {
+            get => this.isDisplayRelativePositionOrientationCheckboxEnabled;
+            set => this.RaiseAndSetIfChanged(ref this.isDisplayRelativePositionOrientationCheckboxEnabled, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedThingPositionOrientation"/>
+        /// </summary>
+        private CatiaShapePositionOrientationViewModel selectedThingOrientation;
+
+        /// <summary>
+        /// Gets or sets the current position and orientation to display
+        /// </summary>
+        public CatiaShapePositionOrientationViewModel SelectedThingPositionOrientation
+        {
+            get => this.selectedThingOrientation;
+            set => this.RaiseAndSetIfChanged(ref this.selectedThingOrientation, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="DisplayRelativePositionOrientationCheckboxText"/>
+        /// </summary>
+        private string displayRelativePositionOrientationCheckboxText = defaultLabelForPositionOrientationCheckbox;
+
+        /// <summary>
+        /// Gets or sets the text displayed as content for the checkbox that allows to display the relative orientation and position of the current <see cref="SelectedThing"/>
+        /// </summary>
+        public string DisplayRelativePositionOrientationCheckboxText
+        {
+            get => this.displayRelativePositionOrientationCheckboxText;
+            set => this.RaiseAndSetIfChanged(ref this.displayRelativePositionOrientationCheckboxText, value);
         }
 
         /// <summary>
@@ -221,7 +282,7 @@ namespace DEHCATIA.ViewModels.Dialogs
             this.SelectedColorParameterType = this.parameterTypeService.MultiColor;
             this.SelectedMaterialParameterType = this.parameterTypeService.Material;
         }
-        
+
         /// <summary>
         /// Initializes this view model <see cref="ICommand"/> and <see cref="Observable"/>
         /// </summary>
@@ -235,7 +296,7 @@ namespace DEHCATIA.ViewModels.Dialogs
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.ExecuteContinueCommand(this.ContinueCommandExecute));
 
-            if (!(this.Elements.FirstOrDefault() is {} element))
+            if (!(this.Elements.FirstOrDefault() is { } element))
             {
                 return;
             }
@@ -259,9 +320,40 @@ namespace DEHCATIA.ViewModels.Dialogs
                 .Subscribe(_ => this.UpdateHubFields(this.UpdateAvailableElementUsages));
 
             this.WhenAnyValue(x => x.SelectedThing)
-                .Subscribe(_ => 
-                    this.CanSetAnElementUsage = 
-                        this.SelectedThing != null && this.SelectedThing != this.TopElement && !(this.SelectedThing is DefinitionRowViewModel));
+                .Subscribe(_ =>
+                {
+                    this.UpdateDisplayedPositionAndOrientation();
+                    this.CanSetAnElementUsage = this.SelectedThing != null 
+                                        && this.SelectedThing != this.TopElement 
+                                        && !(this.SelectedThing is DefinitionRowViewModel);
+                });
+
+
+            this.WhenAnyValue(x => x.IsDisplayRelativePositionOrientationCheckboxChecked)
+                .Subscribe(_ => this.UpdateDisplayedPositionAndOrientation());
+            this.WhenAnyValue(x => x.SelectedThingPositionOrientation)
+                .Subscribe(_ => IsDisplayRelativePositionOrientationCheckboxEnabled = this.SelectedThingPositionOrientation != null);
+
+        }
+
+        /// <summary>
+        /// Updates the <see cref="SelectedThingPositionOrientation"/> and the <see cref="SelectedThingPosition"/>
+        /// </summary>
+        private void UpdateDisplayedPositionAndOrientation()
+        {
+            if(this.SelectedThing is null || this.SelectedThing == this.TopElement || this.SelectedThing.Shape is null)
+            {
+                this.SelectedThingPositionOrientation = null;
+                return;
+            }
+
+            this.DisplayRelativePositionOrientationCheckboxText = this.IsDisplayRelativePositionOrientationCheckboxChecked
+                ? $"Position and Orientation related to {this.selectedThing.Parent?.Name}"
+                : defaultLabelForPositionOrientationCheckbox;
+
+            this.SelectedThingPositionOrientation = this.IsDisplayRelativePositionOrientationCheckboxChecked 
+                ? this.SelectedThing.Shape?.RelativePositionOrientation
+                : this.SelectedThing.Shape?.PositionOrientation;
         }
 
         /// <summary>
@@ -351,11 +443,6 @@ namespace DEHCATIA.ViewModels.Dialogs
         {
             this.AvailableOptions.Clear();
             this.AvailableOptions.AddRange(this.HubController.OpenIteration.Option);
-
-            if (this.AvailableOptions.Count == 1)
-            {
-                this.TopElement.SelectedOption ??= this.AvailableOptions.FirstOrDefault();
-            }
         }
     }
 }

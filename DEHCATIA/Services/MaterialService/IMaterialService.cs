@@ -112,7 +112,7 @@ namespace DEHCATIA.Services.MaterialService
         /// <param name="document">The <see cref="Document"/> from where the provided <see cref="AnyObject"/> is from</param>
         /// <param name="anyObject">The <see cref="AnyObject"/> from which to retrieve the color</param>
         /// <param name="color">The <see cref="Color"/> to apply</param>
-        void ApplyColor(Document document, AnyObject anyObject, Color color);
+        void ApplyColor(Document document, AnyObject anyObject, Color? color);
 
         /// <summary>
         /// Applies the specified color to the anyObject represented by the provided <see cref="MappedElementRowViewModel"/>
@@ -127,6 +127,6 @@ namespace DEHCATIA.Services.MaterialService
         /// <param name="document">The <see cref="Document"/> from where the provided <see cref="AnyObject"/> is from</param>
         /// <param name="anyObject">The <see cref="AnyObject"/> from which to retrieve the color</param>
         /// <returns>a <see cref="Color"/></returns>
-        Color GetColor(Document document, AnyObject anyObject);
+        Color? GetColor(Document document, AnyObject anyObject);
     }
 }
