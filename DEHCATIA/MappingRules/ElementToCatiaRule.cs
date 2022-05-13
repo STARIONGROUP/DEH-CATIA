@@ -426,25 +426,41 @@ namespace DEHCATIA.MappingRules
         }
 
         /// <summary>
-        /// Maps the position parameter
+        /// Maps the position parameters
         /// </summary>
         /// <param name="mappedElementRowViewModel">The <see cref="MappedElementRowViewModel"/></param>
         private void MapPosition(MappedElementRowViewModel mappedElementRowViewModel)
         {
-            var valueSet = this.GetParameterOrOverrideBase(mappedElementRowViewModel.HubElement, this.parameterTypeService.Position)?
+            mappedElementRowViewModel.CatiaElement.Shape.PositionOrientation.Position = 
+                MapPosition(mappedElementRowViewModel, this.parameterTypeService.Position);
+
+            mappedElementRowViewModel.CatiaElement.Shape.RelativePositionOrientation.Position =
+                MapPosition(mappedElementRowViewModel, this.parameterTypeService.RelativePosition);
+        }
+
+        /// <summary>
+        /// Maps the position like specified parameter
+        /// </summary>
+        /// <param name="mappedElementRowViewModel">The <see cref="MappedElementRowViewModel"/></param>
+        /// <param name="parameterType">The <see cref="ParameterType"/> of the parameter to map</param>
+        /// <returns>a <see cref="PositionParameterValueViewModel"/></returns>
+        private PositionParameterValueViewModel MapPosition(MappedElementRowViewModel mappedElementRowViewModel, ParameterType parameterType)
+        {
+            var valueSet = this.GetParameterOrOverrideBase(mappedElementRowViewModel.HubElement, parameterType)?
                 .QueryParameterBaseValueSet(mappedElementRowViewModel.CatiaElement.SelectedOption,
                     mappedElementRowViewModel.CatiaElement.SelectedActualFiniteState);
 
             if (valueSet is { } values && (values.ActualValue.Count != 3 || values.ActualValue.Any(x => x == "-")))
             {
-                this.mappingErrors.Add($"The Position parameter was found but could not be mapped for the element {mappedElementRowViewModel.HubElement.Name}");
+                this.mappingErrors.Add($"The {parameterType.Name} parameter was found but could not be mapped for the element {mappedElementRowViewModel.HubElement.Name}");
             }
 
             var positionMatrix = (Convert.ToDouble(valueSet?.ActualValue[0], CultureInfo.InvariantCulture),
                 Convert.ToDouble(valueSet?.ActualValue[1], CultureInfo.InvariantCulture),
                 Convert.ToDouble(valueSet?.ActualValue[2], CultureInfo.InvariantCulture));
 
-            mappedElementRowViewModel.CatiaElement.Shape.PositionOrientation.Position = new PositionParameterValueViewModel(positionMatrix);
+            var newPosition = new PositionParameterValueViewModel(positionMatrix);
+            return newPosition;
         }
 
         /// <summary>
@@ -453,17 +469,32 @@ namespace DEHCATIA.MappingRules
         /// <param name="mappedElementRowViewModel">The <see cref="MappedElementRowViewModel"/></param>
         private void MapOrientation(MappedElementRowViewModel mappedElementRowViewModel)
         {
-            var valueSet = this.GetParameterOrOverrideBase(mappedElementRowViewModel.HubElement, this.parameterTypeService.Orientation)?
-                .QueryParameterBaseValueSet(mappedElementRowViewModel.CatiaElement.SelectedOption,
-                    mappedElementRowViewModel.CatiaElement.SelectedActualFiniteState);
+            mappedElementRowViewModel.CatiaElement.Shape.PositionOrientation.Orientation = 
+                MapOrientation(mappedElementRowViewModel, this.parameterTypeService.Orientation);
+
+            mappedElementRowViewModel.CatiaElement.Shape.RelativePositionOrientation.Orientation =
+                MapOrientation(mappedElementRowViewModel, this.parameterTypeService.RelativeOrientation);
+        }
+
+        /// <summary>
+        /// Maps the orientation like specified parameter
+        /// </summary>
+        /// <param name="mappedElementRowViewModel">The <see cref="MappedElementRowViewModel"/></param>
+        /// <param name="parameterType">The <see cref="ParameterType"/> of the parameter to map</param>
+        /// <returns>a <see cref="OrientationViewModel"/></returns>
+        private OrientationViewModel MapOrientation(MappedElementRowViewModel mappedElementRowViewModel, ParameterType parameterType)
+        {
+            var valueSet = this.GetParameterOrOverrideBase(mappedElementRowViewModel.HubElement, parameterType)?
+                            .QueryParameterBaseValueSet(mappedElementRowViewModel.CatiaElement.SelectedOption,
+                                mappedElementRowViewModel.CatiaElement.SelectedActualFiniteState);
 
             if (valueSet is { } values && (values.ActualValue.Count != 9 || values.ActualValue.Any(x => x == "-")))
             {
-                this.mappingErrors.Add($"The Orientation parameter was found but could not be mapped for the element {mappedElementRowViewModel.HubElement.Name}");
+                this.mappingErrors.Add($"The {parameterType} parameter was found but could not be mapped for the element {mappedElementRowViewModel.HubElement.Name}");
             }
 
             var orientationMatrix = valueSet?.ActualValue.Select(x => Convert.ToDouble(x, CultureInfo.InvariantCulture)) ?? OrientationViewModel.Default;
-            mappedElementRowViewModel.CatiaElement.Shape.PositionOrientation.Orientation = new OrientationViewModel(orientationMatrix.ToList());
+            return new OrientationViewModel(orientationMatrix.ToList());
         }
 
         /// <summary>
@@ -528,16 +559,19 @@ namespace DEHCATIA.MappingRules
         /// </summary>
         /// <param name="colorValue">the string containing the color value or name</param>
         /// <returns>A assert</returns>
-        private bool TryConvertToColor(string colorValue, out Color color)
+        private bool TryConvertToColor(string colorValue, out Color? color)
         {
             color = default;
 
             try
             {
-                if (ColorConverter.ConvertFromString(colorValue) is Color result)
+                if (ColorConverter.ConvertFromString(colorValue) is Color result && result != Color.FromRgb(255, 255, 255))
                 {
                     color = result;
-                    return true;
+                }
+                else
+                {
+                    color = null;
                 }
             }
             catch (Exception exception)
@@ -545,7 +579,7 @@ namespace DEHCATIA.MappingRules
                 this.logger.Error(exception);
             }
 
-            return false;
+            return true;
         }
 
         /// <summary>

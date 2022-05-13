@@ -118,7 +118,7 @@ namespace DEHCATIA.Services.ComConnector
         /// <summary>
         /// Gets the current active document from the running CATIA client.
         /// </summary>
-        public CatiaDocumentViewModel ActiveDocument { get; private set; }
+        public CatiaDocumentViewModel ActiveDocument { get; set; }
 
         /// <summary>
         /// Initializes a nez <see cref="CatiaComService"/>
@@ -184,7 +184,7 @@ namespace DEHCATIA.Services.ComConnector
             stopwatch.Stop();
             this.statusBar.Append($"Material service ready in {stopwatch.ElapsedMilliseconds} ms");
 
-            var topElement = this.InitializeElement(productDoc.Product, this.ActiveDocument.Name);
+            var topElement = this.InitializeElement(productDoc.Product, null, this.ActiveDocument.Name);
             
             topElement.ElementType = ElementType.CatProduct;
             
@@ -194,10 +194,9 @@ namespace DEHCATIA.Services.ComConnector
                     
                 this.statusBar.Append($"Retrieving product: {product.get_Name()} out of {productDoc.Product.Products.Count} products");
 
-                if (this.GetTreeElementFromProduct(product, this.ActiveDocument.Name, cancelToken) is { } newElement)
+                if (this.GetTreeElementFromProduct(product, topElement, this.ActiveDocument.Name, cancelToken) is { } newElement)
                 {
                     topElement.Children.Add(newElement);
-                    newElement.Parent = topElement;
                 }
             }
 
@@ -301,10 +300,11 @@ namespace DEHCATIA.Services.ComConnector
         /// Resolves a <see cref="Product"/> into a CATIA tree element, adding all its child elements.
         /// </summary>
         /// <param name="product">The COM product.</param>
+        /// <param name="product">The <see cref="ElementRowViewModel"/> parent.</param>
         /// <param name="parentFileName">The parent file name of the product.</param>
         /// <param name="cancelToken">The <see cref="CancellationToken"/></param>
         /// <returns>The element on a <see cref="ElementRowViewModel"/> form, or null if the <see cref="Product"/> couldn't be resolved.</returns>
-        private ElementRowViewModel GetTreeElementFromProduct(Product product, string parentFileName, CancellationToken cancelToken)
+        private ElementRowViewModel GetTreeElementFromProduct(Product product, ElementRowViewModel parent, string parentFileName, CancellationToken cancelToken)
         {
             if (product == null)
             {
@@ -328,7 +328,7 @@ namespace DEHCATIA.Services.ComConnector
                 return null;
             }
 
-            var treeElement = this.InitializeElement(product, fileName, parentFileName);
+            var treeElement = this.InitializeElement(product, parent, fileName, parentFileName);
 
             foreach (Product componentOrPart in product.Products)
             {
@@ -336,11 +336,10 @@ namespace DEHCATIA.Services.ComConnector
 
                 this.statusBar.Append($"Retrieving product: {componentOrPart.get_Name()} out of {product.Products.Count} products");
 
-                var newTreeElement = this.GetTreeElementFromProduct(componentOrPart, fileName, cancelToken);
+                var newTreeElement = this.GetTreeElementFromProduct(componentOrPart, treeElement, fileName, cancelToken);
 
                 if (newTreeElement != null)
                 {
-                    newTreeElement.Parent = treeElement;
                     treeElement.Children.Add(newTreeElement);
                 }
             }
@@ -353,7 +352,7 @@ namespace DEHCATIA.Services.ComConnector
         /// </summary>
         /// <param name="fileName">The file name of the part</param>
         /// <param name="referenceProduct">The product of the Cat part file</param>
-        private DefinitionRowViewModel GetCatDefinition(string fileName, Product referenceProduct)
+        private DefinitionRowViewModel GetCatDefinition(string fileName, ElementRowViewModel parent, Product referenceProduct)
         {
             if (this.catDefinitionCache.TryGetValue(fileName, out var existingRow))
             {
@@ -361,7 +360,7 @@ namespace DEHCATIA.Services.ComConnector
             }
 
             var element = new DefinitionRowViewModel(referenceProduct, fileName);
-            this.GetElementProperties(referenceProduct, element);
+            this.GetElementProperties(referenceProduct, element, parent);
             this.ReadFilePart(fileName, element);
             this.catDefinitionCache.Add(fileName, element);
             return element;
@@ -374,7 +373,7 @@ namespace DEHCATIA.Services.ComConnector
         /// <param name="fileName">The file name</param>
         /// <param name="parentFileName">The file name of the parent the <paramref name="fileName"/></param>
         /// <returns>An <see cref="ElementRowViewModel"/></returns>
-        private ElementRowViewModel InitializeElement(Product product, string fileName, string parentFileName = null)
+        private ElementRowViewModel InitializeElement(Product product, ElementRowViewModel parent, string fileName, string parentFileName = null)
         {
             var element = this.GetDocumentTypeFromFileName(fileName, parentFileName) switch
             {
@@ -384,11 +383,11 @@ namespace DEHCATIA.Services.ComConnector
 
             if (element.ElementType is ElementType.CatPart && product.ReferenceProduct is { } referenceProduct)
             {
-                var definition = this.GetCatDefinition(fileName, referenceProduct);
+                var definition = this.GetCatDefinition(fileName, parent, referenceProduct);
                 element.Children.Add(definition);
             }
             
-            this.GetElementProperties(product, element);
+            this.GetElementProperties(product, element, parent);
             
             return element;
         }
@@ -398,7 +397,7 @@ namespace DEHCATIA.Services.ComConnector
         /// </summary>
         /// <param name="product">The <see cref="Product"/></param>
         /// <param name="element">The <see cref="ElementRowViewModel"/></param>
-        private void GetElementProperties(Product product, ElementRowViewModel element)
+        private void GetElementProperties(Product product, ElementRowViewModel element, ElementRowViewModel parent)
         {
             var name = string.Empty;
 
@@ -416,18 +415,19 @@ namespace DEHCATIA.Services.ComConnector
             element.Shape = new CatiaShapeViewModel()
             {
                 Name = name,
+                Parent = parent,
                 PositionOrientation = this.GetPositionAndOrientation(product)
             };
-            
-            element.MaterialName = this.materialService.GetMaterialName(product);
 
+            element.MaterialName = this.materialService.GetMaterialName(product);
+            element.Parent = parent;
             this.AddInertiaParameters(product.Analyze, element);
         }
 
         /// <summary>
         /// Gets the position and orientation
         /// </summary>
-        private CatiaShapePositionOrientationViewModel GetPositionAndOrientation(Product product)
+        public CatiaShapePositionOrientationViewModel GetPositionAndOrientation(Product product)
         {
             var axisComponentsArray = new dynamic[12];
 
@@ -506,7 +506,7 @@ namespace DEHCATIA.Services.ComConnector
 
             foreach (Body body in partDocument.Part.Bodies)
             {
-                BodyRowViewModel bodyRowViewModel = new BodyRowViewModel(body, this.materialService.GetMaterialName(body))
+                var bodyRowViewModel = new BodyRowViewModel(body, this.materialService.GetMaterialName(body))
                 {
                     Color = this.materialService.GetColor(this.ActiveDocument.Document, body)
                 };
@@ -531,7 +531,7 @@ namespace DEHCATIA.Services.ComConnector
         /// <returns>A collection of <see cref="ElementRowViewModel"/></returns>
         private IEnumerable<ElementRowViewModel> GetFacesAndEdges(Body body)
         {
-            Document document = this.ActiveDocument.Document;
+            var document = this.ActiveDocument.Document;
             var facesAndEdges = new List<ElementRowViewModel>();
 
             document.Selection.Clear();
@@ -553,10 +553,10 @@ namespace DEHCATIA.Services.ComConnector
         /// <param name="elementType">The <see cref="ElementType"/> to get</param>
         private void GetFacesAndEdges<TBoundary>(Document document, List<ElementRowViewModel> facesAndEdges, ElementType elementType) where TBoundary : Boundary
         {
-            string searchPattern = $"Topology.{elementType},sel";
+            var searchPattern = $"Topology.{elementType},sel";
             document.Selection.Search(searchPattern);
 
-            for (int i = 1; i < document.Selection.Count; i++)
+            for (var i = 1; i < document.Selection.Count; i++)
             {
                 try
                 {
@@ -792,6 +792,7 @@ namespace DEHCATIA.Services.ComConnector
         public void UpdateColor(MappedElementRowViewModel mappedElement)
         {
             this.materialService.ApplyColor(this.ActiveDocument.Document, mappedElement);
+            this.exchangeHistoryService.Append($"Element: {mappedElement.CatiaElement.Name}'s color was changed to {mappedElement.CatiaElement.Color}");
 
             foreach (var bodyRowViewModel in mappedElement.CatiaElement.Children.OfType<BodyRowViewModel>())
             {
@@ -873,7 +874,42 @@ namespace DEHCATIA.Services.ComConnector
         /// Updates the position and orientation of the catia element specified in the <paramref name="element"/>
         /// </summary>
         /// <param name="element">The <see cref="ElementRowViewModel"/></param>
-        private void UpdatePositionAndOrientation(ElementRowViewModel element)
+        public void UpdatePositionAndOrientation(ElementRowViewModel element)
+        {
+            if (element.Shape.RelativePositionOrientation != null &&
+                this.GetRelativePositionOrRelativeOrientationIfUpdated(element) is { Parent: { }, Actual: { } } positionOrientation)
+            {
+                var newPositionOrientation = element.Shape.RelativePositionOrientation + positionOrientation.Parent;
+                element.GetProduct()?.Position.SetComponents(newPositionOrientation.GetArrayOfTransformation());
+
+                this.exchangeHistoryService.Append($"Value: [{positionOrientation.Actual}] " +
+                    $"from relative Parameter[Position, Orientation] has been updated to[{newPositionOrientation}]");
+            }
+            else
+            {
+                this.UpdateGlobalPositionOrientation(element);
+            }
+        }
+
+        /// <summary>
+        /// Verifies that the relative position or the relative orientation has been updated
+        /// </summary>
+        /// <param name="element">The <see cref="ElementRowViewModel"/></param>
+        /// <returns>returns the parent <see cref="CatiaShapePositionOrientationViewModel"/> and the current actual <see cref="CatiaShapePositionOrientationViewModel"/> 
+        /// in case the relative position is different</returns>
+        private (CatiaShapePositionOrientationViewModel Parent, CatiaShapePositionOrientationViewModel Actual) GetRelativePositionOrRelativeOrientationIfUpdated(ElementRowViewModel element)
+        {
+            var parentPositionOrientation = this.GetPositionAndOrientation(element.Parent.GetProduct());
+            var currentRelativeValue = parentPositionOrientation - this.GetPositionAndOrientation(element.GetProduct());
+
+            return element.Shape.RelativePositionOrientation == currentRelativeValue ? (null, null) : (parentPositionOrientation, currentRelativeValue);
+        }
+
+        /// <summary>
+        /// Updates the global position for the provided <see cref="ElementRowViewModel"/>
+        /// </summary>
+        /// <param name="element">The <see cref="ElementRowViewModel"/></param>
+        private void UpdateGlobalPositionOrientation(ElementRowViewModel element)
         {
             if (element.Shape.PositionOrientation is null)
             {
@@ -885,7 +921,7 @@ namespace DEHCATIA.Services.ComConnector
 
             element.GetProduct()?.Position.SetComponents(element.Shape.PositionOrientation.GetArrayOfTransformation());
 
-            this.exchangeHistoryService.Append($"Value: [{element.Shape.PositionOrientation.GetArrayOfTransformation()}] from Parameter[Position, Orientation] has been updated to[{currentValue}]");
+            this.exchangeHistoryService.Append($"Value: [{currentValue}] from Parameter[Position, Orientation] has been updated to[{element.Shape.PositionOrientation}]");
         }
 
         /// <summary>

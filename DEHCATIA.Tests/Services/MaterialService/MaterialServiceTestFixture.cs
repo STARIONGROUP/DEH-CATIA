@@ -201,7 +201,7 @@ namespace DEHCATIA.Tests.Services.MaterialService
             visProperty.Setup(x => x.GetRealColor(out red, out green, out blue)).Returns(CatVisPropertyStatus.catVisPropertyUnDefined);
             Assert.That(this.service.GetColor(document.Object, new Mock<Body>().Object).ToString() != default(Color).ToString());
             visProperty.Setup(x => x.GetVisibleColor(out red, out green, out blue)).Returns(CatVisPropertyStatus.catVisPropertyUnDefined);
-            Assert.That(this.service.GetColor(document.Object, new Mock<Body>().Object).A == .0);
+            Assert.That(this.service.GetColor(document.Object, new Mock<Body>().Object) == default);
         }
 
         [Test]

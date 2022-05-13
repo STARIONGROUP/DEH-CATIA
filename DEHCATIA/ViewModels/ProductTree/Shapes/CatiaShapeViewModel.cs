@@ -29,7 +29,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
     using System.Reflection;
 
     using DEHCATIA.ViewModels.ProductTree.Parameters;
-
+    using DEHCATIA.ViewModels.ProductTree.Rows;
     using ReactiveUI;
 
     /// <summary>
@@ -106,6 +106,11 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         /// Backing field for <see cref="PositionOrientation"/>
         /// </summary>
         private CatiaShapePositionOrientationViewModel positionOrientation = new CatiaShapePositionOrientationViewModel();
+
+        /// <summary>
+        /// Backing field for <see cref="RelativePositionOrientation"/>
+        /// </summary>
+        private CatiaShapePositionOrientationViewModel relativePositionOrientation = new CatiaShapePositionOrientationViewModel();
 
         /// <summary>
         /// Backing field for <see cref="isSupported"/>
@@ -260,7 +265,24 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         public CatiaShapePositionOrientationViewModel PositionOrientation
         {
             get => this.positionOrientation;
-            set => this.RaiseAndSetIfChanged(ref this.positionOrientation, value);
+            set
+            {
+                if (this.Parent?.Shape?.PositionOrientation is { } parentPositionOrientation)
+                {
+                    this.RelativePositionOrientation = value - parentPositionOrientation;
+                }
+
+                this.RaiseAndSetIfChanged(ref this.positionOrientation, value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the parent relative position and the orientation of this <see cref="CatiaShapeViewModel"/>
+        /// </summary>
+        public CatiaShapePositionOrientationViewModel RelativePositionOrientation
+        {
+            get => this.relativePositionOrientation;
+            set => this.RaiseAndSetIfChanged(ref this.relativePositionOrientation, value);
         }
 
         /// <summary>
@@ -318,6 +340,11 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
         }
 
         /// <summary>
+        /// Gets or sets the inherited <see cref="ElementRowViewModel"/> parent
+        /// </summary>
+        public ElementRowViewModel Parent { get; internal set; }
+
+        /// <summary>
         /// Gets all the <see cref="DoubleParameterViewModel"/> of this shape as a collection
         /// </summary>
         public IEnumerable<DoubleParameterViewModel> DoubleParameterViewModels =>
@@ -326,7 +353,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Shapes
                 .Select(x => x.GetValue(this, null))
                 .Where(x => x != null)
                 .OfType<DoubleParameterViewModel>();
-        
+
         /// <summary>
         /// Initializes a new <see cref="CatiaShapeViewModel"/>
         /// </summary>
