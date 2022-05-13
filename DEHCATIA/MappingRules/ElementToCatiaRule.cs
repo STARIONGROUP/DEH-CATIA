@@ -650,10 +650,13 @@ namespace DEHCATIA.MappingRules
 
             try
             {
-                if (ColorConverter.ConvertFromString(colorValue) is Color result)
+                if (ColorConverter.ConvertFromString(colorValue) is Color result && result != Color.FromRgb(255, 255, 255))
                 {
                     color = result;
-                    return true;
+                }
+                else
+                {
+                    color = null;
                 }
             }
             catch (Exception exception)
@@ -661,7 +664,7 @@ namespace DEHCATIA.MappingRules
                 this.logger.Error(exception);
             }
 
-            return false;
+            return true;
         }
 
         /// <summary>
