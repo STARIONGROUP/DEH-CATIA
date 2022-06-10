@@ -276,10 +276,10 @@ namespace DEHCATIA.ViewModels.NetChangePreview
             this.ContextMenu.Clear();
 
             this.ContextMenu.Add(
-                new ContextMenuItemViewModel("Select all for transfer", "", this.SelectAllCommand, MenuItemKind.Copy, ClassKind.NotThing));
+                new ContextMenuItemViewModel("Select all mapped elements for transfer", "", this.SelectAllCommand, MenuItemKind.Copy, ClassKind.NotThing));
             
             this.ContextMenu.Add(
-                new ContextMenuItemViewModel("Deselect all for transfer", "", this.DeselectAllCommand, MenuItemKind.Delete, ClassKind.NotThing));
+                new ContextMenuItemViewModel("Deselect all mapped elements for transfer", "", this.DeselectAllCommand, MenuItemKind.Delete, ClassKind.NotThing));
         }
         
         /// <summary>
