@@ -412,8 +412,6 @@ namespace DEHCATIA.DstController
             {
                 this.HubMapResult.Clear();
                 this.HubMapResult.AddRange(mappedElements);
-                this.SelectedHubMapResultToTransfer.Clear();
-                this.SelectedHubMapResultToTransfer.AddRange(mappedElements);
             }
 
             CDPMessageBus.Current.SendMessage(new UpdateDstElementTreeEvent());

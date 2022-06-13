@@ -351,6 +351,20 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         }
 
         /// <summary>
+        /// Backing field for <see cref="IsSelectedForTransfer"/>
+        /// </summary>
+        private bool isSelectedForTransfer;
+
+        /// <summary>
+        /// Gets or sets the value if this row is selected for transfer
+        /// </summary>
+        public bool IsSelectedForTransfer 
+        { 
+            get => this.isSelectedForTransfer; 
+            set => this.RaiseAndSetIfChanged(ref this.isSelectedForTransfer, value);
+        }
+
+        /// <summary>
         /// Initializes a new <see cref="ElementRowViewModel"/>
         /// </summary>
         /// <param name="element">The <see cref="AnyObject"/> this view model represents</param>

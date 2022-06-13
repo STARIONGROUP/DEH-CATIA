@@ -30,6 +30,8 @@ namespace DEHCATIA.ViewModels.NetChangePreview
     using System.Reactive.Linq;
     using System.Windows.Input;
 
+    using CDP4Common.CommonData;
+
     using CDP4Dal;
 
     using DEHCATIA.Events;
@@ -37,8 +39,10 @@ namespace DEHCATIA.ViewModels.NetChangePreview
     using DEHCATIA.ViewModels.ProductTree.Rows;
     using DEHCATIA.ViewModels.Rows;
 
+    using DEHPCommon.Enumerators;
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.Services.NavigationService;
+    using DEHPCommon.UserInterfaces.ViewModels;
     using DEHPCommon.UserInterfaces.ViewModels.Interfaces;
     using DEHPCommon.UserInterfaces.ViewModels.Rows.ElementDefinitionTreeRows;
 
@@ -91,6 +95,22 @@ namespace DEHCATIA.ViewModels.NetChangePreview
         }
 
         /// <summary>
+        /// A collection of <see cref="ElementRowViewModel"/> that are selected for transfer
+        /// </summary>
+        public ReactiveList<ElementRowViewModel> SelectedElements = new();
+
+        /// <summary>
+        /// The command for the context menu that allows to deselect all selectable <see cref="ElementRowViewModel" />
+        /// for transfer.
+        /// </summary>
+        public ReactiveCommand<object> DeselectAllCommand { get; private set; }
+
+        /// <summary>
+        /// The command for the context menu that allows to select all selectable <see cref="ElementRowViewModel" /> for transfer.
+        /// </summary>
+        public ReactiveCommand<object> SelectAllCommand { get; private set; }
+
+        /// <summary>
         /// Initializes the <see cref="ICommand"/> of this view model and the observable
         /// </summary>
         public override void InitializeCommandsAndObservables()
@@ -106,6 +126,65 @@ namespace DEHCATIA.ViewModels.NetChangePreview
                         this.RootElements.Add(x);
                     }
                 });
+
+            this.SelectedElements.BeforeItemsAdded.Subscribe(this.WhenItemSelectedChanges);
+            this.SelectedElements.BeforeItemsRemoved.Subscribe(this.WhenItemSelectedChanges);
+
+            this.SelectAllCommand = ReactiveCommand.Create();
+            this.SelectAllCommand.Subscribe(_ => this.SelectDeselectAllForTransfer());
+
+            this.DeselectAllCommand = ReactiveCommand.Create();
+            this.DeselectAllCommand.Subscribe(_ => this.SelectDeselectAllForTransfer(false));
+        }
+
+        /// <summary>
+        /// Occurs when the <see cref="SelectedElements" /> gets a new element added or removed
+        /// </summary>
+        /// <param name="row">The <see cref="object" /> row that was added or removed</param>
+        private void WhenItemSelectedChanges(ElementRowViewModel row)
+        {
+            var mappedElement = this.DstController.HubMapResult.FirstOrDefault(x => x.CatiaElement.Name == row.Name);
+
+            if (mappedElement is null)
+            {
+                return;
+            }
+
+            this.AddOrRemoveToSelectedThingsToTransfer(!mappedElement.CatiaElement.IsSelectedForTransfer, mappedElement);
+        }
+
+        /// <summary>
+        /// Executes the <see cref="SelectAllCommand" /> and the <see cref="DeselectAllCommand" />
+        /// </summary>
+        /// <param name="areSelected">A value indicating whether the elements are to be selected</param>
+        public void SelectDeselectAllForTransfer(bool areSelected = true)
+        {
+            foreach (var element in this.DstController.HubMapResult)
+            {
+                this.AddOrRemoveToSelectedThingsToTransfer(areSelected, element);
+            }
+        }
+
+        /// <summary>
+        /// Adds or removes the <paramref name="mappedElement" /> to/from the
+        /// <see cref="DstController.IDstController.SelectedHubMapResultToTransfer" />
+        /// </summary>
+        /// <param name="areSelected">A value indicating whether the <paramref name="mappedElement" /> should be added or removed</param>
+        /// <param name="mappedElement">The <see cref="MappedElementRowViewModel" /></param>
+        private void AddOrRemoveToSelectedThingsToTransfer(bool areSelected, MappedElementRowViewModel mappedElement)
+        {
+            mappedElement.CatiaElement.IsSelectedForTransfer = areSelected;
+
+            if (this.DstController.SelectedHubMapResultToTransfer.FirstOrDefault(x => x.CatiaElement.Name == mappedElement.CatiaElement.Name)
+                is { } element)
+            {
+                this.DstController.SelectedHubMapResultToTransfer.Remove(element);
+            }
+
+            if (mappedElement.CatiaElement.IsSelectedForTransfer)
+            {
+                this.DstController.SelectedHubMapResultToTransfer.Add(mappedElement);
+            }
         }
 
         /// <summary>
@@ -202,6 +281,14 @@ namespace DEHCATIA.ViewModels.NetChangePreview
         public override void PopulateContextMenu()
         {
             this.ContextMenu.Clear();
+
+            this.ContextMenu.Add(
+                new ContextMenuItemViewModel("Select all mapped elements for transfer", "", this.SelectAllCommand, 
+                    MenuItemKind.Copy, ClassKind.NotThing));
+
+            this.ContextMenu.Add(
+                new ContextMenuItemViewModel("Deselect all mapped elements for transfer", "", this.DeselectAllCommand, 
+                    MenuItemKind.Delete, ClassKind.NotThing));
         }
     }
 }
