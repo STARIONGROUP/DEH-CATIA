@@ -97,7 +97,7 @@ namespace DEHCATIA.ViewModels.NetChangePreview
         /// <summary>
         /// A collection of <see cref="ElementRowViewModel"/> that are selected for transfer
         /// </summary>
-        public ReactiveList<ElementRowViewModel> SelectedElements = new();
+        public ReactiveList<ElementRowViewModel> SelectedElements { get; } = new();
 
         /// <summary>
         /// The command for the context menu that allows to deselect all selectable <see cref="ElementRowViewModel" />
@@ -143,7 +143,7 @@ namespace DEHCATIA.ViewModels.NetChangePreview
         /// <param name="row">The <see cref="object" /> row that was added or removed</param>
         private void WhenItemSelectedChanges(ElementRowViewModel row)
         {
-            var mappedElement = this.DstController.HubMapResult.FirstOrDefault(x => x.CatiaElement.Name == row.Name);
+            var mappedElement = this.DstController.HubMapResult.FirstOrDefault(x => x.CatiaElement.Identifier == row.Identifier);
 
             if (mappedElement is null)
             {
@@ -175,7 +175,8 @@ namespace DEHCATIA.ViewModels.NetChangePreview
         {
             mappedElement.CatiaElement.IsSelectedForTransfer = areSelected;
 
-            if (this.DstController.SelectedHubMapResultToTransfer.FirstOrDefault(x => x.CatiaElement.Name == mappedElement.CatiaElement.Name)
+            if (this.DstController.SelectedHubMapResultToTransfer.FirstOrDefault(x => x.CatiaElement.Identifier
+                                                                                      == mappedElement.CatiaElement.Identifier)
                 is { } element)
             {
                 this.DstController.SelectedHubMapResultToTransfer.Remove(element);
@@ -251,7 +252,7 @@ namespace DEHCATIA.ViewModels.NetChangePreview
         /// </summary>
         private void Reload()
         {
-            CDPMessageBus.Current.SendMessage(new DstHighlightEvent(this.RootElement?.Name, false));
+            CDPMessageBus.Current.SendMessage(new DstHighlightEvent(this.RootElement?.Identifier, false));
             this.RootElements.Clear();
         }
         
@@ -272,7 +273,7 @@ namespace DEHCATIA.ViewModels.NetChangePreview
         /// <param name="mappedElement">The source <see cref="MappedElementRowViewModel"/></param>
         private void UpdateElementRow(MappedElementRowViewModel mappedElement)
         {
-            CDPMessageBus.Current.SendMessage(new DstHighlightEvent(mappedElement.CatiaElement?.Name));
+            CDPMessageBus.Current.SendMessage(new DstHighlightEvent(mappedElement.CatiaElement?.Identifier));
         }
 
         /// <summary>

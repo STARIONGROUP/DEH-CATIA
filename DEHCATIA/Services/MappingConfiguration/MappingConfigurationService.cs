@@ -276,7 +276,7 @@ namespace DEHCATIA.Services.MappingConfiguration
             elementRowViewModel = null;
             
             if (elementRowViewModels.FirstOrDefault(rowViewModel =>
-                rowViewModel.Name.Equals(externalIdentifier)) is {} element)
+                rowViewModel.Identifier.Equals(externalIdentifier)) is {} element)
             {
                 elementRowViewModel = element;
                 return true;
@@ -306,7 +306,7 @@ namespace DEHCATIA.Services.MappingConfiguration
                     .GroupBy(x => x.ExternalIdentifier.Identifier))
             {
                 if (elementRowViewModels.FirstOrDefault(rowViewModel =>
-                    rowViewModel.Name.Equals(idCorrespondences.Key)) is not { } element)
+                    rowViewModel.Identifier.Equals(idCorrespondences.Key)) is not { } element)
                 {
                     continue;
                 }
@@ -426,7 +426,7 @@ namespace DEHCATIA.Services.MappingConfiguration
         {
             this.AddToExternalIdentifierMap(mappedElement.HubElement.Iid, new ExternalIdentifier
             {
-                Identifier = mappedElement.CatiaElement.Name,
+                Identifier = mappedElement.CatiaElement.Identifier,
                 MappingDirection = MappingDirection.FromHubToDst
             });
 
@@ -436,7 +436,7 @@ namespace DEHCATIA.Services.MappingConfiguration
             {
                 this.AddToExternalIdentifierMap(selectedActualFiniteState.Iid, new ExternalIdentifier
                 {
-                    Identifier = mappedElement.CatiaElement.Name,
+                    Identifier = mappedElement.CatiaElement.Identifier,
                     MappingDirection = MappingDirection.FromHubToDst
                 });
             }
@@ -447,7 +447,7 @@ namespace DEHCATIA.Services.MappingConfiguration
             {
                 this.AddToExternalIdentifierMap(selectedOption.Iid, new ExternalIdentifier
                 {
-                    Identifier = mappedElement.CatiaElement.Name,
+                    Identifier = mappedElement.CatiaElement.Identifier,
                     MappingDirection = MappingDirection.FromHubToDst
                 });
             }
@@ -494,7 +494,7 @@ namespace DEHCATIA.Services.MappingConfiguration
         /// <param name="elementRowViewModel">The <see cref="ElementRowViewModel"/> that holds mapping information</param>
         public void AddToExternalIdentifierMap(ElementRowViewModel elementRowViewModel)
         {
-            this.AddToExternalIdentifierMap(elementRowViewModel.ElementDefinition.Iid, elementRowViewModel.Element.get_Name(), MappingDirection.FromDstToHub);
+            this.AddToExternalIdentifierMap(elementRowViewModel.ElementDefinition.Iid, elementRowViewModel.Identifier, MappingDirection.FromDstToHub);
         }
 
         /// <summary>
@@ -503,7 +503,7 @@ namespace DEHCATIA.Services.MappingConfiguration
         /// <param name="usageRowViewModel">The <see cref="UsageRowViewModel"/> that holds mapping information</param>
         public void AddToExternalIdentifierMap(UsageRowViewModel usageRowViewModel)
         {
-            this.AddToExternalIdentifierMap(usageRowViewModel.ElementUsage.Iid, usageRowViewModel.Element.get_Name(), MappingDirection.FromDstToHub);
+            this.AddToExternalIdentifierMap(usageRowViewModel.ElementUsage.Iid, usageRowViewModel.Identifier, MappingDirection.FromDstToHub);
         }
 
         /// <summary>

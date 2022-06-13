@@ -137,6 +137,11 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         private bool isDraft;
 
         /// <summary>
+        /// Backing field for <see cref="Identifier"/>
+        /// </summary>
+        private string identifier;
+
+        /// <summary>
         /// A value indicating whether the current represented row exist yet in the Catia model
         /// </summary>
         public bool IsDraft
@@ -207,7 +212,16 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
             get => this.isHighlighted;
             set => this.RaiseAndSetIfChanged(ref this.isHighlighted, value);
         }
-        
+
+        /// <summary>
+        /// Gets or sets a unique identifier for this <see cref="ElementRowViewModel"/>
+        /// </summary>
+        public string Identifier
+        {
+            get => this.identifier;
+            set => this.RaiseAndSetIfChanged(ref this.identifier, value);
+        }
+
         /// <summary>
         /// Gets or sets a value whether the row is expanded
         /// </summary>
@@ -394,8 +408,10 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
             this.Name = name;
             this.FileName = fileName;
 
+            this.Identifier = this.ComputeIdentifier();
+
             CDPMessageBus.Current.Listen<DstHighlightEvent>()
-                .Where(x => (string)x.TargetThingId == this.Name)
+                .Where(x => (string)x.TargetThingId == this.Identifier)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => this.IsHighlighted = x.ShouldHighlight);
         }
@@ -412,6 +428,26 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Computes the <see cref="Identifier"/> property
+        /// </summary>
+        /// <returns>The unique identifier</returns>
+        private string ComputeIdentifier()
+        {
+            var identifierComputation = "";
+            var parent = this.Parent;
+
+            while (parent != null)
+            {
+                identifierComputation += $"{parent.Name}.";
+                parent = parent.Parent;
+            }
+
+            identifierComputation += $"{this.Name}";
+
+            return identifierComputation;
         }
     }
 }
