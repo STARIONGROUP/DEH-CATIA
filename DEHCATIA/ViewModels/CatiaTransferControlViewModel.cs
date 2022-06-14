@@ -105,16 +105,6 @@ namespace DEHCATIA.ViewModels
             this.statusBar = statusBar;
             this.exchangeHistoryService = exchangeHistoryService;
 
-            CDPMessageBus.Current.Listen<UpdateObjectBrowserTreeEvent>()
-                .Select(x => !x.Reset)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(this.UpdateCanTransfer);
-
-            CDPMessageBus.Current.Listen<UpdateDstElementTreeEvent>()
-                .Select(x => !x.Reset)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(this.UpdateCanTransfer);
-
             this.dstController.SelectedDstMapResultToTransfer.CountChanged.Subscribe(_ => this.UpdateNumberOfThingsToTransfer());
             this.dstController.SelectedHubMapResultToTransfer.CountChanged.Subscribe(_ => this.UpdateNumberOfThingsToTransfer());
 
