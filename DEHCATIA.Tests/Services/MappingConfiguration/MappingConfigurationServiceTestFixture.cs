@@ -27,6 +27,8 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Concurrency;
+    using System.Threading;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -48,8 +50,11 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
     using Newtonsoft.Json;
 
     using NUnit.Framework;
+    using NUnit.Framework.Internal;
 
     using ProductStructureTypeLib;
+
+    using ReactiveUI;
 
     [TestFixture]
     public class MappingConfigurationServiceTestFixture
@@ -66,10 +71,13 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
         private Mock<Product> product1;
         private ElementDefinition element1;
         private Mock<IParameterTypeService> parameterTypeService;
+        private Mock<Product> product3;
+        private Mock<Product> product2;
 
         [SetUp]
         public void Setup()
         {
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.statusBar = new Mock<IStatusBarControlViewModel>();
             this.hubController = new Mock<IHubController>();
             this.parameterTypeService = new Mock<IParameterTypeService>();
@@ -79,11 +87,29 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
 
             this.product1 = new Mock<Product>();
             this.product1.Setup(x => x.get_Name()).Returns("product1");
+            this.product2 = new Mock<Product>();
+            this.product2.Setup(x => x.get_Name()).Returns("productUsage0");
+            this.product3 = new Mock<Product>();
+            this.product3.Setup(x => x.get_Name()).Returns("productUsage1");
+
+            var usageRow0 = new UsageRowViewModel(this.product2.Object, "productUsage0") { Name = "productUsage0" };
+            usageRow0.Parent = null;
+
+            var usageRow1 = new UsageRowViewModel(this.product3.Object, "productUsage1") { Name = "productUsage1" };
+            usageRow1.Parent = null;
+
+            var definitionRowViewModel0 = new DefinitionRowViewModel(this.product0.Object, "product0") { Name = "product0"};
+            definitionRowViewModel0.Parent = usageRow0;
+
+            var definitionRowViewModel1 = new DefinitionRowViewModel(this.product1.Object, "product1") { Name = "product1" };
+            definitionRowViewModel1.Parent = usageRow1;
+
+            usageRow0.Children.Add(definitionRowViewModel0);
+            usageRow1.Children.Add(definitionRowViewModel1);
 
             this.elements = new List<ElementRowViewModel>()
             {
-                new DefinitionRowViewModel(this.product0.Object, "product0") { Name = "product0" },
-                new DefinitionRowViewModel(this.product1.Object, "product1") { Name = "product1" }
+                usageRow0, usageRow1
             };
 
             this.externalIdentifiers = new List<ExternalIdentifier>()
@@ -91,17 +117,32 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
                 new()
                 {
                     MappingDirection = MappingDirection.FromDstToHub,
-                    Identifier = "product0",
+                    Identifier = definitionRowViewModel0.Identifier,
                 },
                 new()
                 {
                     MappingDirection = MappingDirection.FromDstToHub,
-                    Identifier = "product1"
+                    Identifier = definitionRowViewModel1.Identifier
+                },
+                new()
+                {
+                    MappingDirection = MappingDirection.FromDstToHub,
+                    Identifier = usageRow0.Identifier
+                },
+                new()
+                {
+                    MappingDirection = MappingDirection.FromDstToHub,
+                    Identifier = usageRow1.Identifier
                 },
                 new()
                 {
                     MappingDirection = MappingDirection.FromHubToDst,
-                    Identifier = "product0",
+                    Identifier = definitionRowViewModel0.Identifier,
+                },
+                new()
+                {
+                    MappingDirection = MappingDirection.FromHubToDst,
+                    Identifier = usageRow0.Identifier,
                 }
             };
 
@@ -122,6 +163,7 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
                 Correspondence = 
                 {
                     new IdCorrespondence() { InternalThing = this.element0.Iid, ExternalId = JsonConvert.SerializeObject(this.externalIdentifiers[0]) },
+                    new IdCorrespondence() { InternalThing = this.element0.Iid, ExternalId = JsonConvert.SerializeObject(this.externalIdentifiers.Last()) },
                     new IdCorrespondence() { InternalThing = this.element1.Iid, ExternalId = JsonConvert.SerializeObject(this.externalIdentifiers[1]) },
                     new IdCorrespondence() { InternalThing = Guid.NewGuid(), ExternalId = JsonConvert.SerializeObject(this.externalIdentifiers[2]) },
                 }
@@ -171,7 +213,7 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
             Assert.AreEqual(3, this.service.ExternalIdentifierMap.Correspondence.Count);
             
             this.service.AddToExternalIdentifierMap(internalId, "product0", MappingDirection.FromDstToHub);
-            Assert.AreEqual(3, this.service.ExternalIdentifierMap.Correspondence.Count);
+            Assert.AreEqual(4, this.service.ExternalIdentifierMap.Correspondence.Count);
         }
         
         [Test]
@@ -199,7 +241,6 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
             this.service.AddToExternalIdentifierMap(internalId, "product1", MappingDirection.FromDstToHub);
             Assert.AreEqual(4, this.service.ExternalIdentifierMap.Correspondence.Count);
         }
-
 
         [Test]
         public void VerifyRefresh()
@@ -232,15 +273,19 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
             Assert.DoesNotThrow(() => mappedRows = this.service.LoadMappingFromHubToDst(this.elements));
 
             Thing element = null;
-            this.hubController.Setup(x => x.GetThingById(It.IsAny<Guid>(), It.IsAny<Iteration>(), out element));
+            this.hubController.Setup(x => x.GetThingById(this.element0.Iid, It.IsAny<Iteration>(), out element));
             Assert.DoesNotThrow(() => mappedRows = this.service.LoadMappingFromHubToDst(this.elements));
 
             element = this.element0;
-            this.hubController.Setup(x => x.GetThingById(It.IsAny<Guid>(), It.IsAny<Iteration>(), out element)).Returns(true);
-           Assert.DoesNotThrow(() => mappedRows = this.service.LoadMappingFromHubToDst(this.elements));
+            this.hubController.Setup(x => x.GetThingById(this.element0.Iid, It.IsAny<Iteration>(), out element)).Returns(true);
+            this.hubController.Setup(x => x.GetThingById(this.externalIdentifierMap.Iid, It.IsAny<Iteration>(), out this.externalIdentifierMap)).Returns(true);
+            this.hubController.Setup(x => x.GetThingById(Guid.Empty, It.IsAny<Iteration>(), out element)).Returns(true);
 
-           this.hubController.Verify(x => x.GetThingById(It.IsAny<Guid>(), It.IsAny<Iteration>(), out element), Times.Exactly(3)); 
-           Assert.AreEqual(1, mappedRows.Count);
+            this.service.RefreshExternalIdentifierMap();
+            Assert.DoesNotThrow(() => mappedRows = this.service.LoadMappingFromHubToDst(this.elements));
+
+            this.hubController.Verify(x => x.GetThingById(It.IsAny<Guid>(), It.IsAny<Iteration>(), out element), Times.Exactly(4)); 
+            Assert.AreEqual(1, mappedRows.Count);
         }
         
         [Test]
@@ -285,7 +330,28 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
             Assert.DoesNotThrow(() => this.service.PersistExternalIdentifierMap(transactionMock.Object, iteration));
 
             Assert.AreEqual(2, iteration.ExternalIdentifierMap.Count);
-            transactionMock.Verify(x => x.CreateOrUpdate(It.IsAny<Thing>()), Times.Exactly(6));
+            transactionMock.Verify(x => x.CreateOrUpdate(It.IsAny<Thing>()), Times.Exactly(7));
+        }
+
+        [Test]
+        public void VerifySaveMaterialAndColorParameterType()
+        {
+            this.service.ExternalIdentifierMap = new ExternalIdentifierMap()
+            {
+                Correspondence = 
+                { 
+                    new IdCorrespondence(Guid.NewGuid(), null, null) 
+                    { 
+                        ExternalId = JsonConvert.SerializeObject(new ExternalIdentifier()
+                        {
+                            MappingDirection = MappingDirection.FromDstToHub, Identifier = this.elements[0].Identifier
+                        })
+                    }
+                },
+            };
+
+            Assert.DoesNotThrow(() => this.service.SaveColorParameterType(new TextParameterType() {Name = "color"}));
+            Assert.DoesNotThrow(() => this.service.SaveMaterialParameterType(new TextParameterType() {Name = "material"}));
         }
     }
 }

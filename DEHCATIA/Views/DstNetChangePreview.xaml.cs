@@ -24,11 +24,13 @@
 
 namespace DEHCATIA.Views
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Windows.Controls;
 
     /// <summary>
     /// Interaction logic for DstNetChangePreview.xaml
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public partial class DstNetChangePreview : UserControl
     {
         /// <summary>

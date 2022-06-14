@@ -24,11 +24,14 @@
 
 namespace DEHCATIA.Views.Dialogs
 {
+    using System.Diagnostics.CodeAnalysis;
+
     using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Interaction logic for DstLogin.xaml
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public partial class DstLogin : DXDialogWindow
     {
         /// <summary>

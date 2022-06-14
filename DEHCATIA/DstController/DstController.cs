@@ -412,8 +412,6 @@ namespace DEHCATIA.DstController
             {
                 this.HubMapResult.Clear();
                 this.HubMapResult.AddRange(mappedElements);
-                this.SelectedHubMapResultToTransfer.Clear();
-                this.SelectedHubMapResultToTransfer.AddRange(mappedElements);
             }
 
             CDPMessageBus.Current.SendMessage(new UpdateDstElementTreeEvent());
@@ -443,6 +441,8 @@ namespace DEHCATIA.DstController
             await this.hubController.Refresh();
             this.ResetMappedElement();
             this.mappingConfigurationService.RefreshExternalIdentifierMap();
+            _ = this.SelectedHubMapResultToTransfer.Select(x => x.CatiaElement.IsSelectedForTransfer = false);
+            this.SelectedHubMapResultToTransfer.Clear();
             this.LoadMapping();
         }
 
@@ -478,6 +478,7 @@ namespace DEHCATIA.DstController
 
                 this.mappingConfigurationService.RefreshExternalIdentifierMap();
 
+                this.SelectedDstMapResultToTransfer.Clear();
                 this.LoadMapping();
             }
             catch (Exception e)
