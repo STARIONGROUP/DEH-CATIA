@@ -90,8 +90,6 @@ namespace DEHCATIA.ViewModels.NetChangePreview
             CDPMessageBus.Current.Listen<UpdateDstPreviewBasedOnSelectionEvent>()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => this.UpdateTreeBasedOnSelectionHandler(x.Selection.ToList()));
-
-            this.InitializeCommandsAndObservables();
         }
 
         /// <summary>

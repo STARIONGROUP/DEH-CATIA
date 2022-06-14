@@ -408,7 +408,7 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
             this.Name = name;
             this.FileName = fileName;
 
-            this.Identifier = this.ComputeIdentifier();
+            this.WhenAnyValue(x => x.Parent).Subscribe(_ => this.SetComputeIdentifier());
 
             CDPMessageBus.Current.Listen<DstHighlightEvent>()
                 .Where(x => (string)x.TargetThingId == this.Identifier)
@@ -431,23 +431,11 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         }
 
         /// <summary>
-        /// Computes the <see cref="Identifier"/> property
+        /// Sets the <see cref="Identifier"/> property
         /// </summary>
-        /// <returns>The unique identifier</returns>
-        private string ComputeIdentifier()
+        private void SetComputeIdentifier()
         {
-            var identifierComputation = "";
-            var parent = this.Parent;
-
-            while (parent != null)
-            {
-                identifierComputation += $"{parent.Name}.";
-                parent = parent.Parent;
-            }
-
-            identifierComputation += $"{this.Name}";
-
-            return identifierComputation;
+            this.Identifier = $"{this.Parent?.Identifier}.{this.Name}";
         }
     }
 }

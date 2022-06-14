@@ -80,10 +80,12 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
             this.product1 = new Mock<Product>();
             this.product1.Setup(x => x.get_Name()).Returns("product1");
 
+            var definitionRowViewModel0 = new DefinitionRowViewModel(this.product0.Object, "product0") { Name = "product0" };
+            var definitionRowViewModel1 = new DefinitionRowViewModel(this.product1.Object, "product1") { Name = "product1" };
+
             this.elements = new List<ElementRowViewModel>()
             {
-                new DefinitionRowViewModel(this.product0.Object, "product0") { Name = "product0" },
-                new DefinitionRowViewModel(this.product1.Object, "product1") { Name = "product1" }
+                definitionRowViewModel0, definitionRowViewModel1
             };
 
             this.externalIdentifiers = new List<ExternalIdentifier>()
@@ -91,17 +93,17 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
                 new()
                 {
                     MappingDirection = MappingDirection.FromDstToHub,
-                    Identifier = "product0",
+                    Identifier = definitionRowViewModel0.Identifier,
                 },
                 new()
                 {
                     MappingDirection = MappingDirection.FromDstToHub,
-                    Identifier = "product1"
+                    Identifier = definitionRowViewModel1.Identifier
                 },
                 new()
                 {
                     MappingDirection = MappingDirection.FromHubToDst,
-                    Identifier = "product0",
+                    Identifier = definitionRowViewModel0.Identifier,
                 }
             };
 
@@ -171,7 +173,7 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
             Assert.AreEqual(3, this.service.ExternalIdentifierMap.Correspondence.Count);
             
             this.service.AddToExternalIdentifierMap(internalId, "product0", MappingDirection.FromDstToHub);
-            Assert.AreEqual(3, this.service.ExternalIdentifierMap.Correspondence.Count);
+            Assert.AreEqual(4, this.service.ExternalIdentifierMap.Correspondence.Count);
         }
         
         [Test]
