@@ -137,6 +137,11 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         private bool isDraft;
 
         /// <summary>
+        /// Backing field for <see cref="Identifier"/>
+        /// </summary>
+        private string identifier;
+
+        /// <summary>
         /// A value indicating whether the current represented row exist yet in the Catia model
         /// </summary>
         public bool IsDraft
@@ -207,7 +212,16 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
             get => this.isHighlighted;
             set => this.RaiseAndSetIfChanged(ref this.isHighlighted, value);
         }
-        
+
+        /// <summary>
+        /// Gets or sets a unique identifier for this <see cref="ElementRowViewModel"/>
+        /// </summary>
+        public string Identifier
+        {
+            get => this.identifier;
+            set => this.RaiseAndSetIfChanged(ref this.identifier, value);
+        }
+
         /// <summary>
         /// Gets or sets a value whether the row is expanded
         /// </summary>
@@ -351,6 +365,20 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
         }
 
         /// <summary>
+        /// Backing field for <see cref="IsSelectedForTransfer"/>
+        /// </summary>
+        private bool isSelectedForTransfer;
+
+        /// <summary>
+        /// Gets or sets the value if this row is selected for transfer
+        /// </summary>
+        public bool IsSelectedForTransfer 
+        { 
+            get => this.isSelectedForTransfer; 
+            set => this.RaiseAndSetIfChanged(ref this.isSelectedForTransfer, value);
+        }
+
+        /// <summary>
         /// Initializes a new <see cref="ElementRowViewModel"/>
         /// </summary>
         /// <param name="element">The <see cref="AnyObject"/> this view model represents</param>
@@ -380,8 +408,10 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
             this.Name = name;
             this.FileName = fileName;
 
+            this.WhenAnyValue(x => x.Parent).Subscribe(_ => this.SetComputeIdentifier());
+
             CDPMessageBus.Current.Listen<DstHighlightEvent>()
-                .Where(x => (string)x.TargetThingId == this.Name)
+                .Where(x => (string)x.TargetThingId == this.Identifier)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => this.IsHighlighted = x.ShouldHighlight);
         }
@@ -398,6 +428,14 @@ namespace DEHCATIA.ViewModels.ProductTree.Rows
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="Identifier"/> property
+        /// </summary>
+        private void SetComputeIdentifier()
+        {
+            this.Identifier = $"{this.Parent?.Identifier}.{this.Name}";
         }
     }
 }

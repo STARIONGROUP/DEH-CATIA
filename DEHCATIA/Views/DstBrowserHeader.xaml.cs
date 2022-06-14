@@ -24,11 +24,13 @@
 
 namespace DEHCATIA.Views
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Windows.Controls;
 
     /// <summary>
     /// Interaction logic for <see cref="DstBrowserHeader"/> XAML.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public partial class DstBrowserHeader : UserControl
     {
         /// <summary>

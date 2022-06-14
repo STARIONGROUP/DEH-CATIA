@@ -45,7 +45,9 @@
                               AllowClose="False" AllowDrag="False" 
                               AllowFloat="False" AllowMove="False" Caption="Product Tree">
                 <dxg:TreeListControl ItemsSource="{Binding RootElements}"
-                                 SelectedItem="{Binding SelectedElement}">
+                                 SelectedItem="{Binding SelectedElement}"
+                                 SelectedItems="{Binding SelectedElements}"
+                                 SelectionMode="MultipleRow">
                     <dxmvvm:Interaction.Behaviors>
                         <behaviors:ContextMenuBehavior/>
                     </dxmvvm:Interaction.Behaviors>
@@ -78,6 +80,9 @@
                                             <Setter Property="Background" Value="Yellow"/>
                                             <Setter Property="FontWeight" Value="Bold" />
                                             <Setter Property="Foreground" Value="Blue" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Row.IsSelectedForTransfer}" Value="True">
+                                            <Setter Property="Background" Value="LightGreen"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                     <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />

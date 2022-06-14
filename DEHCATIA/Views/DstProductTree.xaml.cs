@@ -24,12 +24,14 @@
 
 namespace DEHCATIA.Views
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Drawing;
     using System.Windows.Controls;
 
     /// <summary>
     /// Interaction logic for <see cref="DstProductTree"/> XAML.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public partial class DstProductTree : UserControl
     {
         /// <summary>

@@ -93,10 +93,6 @@ namespace DEHCATIA.Tests.ViewModels
         public void VerifyTransferCommand()
         {
             Assert.IsFalse(this.viewModel.TransferCommand.CanExecute(null));
-            CDPMessageBus.Current.SendMessage(new UpdateObjectBrowserTreeEvent(true));
-            Assert.IsFalse(this.viewModel.TransferCommand.CanExecute(null));
-            CDPMessageBus.Current.SendMessage(new UpdateObjectBrowserTreeEvent());
-            Assert.IsTrue(this.viewModel.TransferCommand.CanExecute(null));
 
             Assert.DoesNotThrowAsync(() => this.viewModel.TransferCommand.ExecuteAsyncTask(null));
 

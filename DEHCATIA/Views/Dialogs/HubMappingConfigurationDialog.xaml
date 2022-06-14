@@ -163,17 +163,7 @@
                                             <dxg:TreeListColumn Width="45" FieldName="OwnerShortName" Header="Owner" />
                                             <dxg:TreeListColumn FieldName="Published" Header="Published Value" />
                                             <dxg:TreeListColumn FieldName="ScaleShortName" Header="Scale" />
-                                            <dxg:TreeListColumn AllowEditing="True" FieldName="Switch">
-                                                <dxg:ColumnBase.CellTemplate>
-                                                    <DataTemplate>
-                                                        <dxe:ComboBoxEdit Name="PART_Editor" IsTextEditable="False" ShowBorder="true" ShowCustomItems="False">
-                                                            <dxmvvm:Interaction.Behaviors>
-                                                                <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type engineeringModelData:ParameterSwitchKind}" />
-                                                            </dxmvvm:Interaction.Behaviors>
-                                                        </dxe:ComboBoxEdit>
-                                                    </DataTemplate>
-                                                </dxg:ColumnBase.CellTemplate>
-                                            </dxg:TreeListColumn>
+                                            <dxg:TreeListColumn AllowEditing="False" FieldName="Switch"/>
                                             <dxg:TreeListColumn FieldName="Computed" />
                                             <dxg:TreeListColumn AllowEditing="False" FieldName="Manual" />
                                             <dxg:TreeListColumn AllowEditing="False" FieldName="Reference" />
