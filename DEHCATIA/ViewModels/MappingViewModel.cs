@@ -83,12 +83,11 @@ namespace DEHCATIA.ViewModels
         private void InitializesObservables()
         {
             this.dstController.DstMapResult.ItemsAdded.Subscribe(this.UpdateMappedThings);
+            this.dstController.HubMapResult.ItemsAdded.Subscribe(this.UpdateMappedThings);
 
             this.dstController.DstMapResult.IsEmptyChanged.Where(x => x).Subscribe(_ =>
                 this.MappingRows.RemoveAll(this.MappingRows
                     .Where(x => x.Direction == MappingDirection.FromDstToHub).ToList()));
-
-            this.dstController.HubMapResult.ItemsAdded.Subscribe(this.UpdateMappedThings);
 
             this.dstController.HubMapResult.IsEmptyChanged.Where(x => x).Subscribe(_ =>
                 this.MappingRows.RemoveAll(this.MappingRows

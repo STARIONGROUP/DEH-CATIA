@@ -340,8 +340,8 @@ namespace DEHCATIA.Services.MappingConfiguration
                 {
                     ElementDefinition elementDefinition => () => element.ElementDefinition = elementDefinition.Clone(true),
                     ElementUsage elementUsage when element is UsageRowViewModel usageRow => () => usageRow.ElementUsage = elementUsage.Clone(true),
-                    Option option => () => element.SelectedOption = option.Clone(false),
-                    ActualFiniteState state => () => element.SelectedActualFiniteState = state.Clone(false),
+                    Option option => () => element.SelectedOption = option,
+                    ActualFiniteState state => () => element.SelectedActualFiniteState = state,
                     _ => null
                 };
 

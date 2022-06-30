@@ -43,6 +43,7 @@ namespace DEHCATIA.MappingRules
     using DEHCATIA.ViewModels.ProductTree.Rows;
 
     using DEHPCommon;
+    using DEHPCommon.Enumerators;
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.MappingRules.Core;
 
@@ -132,6 +133,18 @@ namespace DEHCATIA.MappingRules
             {
                 this.selectedActualFiniteState ??= elementRowViewModel.SelectedActualFiniteState;
                 this.selectedOption ??= elementRowViewModel.SelectedOption;
+
+                if (this.selectedActualFiniteState != null)
+                {
+                    this.mappingConfigurationService.AddToExternalIdentifierMap(this.selectedActualFiniteState.Iid,
+                        elementRowViewModel.Identifier, MappingDirection.FromDstToHub);
+                }
+
+                if (this.selectedOption != null)
+                {
+                    this.mappingConfigurationService.AddToExternalIdentifierMap(this.selectedOption.Iid,
+                        elementRowViewModel.Identifier, MappingDirection.FromDstToHub);
+                }
 
                 if (elementRowViewModel.ElementType == ElementType.CatPart
                     && elementRowViewModel is UsageRowViewModel usageRow
