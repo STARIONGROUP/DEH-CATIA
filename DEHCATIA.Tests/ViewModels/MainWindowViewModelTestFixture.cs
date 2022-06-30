@@ -52,6 +52,7 @@ namespace DEHCATIA.Tests.ViewModels
         private Mock<IDstController> dstController;
         private Mock<IDstNetChangePreviewViewModel> dstNetChangePreview;
         private Mock<IHubNetChangePreviewViewModel> hubNetChangePreview;
+        private Mock<IMappingViewModel> mappingViewModel;
 
         [SetUp]
         public void Setup()
@@ -64,10 +65,12 @@ namespace DEHCATIA.Tests.ViewModels
             this.dstController = new Mock<IDstController>();
             this.dstNetChangePreview = new Mock<IDstNetChangePreviewViewModel>();
             this.hubNetChangePreview = new Mock<IHubNetChangePreviewViewModel>();
+            this.mappingViewModel = new Mock<IMappingViewModel>();
 
             this.viewModel = new MainWindowViewModel(this.hubDataSourceViewModel.Object, this.dstSourceViewModel.Object,
                 this.statusBarViewModel.Object, this.navigationService.Object, this.transferControl.Object, this.dstController.Object,
-                this.hubNetChangePreview.Object, this.dstNetChangePreview.Object, new Mock<ICatiaTemplateService>().Object);
+                this.hubNetChangePreview.Object, this.dstNetChangePreview.Object, new Mock<ICatiaTemplateService>().Object,
+                this.mappingViewModel.Object);
         }
 
         [Test]
@@ -76,6 +79,7 @@ namespace DEHCATIA.Tests.ViewModels
             Assert.IsNotNull(this.viewModel.HubDataSourceViewModel);
             Assert.IsNotNull(this.viewModel.StatusBarControlViewModel);
             Assert.IsNull(this.viewModel.SwitchPanelBehavior);
+            Assert.IsNotNull(this.viewModel.MappingViewModel);
         }
 
         [Test]
