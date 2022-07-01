@@ -459,11 +459,11 @@ namespace DEHCATIA.Services.ParameterTypeService
                     else
                     {
                         this.logger.Info($"ParameterType {parameterTypeName} has been successfully created");
+                        textParameterType = task.Result;
                     }
                 }).Wait();
 
-            this.hubController.TryGetThingById(textParameterType.Iid, ClassKind.ParameterType, out ParameterType createdParameterType);
-            return createdParameterType;
+            return textParameterType;
         }
 
         /// <summary>
