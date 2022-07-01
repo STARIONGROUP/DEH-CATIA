@@ -63,12 +63,11 @@ namespace DEHCATIA.Tests.ViewModels
             this.dstController.Setup(x => x.DstMapResult).Returns(this.dstMapResult);
             this.viewModel = new MappingViewModel(this.dstController.Object);
         }
-
         [Test]
         public void VerifyDstMapResultObservables()
         {
             Assert.IsEmpty(this.viewModel.MappingRows);
-            
+
             var elementDefinition = new ElementDefinition()
             {
                 Iid = Guid.NewGuid(),
@@ -77,9 +76,20 @@ namespace DEHCATIA.Tests.ViewModels
 
             var catiaElement = new Mock<AnyObject>();
             catiaElement.Setup(x => x.get_Name()).Returns("key1.1");
-            var elementRow = new ElementRowViewModel(catiaElement.Object, "Loft");
 
-            this.dstMapResult.Add((elementRow, elementDefinition));
+            var elementRow = new ElementRowViewModel(catiaElement.Object, "Loft")
+            {
+                ElementDefinition = elementDefinition
+            };
+
+            var catiaElement2 = new Mock<AnyObject>();
+            catiaElement2.Setup(x => x.get_Name()).Returns("key1");
+            var parentRow = new ElementRowViewModel(catiaElement2.Object, "Loft");
+
+            elementRow.Parent = parentRow;
+            parentRow.Children.Add(elementRow);
+
+            this.dstMapResult.Add((parentRow, elementDefinition));
             Assert.AreEqual(1, this.viewModel.MappingRows.Count);
 
             var mappedRow = this.viewModel.MappingRows.First();
@@ -90,7 +100,7 @@ namespace DEHCATIA.Tests.ViewModels
             Assert.DoesNotThrow(() => this.viewModel.UpdateMappingRowsDirection(MappingDirection.FromDstToHub));
             Assert.DoesNotThrow(() => this.viewModel.UpdateMappingRowsDirection(MappingDirection.FromHubToDst));
             Assert.AreEqual(180, mappedRow.ArrowDirection);
-            this.dstMapResult.Add((elementRow, elementDefinition));
+            this.dstMapResult.Add((parentRow, elementDefinition));
             Assert.AreEqual(1, this.viewModel.MappingRows.Count);
             this.dstMapResult.Clear();
             Assert.IsEmpty(this.viewModel.MappingRows);
@@ -129,12 +139,12 @@ namespace DEHCATIA.Tests.ViewModels
             Assert.DoesNotThrow(() => this.viewModel.UpdateMappingRowsDirection(MappingDirection.FromDstToHub));
             Assert.DoesNotThrow(() => this.viewModel.UpdateMappingRowsDirection(MappingDirection.FromHubToDst));
             Assert.AreEqual(0, mappedRow.ArrowDirection);
-            
+
             this.hubMapResult.Add(mappedElementRowViewModel);
 
             Assert.AreEqual(1, this.viewModel.MappingRows.Count);
             this.hubMapResult.Clear();
             Assert.IsEmpty(this.viewModel.MappingRows);
         }
-    }
+    }    
 }

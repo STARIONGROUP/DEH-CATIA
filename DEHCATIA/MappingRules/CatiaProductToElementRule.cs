@@ -162,7 +162,7 @@ namespace DEHCATIA.MappingRules
                     this.MapElementRowViewModel(elementRowViewModel);
                     this.MapParameters(elementRowViewModel);
 
-                    if (elementRowViewModel.Parent is { } parent)
+                    if (elementRowViewModel.Parent is { ElementDefinition : not null } parent)
                     {
                         var elementUsage = this.GetOrCreateElementUsage(elementRowViewModel.ElementDefinition, elementRowViewModel.Name, parent.ElementDefinition);
                         this.MapParameters(elementUsage, elementRowViewModel);

@@ -306,16 +306,18 @@ namespace DEHCATIA.Services.MappingConfiguration
                     .GroupBy(x => x.ExternalIdentifier.Identifier))
             {
                 if (elementRowViewModels.FirstOrDefault(rowViewModel =>
-                    rowViewModel.Identifier.Equals(idCorrespondences.Key)) is not { } element)
+                    rowViewModel.Identifier.Equals(idCorrespondences.Key)) is { } element)
                 {
-                    continue;
+                    this.LoadsCorrespondances(element, idCorrespondences);
                 }
-
-                this.LoadsCorrespondances(element, idCorrespondences);
-
-                if (element.Children.Any())
+                
+                foreach (var elementRowViewModel in elementRowViewModels)
                 {
-                    this.MapElementsFromTheExternalIdentifierMapToHub(element.Children);
+                    if (elementRowViewModel.Children.Any())
+                    {
+                        this.MapElementsFromTheExternalIdentifierMapToHub(
+                            elementRowViewModel.Children.Where(x => idCorrespondences.Key.ToString().Contains(x.Identifier)).ToList());
+                    }
                 }
             }
 

@@ -112,7 +112,13 @@ namespace DEHCATIA.ViewModels
         /// <param name="mappedElement">The mapped <see cref="ElementRowViewModel"/> to the <see cref="ElementBase"/></param>
         private void UpdateMappedThings((ElementRowViewModel Parent, ElementBase Element) mappedElement)
         {
-            this.UpdateMappedThings(mappedElement.Parent, mappedElement.Element, MappingDirection.FromDstToHub);
+            var childElement = mappedElement.Parent.Children
+                .FirstOrDefault(x => x.ElementDefinition.Iid == mappedElement.Element.Iid);
+
+            if (childElement != null)
+            {
+                this.UpdateMappedThings(childElement, mappedElement.Element, MappingDirection.FromDstToHub);
+            }
         }
 
         /// <summary>
