@@ -462,8 +462,8 @@ namespace DEHCATIA.Services.ParameterTypeService
                     }
                 }).Wait();
 
-            this.hubController.TryGetThingById(textParameterType.Iid, ClassKind.ParameterType, out textParameterType);
-            return textParameterType;
+            this.hubController.TryGetThingById(textParameterType.Iid, ClassKind.ParameterType, out ParameterType createdParameterType);
+            return createdParameterType;
         }
 
         /// <summary>
