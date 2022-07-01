@@ -546,7 +546,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType FetchParameterType(string parameterTypeShortName)
         {
             if (this.parameterTypes?.FirstOrDefault(x =>
-                 x.ShortName == parameterTypeShortName) is { } parameterType)
+                 x.ShortName == parameterTypeShortName && !x.IsDeprecated) is { } parameterType)
             {
                 return parameterType;
             }
