@@ -68,7 +68,7 @@ namespace DEHCATIA.ViewModels.Rows
 
             this.HubThing = new MappedThing
             {
-                Name = elementBase.Name,
+                Name = elementBase.UserFriendlyName,
                 Identifier = elementBase.Iid.ToString()
             };
 

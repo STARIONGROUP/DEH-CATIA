@@ -308,7 +308,7 @@ namespace DEHCATIA.Tests.Services.MappingConfiguration
             Assert.IsNotNull(mappedVariables);
             Assert.AreEqual(2, mappedVariables.Count);
 
-            this.hubController.Verify(x => x.GetThingById(It.IsAny<Guid>(), It.IsAny<Iteration>(), out thing), Times.Exactly(6));
+            this.hubController.Verify(x => x.GetThingById(It.IsAny<Guid>(), It.IsAny<Iteration>(), out thing), Times.Exactly(9));
         }
 
         [Test]

@@ -39,6 +39,18 @@
         <behaviors:CloseWindowBehavior />
     </dxmvvm:Interaction.Behaviors>
     <dx:LoadingDecorator BorderEffect="Default" BorderEffectColor="Blue" IsSplashScreenShown="{Binding IsBusy}" OwnerLock="LoadingContent">
+        <dx:LoadingDecorator.SplashScreenWindowStyle>
+            <Style TargetType="Window">
+                <Setter Property="Topmost" Value="True"/>
+                <Setter Property="AllowsTransparency" Value="True"/>
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="WindowStyle" Value="None"/>
+                <Setter Property="Focusable" Value="False"/>
+                <Setter Property="ShowInTaskbar" Value="False"/>
+                <Setter Property="ShowActivated" Value="False"/>
+                <Setter Property="SizeToContent" Value="WidthAndHeight"/>
+            </Style>
+        </dx:LoadingDecorator.SplashScreenWindowStyle>
         <Grid Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />

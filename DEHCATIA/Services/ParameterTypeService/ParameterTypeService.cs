@@ -447,12 +447,10 @@ namespace DEHCATIA.Services.ParameterTypeService
             {
                 Name = parameterTypeName,
                 ShortName = parameterTypeName,
-                Symbol = parameterTypeName
+                Symbol = parameterTypeName,
             };
 
-            this.CreateParameterType(textParameterType);
-
-            return textParameterType;
+            return this.CreateParameterType(textParameterType);
         }
 
         /// <summary>
@@ -460,7 +458,8 @@ namespace DEHCATIA.Services.ParameterTypeService
         /// </summary>
         /// <typeparam name="TParameterType"></typeparam> The type of <see cref="ParameterType"/> to create
         /// <param name="parameterType">The <typeparamref name="TParameterType"/></param>
-        private void CreateParameterType<TParameterType>(TParameterType parameterType) where TParameterType : ParameterType
+        /// <returns>A <typeparamref name="TParameterType"/></returns>
+        private TParameterType CreateParameterType<TParameterType>(TParameterType parameterType) where TParameterType : ParameterType
         {
             Task.Run(async () => await this.CreateParameterTypeAsync(parameterType))
                 .ContinueWith(task =>
@@ -468,6 +467,7 @@ namespace DEHCATIA.Services.ParameterTypeService
                     if (!task.IsCompleted)
                     {
                         this.logger.Error($"Error during the creation of ParameterType {parameterType.Name} because {task.Exception}");
+                        parameterType = null;
                     }
                     else
                     {
@@ -475,6 +475,8 @@ namespace DEHCATIA.Services.ParameterTypeService
                         parameterType = task.Result;
                     }
                 }).Wait();
+
+            return parameterType;
         }
 
         /// <summary>

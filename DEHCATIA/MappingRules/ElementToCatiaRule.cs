@@ -506,8 +506,14 @@ namespace DEHCATIA.MappingRules
             var valueSet = this.GetParameterOrOverrideBase(mappedElementRowViewModel.HubElement, this.parameterTypeService.Color)?
                 .QueryParameterBaseValueSet(mappedElementRowViewModel.CatiaElement.SelectedOption,
                     mappedElementRowViewModel.CatiaElement.SelectedActualFiniteState);
+            
+            if(valueSet == null)
+            {
+                return;
+            }
 
-            if (mappedElementRowViewModel.CatiaElement is UsageRowViewModel
+            if ((mappedElementRowViewModel.CatiaElement.ElementType == Enumerations.ElementType.CatProduct 
+                || mappedElementRowViewModel.CatiaElement.ElementType == Enumerations.ElementType.CatPart)
                     && this.TryConvertToColor(valueSet.ActualValue.FirstOrDefault(), out var color))
             {
                 mappedElementRowViewModel.CatiaElement.Color = color;
@@ -606,7 +612,9 @@ namespace DEHCATIA.MappingRules
                         }
                     }
                 }
-                else if(mappedElementRowViewModel.CatiaElement is UsageRowViewModel && valueSet.ActualValue.Count == 2)
+                else if((mappedElementRowViewModel.CatiaElement.ElementType == ElementType.CatProduct
+                                || mappedElementRowViewModel.CatiaElement.ElementType == ElementType.CatPart)
+                            && valueSet.ActualValue.Count == 2)
                 {
                     mappedElementRowViewModel.CatiaElement.MaterialName = this.GetPairsOfElementNameValue(valueSet).FirstOrDefault().value;
                 }

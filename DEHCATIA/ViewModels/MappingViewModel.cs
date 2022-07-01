@@ -113,7 +113,7 @@ namespace DEHCATIA.ViewModels
         private void UpdateMappedThings((ElementRowViewModel Parent, ElementBase Element) mappedElement)
         {
             var childElement = mappedElement.Parent.Children
-                .FirstOrDefault(x => x.ElementDefinition.Iid == mappedElement.Element.Iid);
+                .FirstOrDefault(x => x.ElementDefinition?.Iid == mappedElement.Element?.Iid);
 
             if (childElement != null)
             {
