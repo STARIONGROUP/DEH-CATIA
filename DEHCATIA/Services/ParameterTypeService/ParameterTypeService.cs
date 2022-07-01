@@ -29,6 +29,8 @@ namespace DEHCATIA.Services.ParameterTypeService
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
@@ -447,7 +449,21 @@ namespace DEHCATIA.Services.ParameterTypeService
                 ShortName = parameterTypeName
             };
 
-            return this.CreateParameterType(textParameterType).GetAwaiter().GetResult();
+            Task.Run(async () => await this.CreateParameterType(textParameterType))
+                .ContinueWith(task =>
+                {
+                    if (!task.IsCompleted)
+                    {
+                        this.logger.Error($"Error during the creation of ParameterType {parameterTypeName} because {task.Exception}");
+                    }
+                    else
+                    {
+                        this.logger.Info($"ParameterType {parameterTypeName} has been successfully created");
+                    }
+                }).Wait();
+
+            this.hubController.TryGetThingById(textParameterType.Iid, ClassKind.ParameterType, out textParameterType);
+            return textParameterType;
         }
 
         /// <summary>
