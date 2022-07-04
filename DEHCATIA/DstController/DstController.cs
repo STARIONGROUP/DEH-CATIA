@@ -202,7 +202,7 @@ namespace DEHCATIA.DstController
         /// <param name="navigationService">The <see cref="INavigationService"/></param>
         /// <param name="mappingConfigurationService">The <see cref="IMappingConfigurationService"/></param>
         public DstController(ICatiaComService catiaComService, IStatusBarControlViewModel statusBar,
-            IMappingEngine mappingEngine, IExchangeHistoryService exchangeHistory, 
+            IMappingEngine mappingEngine, IExchangeHistoryService exchangeHistory,
             IHubController hubController, INavigationService navigationService,
             IMappingConfigurationService mappingConfigurationService)
         {
@@ -215,7 +215,15 @@ namespace DEHCATIA.DstController
             this.hubController = hubController;
 
             this.WhenAnyValue(x => x.catiaComService.IsCatiaConnected)
-                .Subscribe(x => this.IsCatiaConnected = x);
+                .Subscribe(x =>
+                {
+                    this.IsCatiaConnected = x;
+                    this.ClearMapping();
+                });
+
+            this.WhenAnyValue(x => x.hubController.OpenIteration)
+                .Where(x => x == null)
+                .Subscribe(_ => this.ClearMapping());
 
             this.WhenAnyValue(x => x.ReadyToMapDstTopElement)
                 .Where(x => x != null)
@@ -236,11 +244,21 @@ namespace DEHCATIA.DstController
                     this.Map(this.readyToMapHubElements.ToList());
                     this.readyToMapHubElements.Clear();
                 });
-
-            CDPMessageBus.Current.Listen<SessionEvent>()
-                .Where(x => x.Status == SessionStatus.EndUpdate 
-                            && this.catiaComService.ActiveDocument != null)
+            CDPMessageBus.Current.Listen<HubSessionControlEvent>()
+                .Where(_ => this.catiaComService.ActiveDocument != null)
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.LoadMapping());
+        }
+
+        /// <summary>
+        /// Clears the map result collections
+        /// </summary>
+        private void ClearMapping()
+        {
+            this.DstMapResult.Clear();
+            this.HubMapResult.Clear();
+            this.SelectedDstMapResultToTransfer.Clear();
+            this.SelectedHubMapResultToTransfer.Clear();
         }
 
         /// <summary>

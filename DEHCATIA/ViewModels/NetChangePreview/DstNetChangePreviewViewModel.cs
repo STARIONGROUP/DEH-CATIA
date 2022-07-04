@@ -133,6 +133,10 @@ namespace DEHCATIA.ViewModels.NetChangePreview
 
             this.DeselectAllCommand = ReactiveCommand.Create();
             this.DeselectAllCommand.Subscribe(_ => this.SelectDeselectAllForTransfer(false));
+
+            this.WhenAnyValue(vm => vm.DstController.IsCatiaConnected)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.RunUpdateProductTree());
         }
 
         /// <summary>

@@ -39,6 +39,18 @@
         <behaviors:CloseWindowBehavior />
     </dxmvvm:Interaction.Behaviors>
     <dx:LoadingDecorator BorderEffect="Default" BorderEffectColor="Blue" IsSplashScreenShown="{Binding IsBusy}" OwnerLock="LoadingContent">
+        <dx:LoadingDecorator.SplashScreenWindowStyle>
+            <Style TargetType="Window">
+                <Setter Property="Topmost" Value="True"/>
+                <Setter Property="AllowsTransparency" Value="True"/>
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="WindowStyle" Value="None"/>
+                <Setter Property="Focusable" Value="False"/>
+                <Setter Property="ShowInTaskbar" Value="False"/>
+                <Setter Property="ShowActivated" Value="False"/>
+                <Setter Property="SizeToContent" Value="WidthAndHeight"/>
+            </Style>
+        </dx:LoadingDecorator.SplashScreenWindowStyle>
         <Grid Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -236,7 +248,7 @@
                                     <Label Grid.Row="1" Grid.Column="0" Content="Element Definition:" />
                                     <dxe:ComboBoxEdit Grid.Row="1" Grid.Column="1" Margin="2" AllowNullInput="True" AutoComplete="True" ClearSelectionOnBackspace="True" DisplayMember="ShortName"
                                                       ItemsSource="{Binding AvailableElementDefinitions}"
-                                                      NullText="Create New Element Definition" NullValueButtonPlacement="EditBox"
+                                                      NullText="Select an Element Definition" NullValueButtonPlacement="EditBox"
                                                       SelectedItem="{Binding SelectedThing.ElementDefinition, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                       ShowNullTextForEmptyValue="True" ToolTip="Select an ElementDefinition to be mapped with the top element of the selected tree" ValidateOnTextInput="False" ValueMember="Name">
                                         <dxe:ComboBoxEdit.ItemTemplate>

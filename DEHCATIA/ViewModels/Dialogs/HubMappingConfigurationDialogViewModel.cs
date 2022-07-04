@@ -225,6 +225,8 @@ namespace DEHCATIA.ViewModels.Dialogs
             {
                 this.AddOrUpdateMappedElements( usageRowViewModel.Thing);
             }
+
+            this.SelectedDstElement = null;
         }
 
         /// <summary>
