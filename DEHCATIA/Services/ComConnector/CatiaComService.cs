@@ -362,7 +362,7 @@ namespace DEHCATIA.Services.ComConnector
             var element = new DefinitionRowViewModel(referenceProduct, fileName);
             this.GetElementProperties(referenceProduct, element, parent);
             this.ReadFilePart(fileName, element);
-            this.catDefinitionCache.Add(fileName, element);
+            this.catDefinitionCache[fileName] = element;
             return element;
         }
 

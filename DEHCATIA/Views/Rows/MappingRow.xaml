@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:converters="clr-namespace:DEHPCommon.Converters;assembly=DEHPCommon"
              mc:Ignorable="d" HorizontalAlignment="Stretch"
              d:DesignHeight="50" d:DesignWidth="300">
     <Grid HorizontalAlignment="Stretch">
@@ -16,16 +15,13 @@
             <Grid  Background="AliceBlue">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Height="Auto" Margin="3" FontSize="10" FontWeight="Normal" Text="Element: " />
-                <TextBlock Grid.Row="0" Grid.Column="1" Height="Auto" Margin="3" FontSize="10" TextTrimming="CharacterEllipsis" Text="{Binding HubThing.Name}"/>
-                <TextBlock Grid.Row="1" Grid.Column="0" Height="Auto" Margin="3" FontSize="10" FontWeight="Bold" Text="Value: " />
-                <TextBlock Grid.Row="1" Grid.Column="1" Height="Auto" Margin="3" FontSize="10" FontWeight="Bold" Text="{Binding  HubThing.Value}" TextTrimming="CharacterEllipsis" />
+                <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Height="Auto" Margin="3" FontSize="10" FontWeight="Normal" Text="Element: " />
+                <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Height="Auto" Margin="3" FontSize="10" TextTrimming="CharacterEllipsis" Text="{Binding HubThing.Name}"/>
             </Grid>
         </Border>
         <Path Grid.Column="1" Stretch="Fill" Fill="SlateGray"
@@ -46,13 +42,10 @@
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <TextBlock Height="Auto" Margin="3" FontSize="10" FontWeight="Normal" Text="Element: " />
-                <TextBlock Grid.Row="0" Grid.Column="1" Height="Auto" Margin="3" FontSize="10" Text="{Binding DstThing.Name}" TextTrimming="CharacterEllipsis" />
-                <TextBlock Grid.Column="0" Grid.Row="1"  Height="Auto" Margin="3" FontSize="10" FontWeight="Bold" Text="Value: " />
-                <TextBlock Grid.Row="1" Grid.Column="1" Height="Auto" Margin="3" FontSize="10" FontWeight="Bold" Text="{Binding DstThing.Value}" TextTrimming="CharacterEllipsis" />
-            </Grid>
+                <TextBlock Height="Auto" VerticalAlignment="Center" Margin="3" FontSize="10" FontWeight="Normal" Text="Element: " />
+                <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Height="Auto" Margin="3" FontSize="10" Text="{Binding DstThing.Name}" TextTrimming="CharacterEllipsis" />
+               </Grid>
         </Border>
     </Grid>
 </UserControl>

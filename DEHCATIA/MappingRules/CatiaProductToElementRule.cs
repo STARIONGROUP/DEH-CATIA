@@ -43,6 +43,7 @@ namespace DEHCATIA.MappingRules
     using DEHCATIA.ViewModels.ProductTree.Rows;
 
     using DEHPCommon;
+    using DEHPCommon.Enumerators;
     using DEHPCommon.HubController.Interfaces;
     using DEHPCommon.MappingRules.Core;
 
@@ -133,6 +134,18 @@ namespace DEHCATIA.MappingRules
                 this.selectedActualFiniteState ??= elementRowViewModel.SelectedActualFiniteState;
                 this.selectedOption ??= elementRowViewModel.SelectedOption;
 
+                if (this.selectedActualFiniteState != null)
+                {
+                    this.mappingConfigurationService.AddToExternalIdentifierMap(this.selectedActualFiniteState.Iid,
+                        elementRowViewModel.Identifier, MappingDirection.FromDstToHub);
+                }
+
+                if (this.selectedOption != null)
+                {
+                    this.mappingConfigurationService.AddToExternalIdentifierMap(this.selectedOption.Iid,
+                        elementRowViewModel.Identifier, MappingDirection.FromDstToHub);
+                }
+
                 if (elementRowViewModel.ElementType == ElementType.CatPart
                     && elementRowViewModel is UsageRowViewModel usageRow
                     && usageRow.Children.FirstOrDefault() is DefinitionRowViewModel definitionRow)
@@ -141,7 +154,12 @@ namespace DEHCATIA.MappingRules
                     this.MapElementUsage(usageRow);
                     this.MapParameters(usageRow);
                     this.mappingConfigurationService.AddToExternalIdentifierMap(usageRow);
-                    this.ruleOutput.Add((usageRow.Parent, usageRow.ElementDefinition));
+
+                    if (!this.ruleOutput.Any(x => x.Element.Iid == usageRow.ElementDefinition.Iid))
+                    {
+                        this.ruleOutput.Add((usageRow.Parent, usageRow.ElementDefinition));
+                    }
+
                     this.ruleOutput.Add((usageRow.Parent, usageRow.ElementUsage));
                 }
                 else
@@ -149,7 +167,7 @@ namespace DEHCATIA.MappingRules
                     this.MapElementRowViewModel(elementRowViewModel);
                     this.MapParameters(elementRowViewModel);
 
-                    if (elementRowViewModel.Parent is { } parent)
+                    if (elementRowViewModel.Parent is { ElementDefinition : not null } parent)
                     {
                         var elementUsage = this.GetOrCreateElementUsage(elementRowViewModel.ElementDefinition, elementRowViewModel.Name, parent.ElementDefinition);
                         this.MapParameters(elementUsage, elementRowViewModel);
@@ -255,11 +273,14 @@ namespace DEHCATIA.MappingRules
         /// <returns>An <see cref="ElementUsage"/></returns>
         private ElementUsage GetOrCreateElementUsage(ElementDefinition elementDefinition, string name, ElementDefinition parent)
         {
-            var container = this.hubController.OpenIteration.Element
-                .FirstOrDefault(x => x.ShortName == parent?.ShortName);
-
+            var container = this.ruleOutput.Where(x => x.Element.Iid == parent.Iid)
+                    .Select(x => x.Element)
+                    .OfType<ElementDefinition>()
+                    .FirstOrDefault()
+                ?? this.hubController.OpenIteration.Element.FirstOrDefault(x => x.ShortName == parent?.ShortName)?.Clone(true);
+            
             var elementUsage = container?.ContainedElement
-                .FirstOrDefault(x => x.ShortName == name)?.Clone(true);
+                .FirstOrDefault(x => x.ShortName == name);
 
             if (elementUsage is null)
             {
@@ -790,7 +811,8 @@ namespace DEHCATIA.MappingRules
             {
                 if (this.selectedOption != null)
                 {
-                    option = this.selectedOption;
+                    option = parameter.ValueSets.Where(x => x.ActualOption.Iid == this.selectedOption.Iid).Select(x => x.ActualOption).FirstOrDefault() ?? 
+                        this.hubController.OpenIteration.Option.FirstOrDefault();
                 }
                 else
                 {
@@ -806,10 +828,12 @@ namespace DEHCATIA.MappingRules
                     Logger.Warn($"Unable to update the state dependent parameter {parameter.ModelCode()} with the actual finite state {this.selectedActualFiniteState} selected");
                     return;
                 }
+
+                actualFiniteState = parameter.ValueSets.Where(x => x.ActualState.Iid == this.selectedActualFiniteState.Iid)
+                    .Select(x => x.ActualState).FirstOrDefault() ??
+                    parameter.StateDependence.ActualState.FirstOrDefault();
             }
-            
-            actualFiniteState = this.selectedActualFiniteState;
-            
+                        
             var valueSet = parameter.QueryParameterBaseValueSet(option, actualFiniteState);
 
             ((ParameterValueSetBase)valueSet).Computed = new ValueArray<string>(values);

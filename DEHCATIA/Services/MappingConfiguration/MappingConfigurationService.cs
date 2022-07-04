@@ -245,11 +245,11 @@ namespace DEHCATIA.Services.MappingConfiguration
                     {
                         mappedElement.HubElement = elementBase;
                     }
-                    else if (hubElement is Option option && mappedElement.HubElement.HasAnyDependencyOnOption())
+                    else if (hubElement is Option option)
                     {
                         Application.Current.Dispatcher.Invoke(() => mappedElement.CatiaElement.SelectedOption = option);
                     }
-                    else if (hubElement is ActualFiniteState actualFiniteState && mappedElement.HubElement.HasAnyDependencyOnActualFiniteState(actualFiniteState))
+                    else if (hubElement is ActualFiniteState actualFiniteState)
                     {
                         Application.Current.Dispatcher.Invoke(() => mappedElement.CatiaElement.SelectedActualFiniteState = actualFiniteState);
                     }
@@ -306,16 +306,18 @@ namespace DEHCATIA.Services.MappingConfiguration
                     .GroupBy(x => x.ExternalIdentifier.Identifier))
             {
                 if (elementRowViewModels.FirstOrDefault(rowViewModel =>
-                    rowViewModel.Identifier.Equals(idCorrespondences.Key)) is not { } element)
+                    rowViewModel.Identifier.Equals(idCorrespondences.Key)) is { } element)
                 {
-                    continue;
+                    this.LoadsCorrespondances(element, idCorrespondences);
                 }
-
-                this.LoadsCorrespondances(element, idCorrespondences);
-
-                if (element.Children.Any())
+                
+                foreach (var elementRowViewModel in elementRowViewModels)
                 {
-                    this.MapElementsFromTheExternalIdentifierMapToHub(element.Children);
+                    if (elementRowViewModel.Children.Any())
+                    {
+                        this.MapElementsFromTheExternalIdentifierMapToHub(
+                            elementRowViewModel.Children.Where(x => idCorrespondences.Key.ToString().Contains(x.Identifier)).ToList());
+                    }
                 }
             }
 
@@ -339,9 +341,8 @@ namespace DEHCATIA.Services.MappingConfiguration
                 Action action = thing switch
                 {
                     ElementDefinition elementDefinition => () => element.ElementDefinition = elementDefinition.Clone(true),
-                    ElementUsage elementUsage when element is UsageRowViewModel usageRow => () => usageRow.ElementUsage = elementUsage.Clone(true),
-                    Option option => () => element.SelectedOption = option.Clone(false),
-                    ActualFiniteState state => () => element.SelectedActualFiniteState = state.Clone(false),
+                    Option option => () => element.SelectedOption = option,
+                    ActualFiniteState state => () => element.SelectedActualFiniteState = state,
                     _ => null
                 };
 

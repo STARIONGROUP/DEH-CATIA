@@ -209,7 +209,9 @@ namespace DEHCATIA.ViewModels.Rows
                 }
                 else
                 {
-                    if (element is UsageRowViewModel && this.HubElement is ElementUsage
+                    if (element != null && 
+                        ((element.ElementType == Enumerations.ElementType.CatProduct || element.ElementType == Enumerations.ElementType.CatPart) 
+                            && this.HubElement is ElementUsage)
                         || element is DefinitionRowViewModel && this.HubElement is ElementDefinition)
                     {
                         this.CatiaParent = null;

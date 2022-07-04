@@ -29,6 +29,8 @@ namespace DEHCATIA.Services.ParameterTypeService
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
@@ -444,10 +446,11 @@ namespace DEHCATIA.Services.ParameterTypeService
             var textParameterType = new TextParameterType(Guid.NewGuid(), null, null)
             {
                 Name = parameterTypeName,
-                ShortName = parameterTypeName
+                ShortName = parameterTypeName,
+                Symbol = parameterTypeName,
             };
 
-            return this.CreateParameterType(textParameterType).GetAwaiter().GetResult();
+            return this.CreateParameterType(textParameterType);
         }
 
         /// <summary>
@@ -456,7 +459,33 @@ namespace DEHCATIA.Services.ParameterTypeService
         /// <typeparam name="TParameterType"></typeparam> The type of <see cref="ParameterType"/> to create
         /// <param name="parameterType">The <typeparamref name="TParameterType"/></param>
         /// <returns>A <typeparamref name="TParameterType"/></returns>
-        private async Task<TParameterType> CreateParameterType<TParameterType>(TParameterType parameterType) where TParameterType : ParameterType
+        private TParameterType CreateParameterType<TParameterType>(TParameterType parameterType) where TParameterType : ParameterType
+        {
+            Task.Run(async () => await this.CreateParameterTypeAsync(parameterType))
+                .ContinueWith(task =>
+                {
+                    if (!task.IsCompleted)
+                    {
+                        this.logger.Error($"Error during the creation of ParameterType {parameterType.Name} because {task.Exception}");
+                        parameterType = null;
+                    }
+                    else
+                    {
+                        this.logger.Info($"ParameterType {parameterType.Name} has been successfully created");
+                        parameterType = task.Result;
+                    }
+                }).Wait();
+
+            return parameterType;
+        }
+
+        /// <summary>
+        /// Creates a <typeparamref name="TParameterType"/>
+        /// </summary>
+        /// <typeparam name="TParameterType"></typeparam> The type of <see cref="ParameterType"/> to create
+        /// <param name="parameterType">The <typeparamref name="TParameterType"/></param>
+        /// <returns>A <typeparamref name="TParameterType"/></returns>
+        private async Task<TParameterType> CreateParameterTypeAsync<TParameterType>(TParameterType parameterType) where TParameterType : ParameterType
         {
             var referenceDataLibrary = this.hubController.GetDehpOrModelReferenceDataLibrary();
             var clonedReferenceDataLibrary = referenceDataLibrary.Clone(false);
@@ -530,7 +559,7 @@ namespace DEHCATIA.Services.ParameterTypeService
         private ParameterType FetchParameterType(string parameterTypeShortName)
         {
             if (this.parameterTypes?.FirstOrDefault(x =>
-                 x.ShortName == parameterTypeShortName) is { } parameterType)
+                 x.ShortName == parameterTypeShortName && !x.IsDeprecated) is { } parameterType)
             {
                 return parameterType;
             }

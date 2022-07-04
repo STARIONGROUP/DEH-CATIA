@@ -61,6 +61,44 @@ namespace DEHCATIA.ViewModels
         private readonly IDstController dstController;
 
         /// <summary>
+        /// Initializes a new <see cref="MainWindowViewModel"/>
+        /// </summary>
+        /// <param name="hubDataSourceViewModel">A <see cref="IHubDataSourceViewModel"/></param>
+        /// <param name="dstSourceViewModel">A <see cref="IDstDataSourceViewModel"/></param>/// 
+        /// <param name="statusBarControlViewModel">The <see cref="IStatusBarControlViewModel"/></param>
+        /// <param name="navigationService">The <see cref="INavigationService"/></param>
+        /// <param name="transferControlViewModel">The <see cref="ITransferControlViewModel"/></param>
+        /// <param name="dstController">The <see cref="IDstController"/></param>
+        /// <param name="hubNetChangePreviewViewModel">The <see cref="IHubNetChangePreviewViewModel"/></param>
+        /// <param name="dstNetChangePreviewViewModel">The <see cref="IDstNetChangePreviewViewModel"/></param>
+        /// <param name="templateService">The <see cref="ICatiaTemplateService"/></param>
+        /// <param name="mappingView">The <see cref="IMappingViewModel"/></param>
+        public MainWindowViewModel(IHubDataSourceViewModel hubDataSourceViewModel, IDstDataSourceViewModel dstSourceViewModel,
+            IStatusBarControlViewModel statusBarControlViewModel, INavigationService navigationService,
+            ITransferControlViewModel transferControlViewModel, IDstController dstController,
+            IHubNetChangePreviewViewModel hubNetChangePreviewViewModel, IDstNetChangePreviewViewModel dstNetChangePreviewViewModel,
+            ICatiaTemplateService templateService, IMappingViewModel mappingView)
+        {
+            this.navigationService = navigationService;
+            this.TransferControlViewModel = transferControlViewModel;
+            this.dstController = dstController;
+            this.HubDataSourceViewModel = hubDataSourceViewModel;
+            this.DstSourceViewModel = dstSourceViewModel;
+            this.StatusBarControlViewModel = statusBarControlViewModel;
+            this.HubNetChangePreviewViewModel = hubNetChangePreviewViewModel;
+            this.DstNetChangePreviewViewModel = dstNetChangePreviewViewModel;
+            this.MappingViewModel = mappingView;
+
+            var areTemplateReadyMessage = templateService.AreAllTemplatesAvailable()
+                ? $"All templates are ready."
+                : $"Some template files are missing.";
+
+            this.StatusBarControlViewModel.Append($"Welcome to the DEH Catia adapter! {areTemplateReadyMessage}");
+
+            this.InitializeCommands();
+        }
+
+        /// <summary>
         /// Gets the <see cref="ITransferControlViewModel"/>
         /// </summary>
         public ITransferControlViewModel TransferControlViewModel { get; }
@@ -96,6 +134,11 @@ namespace DEHCATIA.ViewModels
         public IStatusBarControlViewModel StatusBarControlViewModel { get; }
 
         /// <summary>
+        /// Gets the view model that represents the mapping view
+        /// </summary>
+        public IMappingViewModel MappingViewModel { get; }
+
+        /// <summary>
         /// Gets or sets the <see cref="ICommand"/> that will change the mapping direction
         /// </summary>
         public ReactiveCommand<object> ChangeMappingDirection { get; private set; }
@@ -114,42 +157,6 @@ namespace DEHCATIA.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.mappingDirection, value);
         }
 
-        /// <summary>
-        /// Initializes a new <see cref="MainWindowViewModel"/>
-        /// </summary>
-        /// <param name="hubDataSourceViewModel">A <see cref="IHubDataSourceViewModel"/></param>
-        /// <param name="dstSourceViewModel">A <see cref="IDstDataSourceViewModel"/></param>/// 
-        /// <param name="statusBarControlViewModel">The <see cref="IStatusBarControlViewModel"/></param>
-        /// <param name="navigationService">The <see cref="INavigationService"/></param>
-        /// <param name="transferControlViewModel">The <see cref="ITransferControlViewModel"/></param>
-        /// <param name="dstController">The <see cref="IDstController"/></param>
-        /// <param name="hubNetChangePreviewViewModel">The <see cref="IHubNetChangePreviewViewModel"/></param>
-        /// <param name="dstNetChangePreviewViewModel">The <see cref="IDstNetChangePreviewViewModel"/></param>
-        /// <param name="templateService">The <see cref="ICatiaTemplateService"/></param>
-        public MainWindowViewModel(IHubDataSourceViewModel hubDataSourceViewModel, IDstDataSourceViewModel dstSourceViewModel, 
-            IStatusBarControlViewModel statusBarControlViewModel, INavigationService navigationService,
-            ITransferControlViewModel transferControlViewModel, IDstController dstController, 
-            IHubNetChangePreviewViewModel hubNetChangePreviewViewModel, IDstNetChangePreviewViewModel dstNetChangePreviewViewModel,
-            ICatiaTemplateService templateService)
-        {
-            this.navigationService = navigationService;
-            this.TransferControlViewModel = transferControlViewModel;
-            this.dstController = dstController;
-            this.HubDataSourceViewModel = hubDataSourceViewModel;
-            this.DstSourceViewModel = dstSourceViewModel;
-            this.StatusBarControlViewModel = statusBarControlViewModel;
-            this.HubNetChangePreviewViewModel = hubNetChangePreviewViewModel;
-            this.DstNetChangePreviewViewModel = dstNetChangePreviewViewModel;
-
-            var areTemplateReadyMessage = templateService.AreAllTemplatesAvailable()
-                ? $"All templates are ready."
-                : $"Some template files are missing.";
-
-            this.StatusBarControlViewModel.Append($"Welcome to the DEH Catia adapter! {areTemplateReadyMessage}");
-
-            this.InitializeCommands();
-        }
-        
         /// <summary>
         /// Initializes this view model <see cref="ICommand"/>
         /// </summary>

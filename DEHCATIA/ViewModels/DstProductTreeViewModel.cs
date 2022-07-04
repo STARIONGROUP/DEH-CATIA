@@ -239,7 +239,7 @@ namespace DEHCATIA.ViewModels
         /// <summary>
         /// Runs the task that will update the product tree
         /// </summary>
-        private void RunUpdateProductTree()
+        protected void RunUpdateProductTree()
         {
             this.RootElements.Clear();
 
