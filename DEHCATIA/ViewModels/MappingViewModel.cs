@@ -82,8 +82,11 @@ namespace DEHCATIA.ViewModels
         /// </summary>
         private void InitializesObservables()
         {
-            this.dstController.DstMapResult.ItemsAdded.Subscribe(this.UpdateMappedThings);
-            this.dstController.HubMapResult.ItemsAdded.Subscribe(this.UpdateMappedThings);
+            this.dstController.DstMapResult.IsEmptyChanged.Where(x => !x)
+                .Subscribe(_ => this.UpdateMappedThings(MappingDirection.FromDstToHub));
+
+            this.dstController.HubMapResult.IsEmptyChanged.Where(x => !x)
+                .Subscribe(_ => this.UpdateMappedThings(MappingDirection.FromHubToDst));
 
             this.dstController.DstMapResult.IsEmptyChanged.Where(x => x).Subscribe(_ =>
                 this.MappingRows.RemoveAll(this.MappingRows
@@ -95,6 +98,28 @@ namespace DEHCATIA.ViewModels
 
             this.WhenAnyValue(x => x.dstController.MappingDirection)
                 .Subscribe(this.UpdateMappingRowsDirection);
+        }
+
+        /// <summary>
+        /// Updates the <see cref="MappingRows" />
+        /// </summary>
+        /// <param name="mappingDirection">The <see cref="MappingDirection"/></param>
+        private void UpdateMappedThings(MappingDirection mappingDirection)
+        {
+            if(mappingDirection == MappingDirection.FromDstToHub)
+            {
+                foreach (var mappedElement in this.dstController.DstMapResult)
+                {
+                    this.UpdateMappedThings(mappedElement);
+                }
+            }
+            else
+            {
+                foreach (var mappedElement in this.dstController.HubMapResult)
+                {
+                    this.UpdateMappedThings(mappedElement);
+                }
+            }
         }
 
         /// <summary>
